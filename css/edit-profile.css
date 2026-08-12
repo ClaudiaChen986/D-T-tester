@@ -1,0 +1,130 @@
+/* ============================================================================
+   归途 GuiTu — "Your profile (edit)" — personal info form (Figma node 2:552)
+   ----------------------------------------------------------------------------
+   Step 1 of the two-step "edit profile" flow: this page edits your own
+   contact details (email/address/phone/birthday); Save hands off to
+   edit-contacts.html (Figma node 2:688, already built before this pair)
+   for step 2, reordering your emergency contacts. Shares .stage/.screen,
+   tokens, and the .wordmark/.return/.header-title-centered helpers with
+   styles.css; only this page's own layout lives here.
+   ========================================================================== */
+
+.editprofile__content {
+  position: absolute;
+  left: 0;
+  top: 290px;
+  width: 390px;
+  height: 556px;
+  border-radius: 30px 30px 0 0;
+  background: #efefef;
+}
+
+.editprofile__avatar {
+  position: absolute;
+  left: 97px;
+  top: 129px;
+  width: 196px;
+  height: 196px;
+  border-radius: 50%;
+}
+
+/* ----------------------------------------------------------------- fields
+   Same icon-backdrop crop as profile.css's read-only view — kept as its
+   own copy here (rather than a shared class) since the two pages don't
+   share a stylesheet and this is the only rule either needs from it. */
+.editprofile__field {
+  position: absolute;
+  left: 46px;
+  top: var(--y);
+  width: 299px;
+  height: 66px;
+}
+.editprofile__field-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 66px;
+  height: 66px;
+  overflow: hidden;
+}
+.editprofile__field-icon .backdrop {
+  position: absolute;
+  left: -14.527px;
+  top: 0;
+  width: 94.974px;
+  height: 66px;
+  max-width: none;
+}
+.editprofile__field-icon .glyph {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 34px;
+  height: 34px;
+}
+
+.editprofile__field-label {
+  position: absolute;
+  left: 73px;
+  top: 10px;
+  width: 228px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  font-weight: 700;
+  color: #000;
+}
+.editprofile__field-label .t-en { font-family: var(--font-en); font-size: 18px; }
+.editprofile__field-label .sp   { font-size: 20px; }
+.editprofile__field-label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+
+.editprofile__field-input {
+  position: absolute;
+  left: 73px;
+  top: 32px;
+  width: 252px;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 0;
+  font-family: var(--font-en);
+  font-size: 16px;
+  color: #000;
+}
+.editprofile__field-input::placeholder {
+  font-family: var(--font-cn);
+  color: #8c8c8c;
+  letter-spacing: .05em;
+}
+.editprofile__field-input:focus { text-decoration: underline; text-decoration-color: #d7bb89; }
+
+.editprofile__lines {
+  position: absolute;
+  left: 43px;
+  top: 404px;
+  width: 304px;
+  height: 272px;
+  pointer-events: none;   /* decorative — was overlapping and swallowing clicks on the address/phone/birthday inputs below it in DOM order */
+}
+
+/* -------------------------------------------------------------------- save */
+.editprofile__save {
+  position: absolute;
+  left: 17px;
+  top: 763px;
+  width: 356px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  background: #154c52;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  color: #fff;
+  font-size: 0;
+  line-height: normal;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.editprofile__save:active { transform: scale(.98); }
+.editprofile__save .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.editprofile__save .t-cn { font-family: var(--font-cn); font-size: 20px; font-weight: 700; letter-spacing: 1px; }

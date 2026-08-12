@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — Your profile 您的个人资料</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/edit-profile.css">
+</head>
+<body>
+
+<div class="stage">
+<!-- ============================================================
+     profile（edit） - both  ·  390 × 844   (Figma node 2:552)
+     Step 1 of "edit profile" — step 2 is edit-contacts.html (node 2:688)
+     ============================================================ -->
+<div class="screen" id="screen">
+
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
+
+  <!-- ---------------------------------------------------------------- header -->
+  <header class="header">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="profile.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="Cancel, back to your profile 返回">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header-title-centered">
+      <span class="t-en">Your profile</span>
+      <span class="t-cn">您的个人资料</span>
+    </h1>
+  </header>
+
+  <!-- ------------------------------------------------------------- content -->
+  <form id="editProfileForm">
+
+    <div class="editprofile__content"></div>
+
+    <img class="editprofile__avatar" src="../assets/avatar-xl.svg" alt="">
+
+    <div class="editprofile__field" style="--y:332px">
+      <div class="editprofile__field-icon">
+        <img class="backdrop" src="../assets/icon-field-backdrop.png" alt="">
+        <img class="glyph" src="../assets/icon-mail.svg" alt="">
+      </div>
+      <p class="editprofile__field-label">
+        <span class="t-en">Email</span><span class="sp"> </span><span class="t-cn">电子邮件：</span>
+      </p>
+      <input class="editprofile__field-input" type="email" id="emailInput" name="email" autocomplete="off"
+             placeholder="Enter text here 请在此输入文本" aria-label="Email 电子邮件">
+    </div>
+
+    <div class="editprofile__field" style="--y:422px">
+      <div class="editprofile__field-icon">
+        <img class="backdrop" src="../assets/icon-field-backdrop.png" alt="">
+        <img class="glyph" src="../assets/icon-home-field.svg" alt="">
+      </div>
+      <p class="editprofile__field-label">
+        <span class="t-en">Address</span><span class="sp"> </span><span class="t-cn">住址：</span>
+      </p>
+      <input class="editprofile__field-input" type="text" id="addressInput" name="address" autocomplete="off"
+             placeholder="Enter text here 请在此输入文本" aria-label="Address 住址">
+    </div>
+
+    <div class="editprofile__field" style="--y:512px">
+      <div class="editprofile__field-icon">
+        <img class="backdrop" src="../assets/icon-field-backdrop.png" alt="">
+        <img class="glyph" src="../assets/icon-phone-field.svg" alt="">
+      </div>
+      <p class="editprofile__field-label">
+        <span class="t-en">Phone No.</span><span class="sp"> </span><span class="t-cn">电话号码：</span>
+      </p>
+      <input class="editprofile__field-input" type="tel" id="phoneInput" name="phone" autocomplete="off"
+             placeholder="Enter text here 在此输入文本" aria-label="Phone number 电话号码">
+    </div>
+
+    <div class="editprofile__field" style="--y:602px">
+      <div class="editprofile__field-icon">
+        <img class="backdrop" src="../assets/icon-field-backdrop.png" alt="">
+        <img class="glyph" src="../assets/icon-calendar.svg" alt="">
+      </div>
+      <p class="editprofile__field-label">
+        <span class="t-en">Birthday</span><span class="sp"> </span><span class="t-cn">生日：</span>
+      </p>
+      <input class="editprofile__field-input" type="text" id="birthdayInput" name="birthday" autocomplete="off"
+             placeholder="Enter text here 在此输入文本" aria-label="Birthday 生日">
+    </div>
+
+    <img class="editprofile__lines" src="../assets/edit-profile-lines.svg" alt="">
+
+    <button class="editprofile__save" id="saveBtn" type="submit">
+      <span class="t-en">Save&nbsp;</span><span class="t-cn">保存</span>
+    </button>
+
+  </form>
+
+</div>
+</div>
+
+<script src="../js/edit-profile.js"></script>
+</body>
+</html>

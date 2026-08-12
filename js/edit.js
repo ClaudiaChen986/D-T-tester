@@ -1,6 +1,11 @@
 /* ============================================================================
    归途 GuiTu — "Your profile": drag to rearrange emergency contacts
    ----------------------------------------------------------------------------
+   Step 2 (final) of the "edit profile" flow — step 1 is edit-profile.html
+   (node 2:552), which edits your personal-info fields and hands off here
+   for contact order; this page's own Save returns to profile.html (node
+   2:544), where both are now reflected.
+
    Layout constants below are literal Figma pixel values (node 2:688):
      row 1 (Son) top = 300px, row 2 (Daughter) top = 394px — a 94px step.
      The dashed "top 3" frame (22,288,346×287) hugs those three rows with a
@@ -37,7 +42,6 @@
   var list       = document.getElementById('crowlist');
   var frame      = document.getElementById('top3frame');
   var saveBtn    = document.getElementById('saveBtn');
-  var toast      = document.getElementById('toast');
   var statusLine = document.getElementById('reorderStatus');
 
   var nodes = {};   // id -> <li>
@@ -182,14 +186,15 @@
 
   function announce(text) { statusLine.textContent = text; }
 
-  /* ------------------------------------------------------------------ save */
-  var toastTimer;
+  /* ------------------------------------------------------------------ save
+     Step 2 (final) of the "edit profile" flow that starts at
+     edit-profile.html: that page's own Save already persisted the
+     personal-info fields and handed off here for the contact order. This
+     Save persists the order and returns to profile.html, where both are
+     now reflected. */
   saveBtn.addEventListener('click', function () {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-    toast.textContent = 'Saved 已保存';
-    toast.classList.add('is-visible');
     announce('Contact order saved.');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toast.classList.remove('is-visible'); }, 1800);
+    window.location.href = 'profile.html';
   });
 }());

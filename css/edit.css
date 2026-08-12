@@ -158,27 +158,8 @@
 .save .sp   { font-size: 20px; }
 .save .t-cn { font-family: var(--font-cn); font-size: 20px; font-weight: 700; letter-spacing: 1px; }
 
-.toast {
-  position: absolute;
-  left: 50%;
-  bottom: 92px;
-  transform: translate(-50%, 8px);
-  padding: 10px 20px;
-  border-radius: 20px;
-  background: rgba(21, 76, 82, .95);
-  color: #fff;
-  font-family: var(--font-en);
-  font-size: 15px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .2s ease, transform .2s ease;
-}
-.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
-
 @media (prefers-reduced-motion: reduce) {
   .top3frame,
   .crow,
-  .save,
-  .toast { transition: none; }
+  .save { transition: none; }
 }

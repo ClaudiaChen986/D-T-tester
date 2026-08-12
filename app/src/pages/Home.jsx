@@ -12,6 +12,8 @@ const WAVE_BARS = 12;
 export default function Home() {
   const stageRef = useStageScale();
   const voiceBtnRef = useRef(null);
+  const sheetRef = useRef(null);
+  const handleRef = useRef(null);
 
   const [isListening, setIsListening] = useState(false);
   const [sheetExpanded, setSheetExpanded] = useState(false);
@@ -66,6 +68,123 @@ export default function Home() {
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [sheetExpanded]);
+
+  /* Drag anywhere on the card frame to open/close it; the arrow stays the
+     only *tap*-to-toggle target (its own click listener below). Plain
+     native DOM listeners rather than React's synthetic pointer props: the
+     drag needs to write `sheet.style.transform` on every pointermove
+     without going through a re-render, and — critically — pointer capture
+     has to be deferred until real movement is detected, not taken
+     eagerly on pointerdown. Capturing eagerly was tried first and broke
+     every button and tel: link inside the sheet (nav pills, call
+     buttons): Chrome silently drops the `click` that would normally
+     follow a plain tap's pointerup once an *ancestor* holds capture, even
+     though only pointermove/pointerup are documented as being
+     re-targeted. Deferring capture to "this is a real drag now" means a
+     plain tap never triggers it, so every descendant's native click (and
+     React's synthetic ones, which ride on the same native event) keeps
+     working exactly as if this listener weren't here.
+
+     Same --scale-compensation pattern as the static prototype's app.js —
+     pointer deltas arrive in real screen pixels, but the sheet's travel
+     (--sheet-offset) is expressed in the unscaled 390×844 design space. */
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    const handle = handleRef.current;
+    const stage = stageRef.current;
+    if (!sheet || !handle || !stage) return undefined;
+
+    const sheetOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sheet-offset')) || 540;
+    const DRAG_THRESHOLD = 4;
+    let drag = null;
+    let justDragged = false;
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function currentTranslateY() { return sheet.dataset.state === 'expanded' ? -sheetOffset : 0; }
+
+    function onPointerDown(e) {
+      if (e.button != null && e.button !== 0) return;
+      drag = {
+        pointerId: e.pointerId,
+        startClientY: e.clientY,
+        startY: currentTranslateY(),
+        scale: parseFloat(getComputedStyle(stage).getPropertyValue('--scale')) || 1,
+        moved: false,
+      };
+    }
+
+    function onPointerMove(e) {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const deltaScreen = e.clientY - drag.startClientY;
+      if (!drag.moved) {
+        if (Math.abs(deltaScreen) <= DRAG_THRESHOLD) return;
+        drag.moved = true;
+        sheet.classList.add('is-dragging');
+        try { sheet.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      }
+      const y = clamp(drag.startY + deltaScreen / drag.scale, -sheetOffset, 0);
+      sheet.style.transform = `translateY(${y}px)`;
+    }
+
+    function endDrag(e) {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      const deltaScreen = e.clientY - drag.startClientY;
+      const endY = clamp(drag.startY + deltaScreen / drag.scale, -sheetOffset, 0);
+      const moved = drag.moved;
+      const wasExpanded = drag.startY !== 0;
+      // Threshold is a fraction of the travel *from wherever the drag
+      // started*, not of the absolute position — so closing takes the
+      // same amount of drag as opening.
+      const draggedFraction = Math.abs(endY - drag.startY) / sheetOffset;
+
+      if (moved) {
+        sheet.classList.remove('is-dragging');
+        sheet.style.transform = '';
+        try { sheet.releasePointerCapture(drag.pointerId); } catch (err) { /* ignore */ }
+      }
+      drag = null;
+
+      if (moved) {
+        // A drag ending back over the arrow can still produce a trailing
+        // `click` there; this suppresses the double-toggle that would
+        // cause. Not guaranteed to fire at all though, so it can't wait
+        // indefinitely for that click to consume it — it has to expire
+        // on its own almost immediately, or it sits there and silently
+        // eats the *next*, unrelated tap on the arrow instead.
+        justDragged = true;
+        setTimeout(() => { justDragged = false; }, 0);
+        setSheetExpanded(draggedFraction > 0.25 ? !wasExpanded : wasExpanded);
+      }
+    }
+
+    function onPointerCancel(e) {
+      if (!drag || e.pointerId !== drag.pointerId) return;
+      if (drag.moved) {
+        sheet.classList.remove('is-dragging');
+        sheet.style.transform = '';
+      }
+      drag = null;
+    }
+
+    function onHandleClick() {
+      if (justDragged) { justDragged = false; return; }
+      setSheetExpanded((prev) => !prev);
+    }
+
+    sheet.addEventListener('pointerdown', onPointerDown);
+    sheet.addEventListener('pointermove', onPointerMove);
+    sheet.addEventListener('pointerup', endDrag);
+    sheet.addEventListener('pointercancel', onPointerCancel);
+    handle.addEventListener('click', onHandleClick);
+
+    return () => {
+      sheet.removeEventListener('pointerdown', onPointerDown);
+      sheet.removeEventListener('pointermove', onPointerMove);
+      sheet.removeEventListener('pointerup', endDrag);
+      sheet.removeEventListener('pointercancel', onPointerCancel);
+      handle.removeEventListener('click', onHandleClick);
+    };
+  }, [stageRef]);
 
   return (
     <div className="app-center">
@@ -182,7 +301,7 @@ export default function Home() {
         </span>
       </button>
 
-      <div className="sheet" data-state={sheetExpanded ? 'expanded' : 'collapsed'}>
+      <div className="sheet" ref={sheetRef} data-state={sheetExpanded ? 'expanded' : 'collapsed'}>
         <img className="sheet__bg" src="/assets/sheet-bg.svg" alt="" />
 
         <button className="navbtn navbtn--calls" type="button" onClick={() => setSheetExpanded(true)}>
@@ -246,12 +365,12 @@ export default function Home() {
         </div>
 
         <button
+          ref={handleRef}
           className="sheet__handle"
           type="button"
           aria-controls="sheet"
           aria-expanded={sheetExpanded}
           aria-label={sheetExpanded ? 'Collapse contacts' : 'Expand contacts'}
-          onClick={() => setSheetExpanded((prev) => !prev)}
         >
           <img src="/assets/sheet-handle-arrow.svg" alt="" />
         </button>

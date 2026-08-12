@@ -343,8 +343,17 @@ body {
   width: 390px;
   height: 685px;
   transition: transform .38s cubic-bezier(.22, .61, .36, 1);
+  cursor: grab;
+  touch-action: none;   /* the whole frame is a drag target, not just the arrow */
 }
 .sheet[data-state="expanded"] { transform: translateY(calc(-1 * var(--sheet-offset))); }
+
+/* Dragging sets an inline transform every pointermove — the CSS transition
+   would fight that (each move competing with a .38s easing toward the
+   previous move's target), so it's switched off for the duration and
+   handed back to the class-driven transform on release, which is what
+   actually produces the snap-open/snap-closed animation. */
+.sheet.is-dragging { transition: none; cursor: grabbing; }
 
 .sheet__bg    { position: absolute; left: 0;   top: 0;        width: 390px; height: 685px; }
 .sheet__panel { position: absolute; left: 23px; top: 139.549px; width: 345px; height: 512.349px; }
@@ -442,11 +451,17 @@ body {
 }
 .row__call--sos .row__call-glyph {
   position: absolute;
+  /* `inset` is a shorthand for all four offsets — it has to come first,
+     or it would zero out the left/top set right below it and the glyph
+     would land at its static (top-left) position instead, which is
+     exactly what was happening here: right/bottom need to be auto (so
+     the explicit width/height below aren't fighting the 50px circle's
+     inset:0 from .row__call > img), but left/top must stay put. */
+  inset: auto;
   left: 10.5px;                    /* 292.5 − 282 within the 50px circle */
   top: 11.25px;                    /* 1247.25 − 1236                     */
   width: 28px;
   height: 29px;
-  inset: auto;
 }
 
 /* handle + medallion */
@@ -459,8 +474,9 @@ body {
   padding: 0;
   border: 0;
   background: none;
-  cursor: pointer;
+  cursor: inherit;   /* grab/grabbing — set on .sheet, which owns the drag now */
 }
+
 .sheet__handle > img {
   position: absolute;
   left: 26px;
@@ -471,6 +487,18 @@ body {
 }
 .sheet[data-state="expanded"] .sheet__handle > img { transform: rotate(180deg); }
 
+/* Idle "swipe me" hint: the arrow bobs up and down while the card is
+   collapsed, and stops the instant a drag actually starts (own rule below)
+   so it never fights the finger/pointer for control of the same transform. */
+@keyframes handle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.sheet[data-state="collapsed"] .sheet__handle > img {
+  animation: handle-bounce 1.8s ease-in-out infinite;
+}
+.sheet.is-dragging .sheet__handle > img { animation: none; }
+
 .sheet__medallion { z-index: 1; }
 
 /* --------------------------------------------------- reduced-motion opt-out */
@@ -480,4 +508,5 @@ body {
   .row__call,
   .sheet,
   .sheet__handle > img { transition: none; }
+  .sheet__handle > img { animation: none; }
 }

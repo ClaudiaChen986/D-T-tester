@@ -3,224 +3,91 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>归途 GuiTu — Home 首页</title>
+<title>归途 GuiTu — Choose your language 选择你的语言</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
 <link rel="stylesheet" href="css/styles.css">
-<link rel="stylesheet" href="css/soundwave.css">
+<link rel="stylesheet" href="css/language.css">
 </head>
 <body>
 
 <div class="stage">
 <!-- ============================================================
-     home - both  ·  390 × 844   (Figma node 2:40)
+     index - language choice  ·  390 × 844   (Figma node 1:5)
+     The true entry point — every session starts here, before Home.
      ============================================================ -->
 <div class="screen" id="screen">
 
-  <!-- background texture -->
+  <!-- background texture (identical asset/crop to the other screens) -->
   <div class="bg-texture"><img src="assets/background-texture.png" alt=""></div>
 
   <!-- ---------------------------------------------------------- header -->
-  <header class="header">
-    <img class="header__bg" src="assets/header.svg" alt="">
+  <header class="langheader">
+    <img class="langheader__bg" src="assets/header-lang.svg" alt="">
 
-    <div class="header__logo"><img src="assets/logo-sprite.png" alt="归途 GuiTu"></div>
+    <div class="langheader__logo">
+      <img src="assets/logo-sprite.png" alt="归途 GuiTu">
+    </div>
 
-    <h1 class="header__title">
-      <span class="t-en">Home&nbsp;</span><span class="t-cn">首页</span>
+    <h1 class="header-title-centered header-title-centered--lang">
+      <span class="t-en">Choose your language</span>
+      <span class="t-cn">选择你的语言</span>
     </h1>
-
-    <p class="header__welcome">
-      <span class="t-en">Welcome, XXX!</span>
-      <span class="t-cn">欢迎，XXX!</span>
-    </p>
   </header>
 
-  <!-- wordmark: 归途 GuiTu — individually rotated glyphs -->
-  <div class="wordmark" aria-hidden="true">
-    <span style="--x:25px;--y:156.487px;--w:26.275px;--h:32.899px"><i style="--r:13.64deg">归</i></span>
-    <span style="--x:47.48px;--y:160.88px;--w:23.925px;--h:31.552px"><i style="--r:8.19deg">途</i></span>
-    <span style="--x:74.16px;--y:164.143px;--w:15.44px;--h:29.225px"><i style="--r:0.87deg">G</i></span>
-    <span style="--x:88.594px;--y:163.472px;--w:15.687px;--h:29.776px"><i style="--r:-3.38deg">u</i></span>
-    <span style="--x:103.65px;--y:161.694px;--w:10.368px;--h:29.623px"><i style="--r:-6.77deg">i</i></span>
-    <span style="--x:110.941px;--y:155.9px;--w:21.326px;--h:31.707px"><i style="--r:-15.7deg">T</i></span>
-    <span style="--x:122.962px;--y:152px;--w:23.015px;--h:32.031px"><i style="--r:-19.85deg">u</i></span>
-  </div>
+  <!-- ---------------------------------------------------------- language options
+       All three crop the same icon-language.png sprite (English glyph /
+       Chinese glyph / both, white-outline row) at a different column —
+       see css/language.css for why the icon window itself is fixed and
+       only --ix/--iy/--iw/--ih move. -->
 
-  <!-- ---------------------------------------------------------- 2 × 2 tiles -->
-  <button class="tile" style="--x:24px;--y:224px" type="button">
-    <img class="tile__bg" src="assets/tile-bg.svg" alt="">
-    <span class="crop tile__icon" style="--x:22px;--y:14px;--s:56px">
-      <img src="assets/icon-translation.png" alt=""
-           style="--iw:190.47px;--ih:139.66px;--ix:-64.97px;--iy:-76.21px">
+  <a class="langbtn" href="pages/home.html?lang=cn" style="--y:312px" data-lang="cn">
+    <img class="langbtn__bg" src="assets/lang-button-bg.svg" alt="">
+    <span class="langbtn__icon">
+      <img src="assets/icon-language.png" alt=""
+           style="--ix:-126.517px;--iy:-125.276px;--iw:348.706px;--ih:242.256px">
     </span>
-    <span class="chevron" style="--x:105.419px;--y:25.589px;--s:34.823px">
+    <p class="langbtn__label" style="--y:51px;--w:128px">
+      <span class="t-cn">只有中文</span>
+    </p>
+    <span class="chevron" style="--x:299.5px;--y:50px;--s:36px">
       <img src="assets/icon-chevron.svg" alt="">
-    </span>
-    <span class="tile__label" style="--x:14px;--y:71px;--w:139px">
-      <span class="t-en">Translation</span>
-      <span class="t-cn">翻译</span>
-    </span>
-  </button>
-
-  <a class="tile" style="--x:202px;--y:224px" href="pages/contacts.html">
-    <img class="tile__bg" src="assets/tile-bg.svg" alt="">
-    <span class="crop tile__icon" style="--x:19px;--y:15px;--s:54.169px">
-      <img src="assets/icon-contacts.png" alt=""
-           style="--iw:187.96px;--ih:130.62px;--ix:-68.93px;--iy:-6.47px">
-    </span>
-    <span class="chevron" style="--x:103.527px;--y:24.673px;--s:34.823px">
-      <img src="assets/icon-chevron.svg" alt="">
-    </span>
-    <span class="tile__label" style="--x:19.886px;--y:69.084px;--w:129.123px">
-      <span class="t-en">Contacts</span>
-      <span class="t-cn">联系人</span>
     </span>
   </a>
 
-  <button class="tile" style="--x:24px;--y:394px" type="button">
-    <img class="tile__bg" src="assets/tile-bg.svg" alt="">
-    <span class="crop tile__icon" style="--x:21px;--y:17px;--s:53.7px">
-      <img src="assets/icon-nav-other.png" alt=""
-           style="--iw:197px;--ih:136.9px;--ix:-138.4px;--iy:-12.4px">
+  <a class="langbtn" href="pages/home.html?lang=both" style="--y:487px" data-lang="both">
+    <img class="langbtn__bg" src="assets/lang-button-bg.svg" alt="">
+    <span class="langbtn__icon">
+      <img src="assets/icon-language.png" alt=""
+           style="--ix:-239.019px;--iy:-128.331px;--iw:348.706px;--ih:242.256px">
     </span>
-    <span class="chevron" style="--x:103.521px;--y:26.739px;--s:34.521px">
+    <p class="langbtn__label" style="--y:24px;--w:166.746px">
+      <span class="t-en">English &amp; Chinese</span>
+      <span class="t-cn">中英双语</span>
+    </p>
+    <span class="chevron" style="--x:299.5px;--y:50px;--s:36px">
       <img src="assets/icon-chevron.svg" alt="">
     </span>
-    <span class="tile__label" style="--x:14px;--y:68px;--w:139px">
-      <span class="t-en">Navigation</span>
-      <span class="t-cn">导航</span>
-    </span>
-  </button>
+  </a>
 
-  <button class="tile" style="--x:202px;--y:394px" type="button">
-    <img class="tile__bg" src="assets/tile-bg.svg" alt="">
-    <span class="crop tile__icon" style="--x:22px;--y:17px;--s:53.7px">
-      <img src="assets/icon-nav-other.png" alt=""
-           style="--iw:197px;--ih:136.9px;--ix:-78.36px;--iy:-72.82px">
+  <a class="langbtn" href="pages/home.html?lang=en" style="--y:662px" data-lang="en">
+    <img class="langbtn__bg" src="assets/lang-button-bg.svg" alt="">
+    <span class="langbtn__icon">
+      <img src="assets/icon-language.png" alt=""
+           style="--ix:-8.432px;--iy:-124.328px;--iw:349.166px;--ih:242.62px">
     </span>
-    <span class="chevron" style="--x:109.038px;--y:23.739px;--s:34.521px">
+    <p class="langbtn__label" style="--y:53px;--w:152px">
+      <span class="t-en">Only English</span>
+    </p>
+    <span class="chevron" style="--x:299.5px;--y:50px;--s:36px">
       <img src="assets/icon-chevron.svg" alt="">
     </span>
-    <span class="tile__label" style="--x:19px;--y:68px;--w:129px">
-      <span class="t-en">Other</span>
-      <span class="t-cn">其他</span>
-    </span>
-  </button>
+  </a>
 
-  <!-- ---------------------------------------------------------- voice assistant (press & hold) -->
-  <button class="voice" id="voiceBtn" type="button" aria-pressed="false"
-          aria-label="Voice assistant 语音助手 — press and hold to speak">
-    <img class="voice__bg" src="assets/voice-assistant-card.svg" alt="">
-    <img class="voice__ring" src="assets/mic-ring.svg" alt="">
-    <span class="crop voice__micbg" style="--x:32.241px;--y:29.239px;--s:79.884px">
-      <img src="assets/mic-button-bg.png" alt=""
-           style="--iw:114.95px;--ih:79.884px;--ix:-17.58px;--iy:0px">
-    </span>
-    <img class="voice__mic" src="assets/icon-mic.svg" alt="">
-    <span class="voice__title">
-      <span class="t-en">Voice assistant</span>
-      <span class="t-cn">语音助手</span>
-    </span>
-    <span class="voice__hint" id="voiceHint">
-      <span class="t-en">press to speak</span><span class="sp"> </span><span class="t-cn">按住说话</span>
-    </span>
-  </button>
-
-  <!-- ---------------------------------------------------------- slide up card -->
-  <div class="sheet" id="sheet" data-state="collapsed">
-    <img class="sheet__bg" src="assets/sheet-bg.svg" alt="">
-
-    <button class="navbtn navbtn--calls" type="button" data-action="open-contacts">
-      <img class="navbtn__icon" src="assets/icon-phone.svg" alt=""
-           style="--x:15.256px;--y:11.322px;--w:34.662px;--h:35.294px">
-      <span class="navbtn__label" style="--x:51px;--y:5.773px;--w:51px">
-        <span class="t-en">Calls</span>
-        <span class="t-cn">电话</span>
-      </span>
-    </button>
-
-    <a class="navbtn navbtn--profile" href="pages/edit-contacts.html">
-      <img class="navbtn__icon" src="assets/icon-profile.svg" alt=""
-           style="--x:14px;--y:10.185px;--w:32px;--h:37.251px">
-      <span class="navbtn__label" style="--x:50px;--y:5.773px;--w:60px">
-        <span class="t-en">Profile</span>
-        <span class="t-cn">个人</span>
-      </span>
-    </a>
-
-    <img class="sheet__panel" src="assets/sheet-panel.svg" alt="">
-
-    <!-- contact rows -->
-    <div class="row" style="--y:194px">
-      <img class="row__bg" src="assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="assets/avatar.svg" alt="" style="--y:26px">
-      <span class="row__text" style="--y:26px">
-        <span class="t-en">Son (David)</span>
-        <span class="t-cn">儿子（大卫）</span>
-        <span class="t-num">0412 345 678</span>
-      </span>
-      <a class="row__call" href="tel:0412345678" style="--y:36px" aria-label="Call Son (David)">
-        <img src="assets/call-btn.svg" alt="">
-      </a>
-    </div>
-
-    <div class="row" style="--y:343px">
-      <img class="row__bg" src="assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="assets/avatar.svg" alt="" style="--y:24px">
-      <span class="row__text" style="--y:24px">
-        <span class="t-en">Daughter (Lily)</span>
-        <span class="t-cn">女儿（莉莉）</span>
-        <span class="t-num">0423 456 789</span>
-      </span>
-      <a class="row__call" href="tel:0423456789" style="--y:34px" aria-label="Call Daughter (Lily)">
-        <img src="assets/call-btn.svg" alt="">
-      </a>
-    </div>
-
-    <div class="row row--emergency" style="--y:492px">
-      <img class="row__bg" src="assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="assets/emergency-ellipse.svg" alt="" style="--y:24px">
-      <img class="row__warn" src="assets/emergency-triangle.svg" alt="">
-      <span class="row__warn-mark" aria-hidden="true">！</span>
-      <span class="row__text" style="--y:24px">
-        <span class="t-en">Emergency</span>
-        <span class="t-cn">紧急联络</span>
-        <span class="t-num">000</span>
-      </span>
-      <a class="row__call row__call--sos" href="tel:000" style="--y:34px" aria-label="Call emergency 000">
-        <img src="assets/call-btn-plain.svg" alt="">
-        <img class="row__call-glyph" src="assets/icon-phone-white.svg" alt="">
-      </a>
-    </div>
-
-    <button class="sheet__handle" id="sheetHandle" type="button"
-            aria-controls="sheet" aria-expanded="false" aria-label="Expand contacts">
-      <img src="assets/sheet-handle-arrow.svg" alt="">
-    </button>
-
-    <span class="crop sheet__medallion" style="--x:156px;--y:7px;--w:78.179px;--h:79.817px">
-      <img src="assets/logo-sprite.png" alt=""
-           style="--iw:292.75px;--ih:203.45px;--ix:-110.95px;--iy:-107.65px">
-    </span>
-  </div>
-
-  <!-- ---------------------------------------------------------- listening overlay (node 276:649) -->
-  <div class="listening" id="listening" aria-hidden="true">
-    <div class="listening__scrim"></div>
-    <div class="wave" id="wave">
-      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
-      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
-      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
-      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
-    </div>
-  </div>
-
-  <p class="sr-only" role="status" id="status"></p>
 </div>
 </div>
 
-<script src="js/app.js"></script>
+<script src="js/language.js"></script>
 </body>
 </html>

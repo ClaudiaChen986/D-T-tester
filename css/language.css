@@ -1,0 +1,117 @@
+/* ============================================================================
+   归途 GuiTu — "Choose your language" (Figma node 1:5)
+   ----------------------------------------------------------------------------
+   The true entry point: every session starts here, before Home. Shares
+   .stage/.screen, tokens, and the .crop/.chevron helpers with styles.css;
+   only this page's own layout lives here.
+
+   The header is a taller variant of the shared header shape (390×276 vs
+   209.144px elsewhere) — same gradient/curve, scaled up in Figma to make
+   room for the title sitting below the logo instead of beside it, so it's
+   its own asset (header-lang.svg) rather than a stretched reuse of
+   header.svg (stretching a fixed-viewBox, non-uniform curve would distort
+   it, not just resize it).
+   ========================================================================== */
+
+.langheader {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 390px;
+  height: 276px;
+}
+.langheader__bg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 276px;
+}
+
+.langheader__logo {
+  position: absolute;
+  left: 133px;
+  top: 38px;
+  width: 124px;
+  height: 130px;
+  overflow: hidden;
+}
+.langheader__logo > img {
+  position: absolute;
+  left: -161.51px;
+  top: -153.41px;
+  width: 439.03px;
+  height: 306.215px;
+  max-width: none;
+}
+
+.header-title-centered--lang { top: 173px; }
+
+/* ------------------------------------------------------------- lang buttons
+   Structurally the same idea as the home screen's .tile (bg art + a crop
+   window onto a shared icon sprite + a label + a chevron), just taller and
+   full-width instead of a 2×2 grid — same reason the 90°-rotated .chevron
+   helper is reused as-is below rather than reinvented. */
+.langbtn {
+  display: block;
+  position: absolute;
+  left: 36px;
+  top: var(--y);
+  width: 317px;
+  height: 135px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.langbtn__bg {
+  position: absolute;
+  left: -4px;
+  top: -7px;
+  width: 325px;
+  height: 149px;
+  max-width: none;
+}
+
+/* icon-language.png is a 3×2 sprite (English / Chinese / both, in a plain
+   and a dark-outline variant); every button crops the same top row, just a
+   different column — same fixed window each time, so unlike .crop
+   elsewhere this doesn't need --x/--y on the wrapper too, only --ix/--iy/
+   --iw/--ih on the image for which part of the sprite shows through. */
+.langbtn__icon {
+  position: absolute;
+  left: 9.861px;
+  top: 20.141px;
+  width: 95.718px;
+  height: 95.718px;
+  overflow: hidden;
+}
+.langbtn__icon > img {
+  position: absolute;
+  left: var(--ix);
+  top: var(--iy);
+  width: var(--iw);
+  height: var(--ih);
+  max-width: none;
+}
+
+/* Label top/width vary per button — not export noise, an actual centering
+   difference: buttons 1 and 3 hold one line of text, button 2 holds two,
+   so each is vertically centered around a different height within the
+   same 135px button. --y/--w come from each instance below, matching the
+   --x/--y convention .row__text and .tile__label already use for the
+   same reason (per-instance placement, shared rule for everything else). */
+.langbtn__label {
+  position: absolute;
+  left: 115px;
+  top: var(--y);
+  width: var(--w);
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.langbtn__label .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 400; }
+.langbtn__label .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 400; letter-spacing: 1.1px; }
+.langbtn__label > span { display: block; }
+
+/* The arrow itself is the shared .chevron helper (see styles.css) — same
+   fixed local position in every button, so it's set directly in the
+   markup via --x/--y/--s rather than duplicated here. */

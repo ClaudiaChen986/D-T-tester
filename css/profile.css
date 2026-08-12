@@ -1,0 +1,147 @@
+/* ============================================================================
+   归途 GuiTu — "Your profile" view (Figma node 2:544)
+   ----------------------------------------------------------------------------
+   Shares .stage/.screen, tokens, and the .crop/.wordmark/.return/
+   .header-title-centered helpers with styles.css; only this page's own
+   layout lives here. Header, return button, background texture, bottom
+   nav bar and its logo crop, and the avatar placeholder are all pixel-
+   identical assets to ones other pages already use (confirmed by
+   comparing exported bytes against the Figma output), so nothing new was
+   added for those — only the four field icons, the icon backdrop circle,
+   the edit-pencil button, and the dashed separator lines are new.
+   ========================================================================== */
+
+.profileview__content {
+  position: absolute;
+  left: 37px;
+  top: 227px;
+  width: 317px;
+  height: 520px;
+  border-radius: 20px;
+  background: #edd8b4;
+}
+
+.profileview__avatar {
+  position: absolute;
+  left: 97px;
+  top: 129px;
+  width: 196px;
+  height: 196px;
+  border-radius: 50%;
+}
+
+/* ------------------------------------------------------------------- edit */
+.profileview__edit {
+  position: absolute;
+  left: 241px;
+  top: 251px;
+  width: 63px;
+  height: 63px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.profileview__edit-bg { position: absolute; inset: 0; width: 63px; height: 63px; }
+.profileview__edit-icon {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+}
+.profileview__edit:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; border-radius: 50%; }
+
+/* ----------------------------------------------------------------- fields
+   Each row: a cropped window onto icon-field-backdrop.png (a hand-drawn
+   red ring, wider than tall, so it's clipped the same way on every row —
+   see .profileview__field-icon > .backdrop) with the row's own glyph
+   centered on top, plus a bold bilingual label and its value underneath. */
+.profileview__field {
+  position: absolute;
+  left: 46px;
+  top: var(--y);
+  width: 299px;
+  height: 66px;
+}
+.profileview__field-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 66px;
+  height: 66px;
+  overflow: hidden;
+}
+.profileview__field-icon .backdrop {
+  position: absolute;
+  left: -14.527px;
+  top: 0;
+  width: 94.974px;
+  height: 66px;
+  max-width: none;
+}
+.profileview__field-icon .glyph {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 34px;
+  height: 34px;
+}
+
+.profileview__field-text {
+  position: absolute;
+  left: 71px;
+  top: 10px;
+  width: 228px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.profileview__field-text .label { display: block; font-weight: 700; }
+.profileview__field-text .label .t-en { font-family: var(--font-en); font-size: 18px; }
+.profileview__field-text .label .sp   { font-size: 20px; }
+.profileview__field-text .label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+.profileview__field-text .value {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-en);
+  font-size: 18px;
+  color: #000;
+}
+
+.profileview__lines {
+  position: absolute;
+  left: 50px;
+  top: 404px;
+  width: 290px;
+  height: 272px;
+  pointer-events: none;   /* purely decorative, same reasoning as edit-profile.css */
+}
+
+/* -------------------------------------------------------------- back bar
+   Same asset and geometry as contacts.html's .backbar, just position:
+   absolute (this page is a fixed 390×844 .stage/.screen, not a real
+   scrolling document like contacts.html) instead of position: relative. */
+.profilebar {
+  position: absolute;
+  left: 0;
+  top: 712px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.profilebar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.profilebar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.profilebar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.profilebar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
