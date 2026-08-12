@@ -88,12 +88,12 @@
      saved yet, so a fresh install shows exactly what used to be
      hardcoded here (Son, Daughter, Emergency, in that order).
 
-     Alex and Harry don't have a phone number on file anywhere in this
-     prototype (contacts.html's own seed data leaves theirs blank too),
-     so if a reorder promotes one into the top 3, its call button renders
-     disabled instead of linking a fake tel:. They don't have a real photo
-     either, so they fall back to the same generic avatar.svg placeholder
-     Son and Daughter use — no `avatar` override below, same as those two.
+     Every contact's call button links to calling.html, whether or not it
+     has a real phone number on file — this is a prototype, so there's
+     nothing a phone number unlocks that a made-up one wouldn't (calling.js
+     never even reads it). Alex and Harry don't have a real photo either,
+     so they fall back to the same generic avatar.svg placeholder Son and
+     Daughter use — no `avatar` override below, same as those two.
 
      Row 1 sits fractionally lower in Figma than rows 2–3 (26/26/36 vs
      24/24/34 for avatar/text/call-button --y) — an export quirk of the
@@ -134,13 +134,10 @@
   function personRowHtml(id, slot) {
     var c = CONTACTS[id];
     var numHtml = c.phone ? '<span class="t-num">' + formatAuPhone(c.phone) + '</span>' : '';
-    var callHtml = c.phone
-      ? '<a class="row__call" href="calling.html" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
-          '<img src="../assets/call-btn.svg" alt="">' +
-        '</a>'
-      : '<span class="row__call" aria-hidden="true" style="--y:' + slot.callY + 'px">' +
-          '<img src="../assets/call-btn.svg" alt="">' +
-        '</span>';
+    var callHtml =
+      '<a class="row__call" href="calling.html" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
+        '<img src="../assets/call-btn.svg" alt="">' +
+      '</a>';
     return (
       '<div class="row" style="--y:' + slot.y + 'px">' +
         '<img class="row__bg" src="../assets/contact-row.svg" alt="">' +

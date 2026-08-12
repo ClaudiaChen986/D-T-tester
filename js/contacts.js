@@ -82,17 +82,17 @@
      of stashing the target directly on the link, the link just carries an
      index into this in-memory list and a delegated click handler (below)
      looks the real contact up out of it right before the browser follows
-     the href. */
+     the href. Every card gets a working call button, even seed contacts
+     with no phone on file (Grandsons, every Friend) — this is a
+     prototype, so there's nothing a phone number unlocks that calling.js
+     needs (it never reads it). */
   var CALL_TARGETS = [];
 
   function callButtonHtml(contact) {
     var icon = '<img src="../assets/icon-call-white.svg" alt="">';
-    if (contact.phone) {
-      var index = CALL_TARGETS.push(contact) - 1;
-      return '<a class="card__call" href="calling.html" data-call-index="' + index + '" ' +
-             'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
-    }
-    return '<span class="card__call" aria-hidden="true">' + icon + '</span>';
+    var index = CALL_TARGETS.push(contact) - 1;
+    return '<a class="card__call" href="calling.html" data-call-index="' + index + '" ' +
+           'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
   }
 
   function cardHtml(contact) {

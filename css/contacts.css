@@ -131,8 +131,6 @@
   cursor: pointer;
 }
 .card__call img { width: 24px; height: 25px; }
-.card__call[href] { cursor: pointer; }
-span.card__call { cursor: default; opacity: .55; }
 
 .card__name {
   margin-top: 14px;

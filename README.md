@@ -169,13 +169,34 @@ red/cream background swap, both taken directly from Figma's own two states
 for each button — see node `7:470`, a 9-variant component covering all
 three toggle combinations) with no real audio routing, microphone, or
 location sharing behind them — consistent with the rest of this
-prototype's "the interaction is real, the backend isn't" posture (the
-keypad is likewise visual-only, no DTMF or typed-digits display). Hung up
+prototype's "the interaction is real, the backend isn't" posture. Hung up
 ends the call via `history.back()`, returning to wherever the call was
 placed from, since it can legitimately be either `home.html` or
 `contacts.html`. This is also the one screen in the whole app with no
 `.return` arrow at all — there's deliberately no way out except hanging up,
 matching a real in-call screen.
+
+The cream button panel is draggable: Figma's own layer tree names it
+"Slide up card" and it's a literal instance of the *same* component
+`home.html`'s slide-up card uses (confirmed via `get_metadata` — same
+handle, same base frame), so it drags too, revealing the decorative keypad
+stacked underneath it (also visual-only, no DTMF or typed-digits display).
+Unlike home's card, there's no separate collapsed state to leave it in —
+Hung up has to stay reachable, and the panel is tall enough that fully
+collapsing it would carry Hung up off-screen — so this is a bounded
+rubber-band peek (`js/calling.js`) rather than a real toggle: drag down to
+preview the keypad, let go, it always springs back. Same deferred
+pointer-capture trick as the home sheet (capture only engages once real
+movement crosses a threshold) so a plain tap on Speaker/Mute/Location/Hung
+up — all of them descendants of the same draggable panel — keeps working
+untouched.
+
+Every contact's call button is a working link to this page, including
+ones with no phone number on file anywhere in this prototype (both
+Grandsons, every seed Friend) — this is a click-through prototype, so
+there's nothing a phone number unlocks that calling.js needs (it never
+reads one). Earlier these rendered as a disabled, dimmed `<span>` instead
+of an `<a>`; that state is gone now, along with the CSS that styled it.
 
 Nearly every supporting asset here turned out to already exist elsewhere in
 the app — the background texture, and (surprisingly) even the hangup

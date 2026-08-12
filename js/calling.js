@@ -72,6 +72,65 @@
   wireToggle('muteBtn', 'muteIcon', '../assets/icon-call-mute-off.svg', '../assets/icon-call-mute-on.svg');
   wireToggle('locationBtn', 'locationIcon', '../assets/icon-call-location-off.svg', '../assets/icon-call-location-on.svg');
 
+  /* ------------------------------------------------ call panel: peek drag
+     Same deferred-pointer-capture drag as home.html's slide-up card (see
+     js/app.js) — capture is only taken once real movement crosses the
+     threshold, so a plain tap on Speaker/Mute/Location/Hung up (all
+     descendants of the panel, which is the whole drag target, same as
+     the home sheet) keeps working untouched. Unlike that card, this one
+     always springs back on release: the keypad is decorative and Hung up
+     has to stay reachable, so there's no persisted "collapsed" resting
+     state to drag to, only a bounded peek. PEEK_MAX (320px) is just past
+     the keypad's lowest row (0), so a full drag reveals every key. */
+  var callpanel = document.querySelector('.callpanel');
+  var PEEK_MAX = 320;
+  var DRAG_THRESHOLD = 4;
+  var panelDrag = null;
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  callpanel.addEventListener('pointerdown', function (e) {
+    if (e.button != null && e.button !== 0) return;
+    panelDrag = {
+      pointerId: e.pointerId,
+      startClientY: e.clientY,
+      scale: parseFloat(getComputedStyle(stage).getPropertyValue('--scale')) || 1,
+      moved: false,
+    };
+  });
+
+  callpanel.addEventListener('pointermove', function (e) {
+    if (!panelDrag || e.pointerId !== panelDrag.pointerId) return;
+    var deltaScreen = e.clientY - panelDrag.startClientY;
+    if (!panelDrag.moved) {
+      if (Math.abs(deltaScreen) <= DRAG_THRESHOLD) return;
+      panelDrag.moved = true;
+      callpanel.classList.add('is-dragging');
+      try { callpanel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    }
+    var y = clamp(deltaScreen / panelDrag.scale, 0, PEEK_MAX);
+    callpanel.style.transform = 'translateY(' + y + 'px)';
+  });
+
+  function endPanelDrag(e) {
+    if (!panelDrag || e.pointerId !== panelDrag.pointerId) return;
+    if (panelDrag.moved) {
+      callpanel.classList.remove('is-dragging');
+      callpanel.style.transform = '';
+      try { callpanel.releasePointerCapture(panelDrag.pointerId); } catch (err) { /* ignore */ }
+    }
+    panelDrag = null;
+  }
+  callpanel.addEventListener('pointerup', endPanelDrag);
+  callpanel.addEventListener('pointercancel', function (e) {
+    if (!panelDrag || e.pointerId !== panelDrag.pointerId) return;
+    if (panelDrag.moved) {
+      callpanel.classList.remove('is-dragging');
+      callpanel.style.transform = '';
+    }
+    panelDrag = null;
+  });
+
   /* -------------------------------------------------------------- hang up */
   document.getElementById('hangupBtn').addEventListener('click', function () {
     if (window.history.length > 1) {
