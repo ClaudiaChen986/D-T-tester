@@ -52,7 +52,12 @@
 
     <div class="editprofile__content"></div>
 
-    <img class="editprofile__avatar" src="../assets/avatar-xl.svg" alt="">
+    <img class="editprofile__avatar" id="avatarPreview" src="../assets/avatar-xl.svg" alt="">
+    <button class="editprofile__edit" type="button" id="choosePhotoBtn" aria-label="Choose photo 选择照片">
+      <img src="../assets/edit-ellipse.svg" alt="" class="editprofile__edit-bg">
+      <img src="../assets/icon-edit-pencil.svg" alt="" class="editprofile__edit-icon">
+    </button>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" hidden>
 
     <div class="editprofile__field" style="--y:332px">
       <div class="editprofile__field-icon">

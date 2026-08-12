@@ -9,6 +9,13 @@
    edit-contacts.html (node 2:688) for step 2, reordering emergency
    contacts; that page's own Save then returns to profile.html, where
    everything entered here is what gets displayed.
+
+   Choose photo → the OS photo/file picker → FileReader renders the chosen
+   image into the avatar circle immediately, same as add-contact.html's
+   picker (including its downscale-before-storing step: a raw phone photo
+   can be several MB, comfortably over localStorage's ~5MB quota once
+   base64-encoded, which is exactly what made saved photos vanish
+   silently elsewhere in this app before that fix — see add-contact.js).
    ========================================================================== */
 (function () {
   'use strict';
@@ -16,8 +23,11 @@
   var STORAGE_KEY = 'guitu.profile';
   var FIELDS = ['email', 'address', 'phone', 'birthday'];
 
-  var stage = document.querySelector('.stage');
-  var form = document.getElementById('editProfileForm');
+  var stage           = document.querySelector('.stage');
+  var form             = document.getElementById('editProfileForm');
+  var choosePhotoBtn   = document.getElementById('choosePhotoBtn');
+  var photoInput       = document.getElementById('photoInput');
+  var avatarPreview    = document.getElementById('avatarPreview');
 
   /* ---------------------------------------------------------------- scaling */
   function fit() {
@@ -41,16 +51,60 @@
   }
 
   var saved = loadProfile();
+  var photoDataUrl = saved.photo || null;
+  if (photoDataUrl) avatarPreview.src = photoDataUrl;
+
   FIELDS.forEach(function (field) {
     var input = document.getElementById(field + 'Input');
     if (input && saved[field]) input.value = saved[field];
+  });
+
+  /* ------------------------------------------------------- choose a photo
+     Avatar is only ever shown at up to 196px, so there's no reason to
+     store it at full camera resolution — downscale onto a canvas and
+     re-encode as a modest-quality JPEG first. */
+  var AVATAR_MAX_DIMENSION = 512;
+  var AVATAR_JPEG_QUALITY = 0.85;
+
+  function readAndResizeImage(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = function () { reject(reader.error); };
+      reader.onload = function () {
+        var img = new Image();
+        img.onerror = reject;
+        img.onload = function () {
+          var scale = Math.min(1, AVATAR_MAX_DIMENSION / Math.max(img.width, img.height));
+          var w = Math.max(1, Math.round(img.width * scale));
+          var h = Math.max(1, Math.round(img.height * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', AVATAR_JPEG_QUALITY));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  choosePhotoBtn.addEventListener('click', function () { photoInput.click(); });
+
+  photoInput.addEventListener('change', function () {
+    var file = photoInput.files && photoInput.files[0];
+    if (!file) return;
+    readAndResizeImage(file).then(function (dataUrl) {
+      photoDataUrl = dataUrl;
+      avatarPreview.src = photoDataUrl;
+    });
   });
 
   /* ------------------------------------------------------------------ save */
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    var profile = {};
+    var profile = { photo: photoDataUrl };
     FIELDS.forEach(function (field) {
       var input = document.getElementById(field + 'Input');
       profile[field] = input.value.trim();

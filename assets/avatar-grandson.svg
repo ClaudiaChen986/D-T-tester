@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 6">
+<g id="Ellipse 1" filter="url(#filter0_i_0_grandson)">
+<circle cx="35" cy="35" r="35" fill="#37848C"/>
+</g>
+<circle id="Ellipse 4" cx="34.9999" cy="22.4074" r="9.44444" fill="#154C52"/>
+<ellipse id="Ellipse 5" cx="35.1852" cy="47.7778" rx="20.7407" ry="12.5926" fill="#154C52"/>
+</g>
+<defs>
+<filter id="filter0_i_0_grandson" x="0" y="0" width="70" height="74" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_0_grandson"/>
+</filter>
+</defs>
+</svg>

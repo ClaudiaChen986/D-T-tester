@@ -41,6 +41,10 @@
       var el = document.getElementById(field + 'Value');
       if (el && profile[field]) el.textContent = profile[field];
     });
+    if (profile.photo) {
+      var avatar = document.getElementById('avatarImg');
+      if (avatar) avatar.src = profile.photo;
+    }
   }
 
   editBtn.addEventListener('click', function () {

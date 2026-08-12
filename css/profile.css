@@ -28,6 +28,8 @@
   width: 196px;
   height: 196px;
   border-radius: 50%;
+  object-fit: cover;
+  background: #37848c;
 }
 
 /* ------------------------------------------------------------------- edit */

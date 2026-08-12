@@ -26,7 +26,39 @@
   width: 196px;
   height: 196px;
   border-radius: 50%;
+  object-fit: cover;
+  background: #37848c;
 }
+
+/* Photo picker — same edit-pencil button as profile.html (same asset,
+   same position relative to the avatar; that page's own build just
+   missed adding it here at the time). Wired to a real <input type=file>
+   like add-contact.html's avatar picker, including the same
+   quota-safe downscale-before-storing step (see readAndResizeImage in
+   edit-profile.js) — a full-resolution phone photo blowing past
+   localStorage's quota is exactly what made saved photos vanish
+   elsewhere in this app before that fix, and profile photos would hit
+   the same wall. */
+.editprofile__edit {
+  position: absolute;
+  left: 241px;
+  top: 251px;
+  width: 63px;
+  height: 63px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.editprofile__edit-bg { position: absolute; inset: 0; width: 63px; height: 63px; }
+.editprofile__edit-icon {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+}
+.editprofile__edit:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; border-radius: 50%; }
 
 /* ----------------------------------------------------------------- fields
    Same icon-backdrop crop as profile.css's read-only view — kept as its

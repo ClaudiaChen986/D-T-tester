@@ -152,48 +152,9 @@
 
     <img class="sheet__panel" src="../assets/sheet-panel.svg" alt="">
 
-    <!-- contact rows -->
-    <div class="row" style="--y:194px">
-      <img class="row__bg" src="../assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="../assets/avatar.svg" alt="" style="--y:26px">
-      <span class="row__text" style="--y:26px">
-        <span class="t-en">Son (David)</span>
-        <span class="t-cn">儿子（大卫）</span>
-        <span class="t-num">0412 345 678</span>
-      </span>
-      <a class="row__call" href="tel:0412345678" style="--y:36px" aria-label="Call Son (David)">
-        <img src="../assets/call-btn.svg" alt="">
-      </a>
-    </div>
-
-    <div class="row" style="--y:343px">
-      <img class="row__bg" src="../assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="../assets/avatar.svg" alt="" style="--y:24px">
-      <span class="row__text" style="--y:24px">
-        <span class="t-en">Daughter (Lily)</span>
-        <span class="t-cn">女儿（莉莉）</span>
-        <span class="t-num">0423 456 789</span>
-      </span>
-      <a class="row__call" href="tel:0423456789" style="--y:34px" aria-label="Call Daughter (Lily)">
-        <img src="../assets/call-btn.svg" alt="">
-      </a>
-    </div>
-
-    <div class="row row--emergency" style="--y:492px">
-      <img class="row__bg" src="../assets/contact-row.svg" alt="">
-      <img class="row__avatar" src="../assets/emergency-ellipse.svg" alt="" style="--y:24px">
-      <img class="row__warn" src="../assets/emergency-triangle.svg" alt="">
-      <span class="row__warn-mark" aria-hidden="true">！</span>
-      <span class="row__text" style="--y:24px">
-        <span class="t-en">Emergency</span>
-        <span class="t-cn">紧急联络</span>
-        <span class="t-num">000</span>
-      </span>
-      <a class="row__call row__call--sos" href="tel:000" style="--y:34px" aria-label="Call emergency 000">
-        <img src="../assets/call-btn-plain.svg" alt="">
-        <img class="row__call-glyph" src="../assets/icon-phone-white.svg" alt="">
-      </a>
-    </div>
+    <!-- contact rows — the top 3 from guitu.emergencyContactOrder (edit-contacts.html),
+         rendered by app.js; falls back to Son/Daughter/Emergency if nothing's saved yet -->
+    <div id="sheetRows"></div>
 
     <button class="sheet__handle" id="sheetHandle" type="button"
             aria-controls="sheet" aria-expanded="false" aria-label="Expand contacts">

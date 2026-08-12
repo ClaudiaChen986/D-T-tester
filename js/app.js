@@ -80,6 +80,111 @@
     if (document.hidden) stopListening();
   });
 
+  /* ------------------------------------------------- slide-up card: rows
+     The three contact rows shown here are the top 3 of whatever order was
+     last saved on the reorder screen (edit-contacts.html,
+     localStorage["guitu.emergencyContactOrder"]) — same key, same five
+     ids, same default order that page falls back to when nothing's been
+     saved yet, so a fresh install shows exactly what used to be
+     hardcoded here (Son, Daughter, Emergency, in that order).
+
+     Alex and Harry don't have a phone number on file anywhere in this
+     prototype (contacts.html's own seed data leaves theirs blank too),
+     so if a reorder promotes one into the top 3, its call button renders
+     disabled instead of linking a fake tel:. They also don't have a real
+     photo, so they get a dedicated placeholder avatar (avatar-grandson.svg)
+     rather than reusing Son/Daughter's — same silhouette construction,
+     just the same teal placeholder palette add-contact.html/profile.html
+     use elsewhere in the app for "no photo yet", instead of the cream one
+     that's specifically Son/Daughter's.
+
+     Row 1 sits fractionally lower in Figma than rows 2–3 (26/26/36 vs
+     24/24/34 for avatar/text/call-button --y) — an export quirk of the
+     row artwork's first slot, not something tied to which contact is in
+     it, so it's keyed to slot index here, not to a contact id. */
+  var CONTACTS = {
+    son:       { en: 'Son (David)',       cn: '儿子（大卫）',     phone: '0412345678', type: 'person' },
+    daughter:  { en: 'Daughter (Lily)',   cn: '女儿（莉莉）',     phone: '0423456789', type: 'person' },
+    emergency: { en: 'Emergency',         cn: '紧急联络',         phone: '000',        type: 'emergency' },
+    alex:      { en: 'Grandson (Alex)',   cn: '孙子（亚历克斯）', phone: '',           type: 'person', avatar: '../assets/avatar-grandson.svg' },
+    harry:     { en: 'Grandson (Harry)',  cn: '孙子（哈利）',     phone: '',           type: 'person', avatar: '../assets/avatar-grandson.svg' },
+  };
+  var DEFAULT_ORDER = ['son', 'daughter', 'emergency', 'alex', 'harry'];
+  var ORDER_STORAGE_KEY = 'guitu.emergencyContactOrder';
+
+  var SLOTS = [
+    { y: 194, avatarY: 26, textY: 26, callY: 36 },
+    { y: 343, avatarY: 24, textY: 24, callY: 34 },
+    { y: 492, avatarY: 24, textY: 24, callY: 34 },
+  ];
+
+  function loadContactOrder() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(ORDER_STORAGE_KEY));
+      if (Array.isArray(raw) && raw.length === DEFAULT_ORDER.length &&
+          raw.every(function (id) { return CONTACTS[id]; })) {
+        return raw;
+      }
+    } catch (e) { /* ignore malformed storage */ }
+    return DEFAULT_ORDER.slice();
+  }
+
+  function formatAuPhone(digits) {
+    // 0412345678 -> "0412 345 678"
+    return digits.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
+  }
+
+  function personRowHtml(id, slot) {
+    var c = CONTACTS[id];
+    var numHtml = c.phone ? '<span class="t-num">' + formatAuPhone(c.phone) + '</span>' : '';
+    var callHtml = c.phone
+      ? '<a class="row__call" href="tel:' + c.phone + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
+          '<img src="../assets/call-btn.svg" alt="">' +
+        '</a>'
+      : '<span class="row__call" aria-hidden="true" style="--y:' + slot.callY + 'px">' +
+          '<img src="../assets/call-btn.svg" alt="">' +
+        '</span>';
+    return (
+      '<div class="row" style="--y:' + slot.y + 'px">' +
+        '<img class="row__bg" src="../assets/contact-row.svg" alt="">' +
+        '<img class="row__avatar" src="' + (c.avatar || '../assets/avatar.svg') + '" alt="" style="--y:' + slot.avatarY + 'px">' +
+        '<span class="row__text" style="--y:' + slot.textY + 'px">' +
+          '<span class="t-en">' + c.en + '</span>' +
+          '<span class="t-cn">' + c.cn + '</span>' +
+          numHtml +
+        '</span>' +
+        callHtml +
+      '</div>'
+    );
+  }
+
+  function emergencyRowHtml(slot) {
+    var c = CONTACTS.emergency;
+    return (
+      '<div class="row row--emergency" style="--y:' + slot.y + 'px">' +
+        '<img class="row__bg" src="../assets/contact-row.svg" alt="">' +
+        '<img class="row__avatar" src="../assets/emergency-ellipse.svg" alt="" style="--y:' + slot.avatarY + 'px">' +
+        '<img class="row__warn" src="../assets/emergency-triangle.svg" alt="">' +
+        '<span class="row__warn-mark" aria-hidden="true">！</span>' +
+        '<span class="row__text" style="--y:' + slot.textY + 'px">' +
+          '<span class="t-en">' + c.en + '</span>' +
+          '<span class="t-cn">' + c.cn + '</span>' +
+          '<span class="t-num">' + c.phone + '</span>' +
+        '</span>' +
+        '<a class="row__call row__call--sos" href="tel:' + c.phone + '" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
+          '<img src="../assets/call-btn-plain.svg" alt="">' +
+          '<img class="row__call-glyph" src="../assets/icon-phone-white.svg" alt="">' +
+        '</a>' +
+      '</div>'
+    );
+  }
+
+  var sheetRows = document.getElementById('sheetRows');
+  sheetRows.innerHTML = loadContactOrder().slice(0, 3).map(function (id, i) {
+    var slot = SLOTS[i];
+    return CONTACTS[id].type === 'emergency' ? emergencyRowHtml(slot) : personRowHtml(id, slot);
+  }).join('');
+
   /* ------------------------------------------------------- slide-up card */
   function setSheet(expanded) {
     sheet.dataset.state = expanded ? 'expanded' : 'collapsed';
