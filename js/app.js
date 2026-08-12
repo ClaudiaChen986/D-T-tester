@@ -91,12 +91,9 @@
      Alex and Harry don't have a phone number on file anywhere in this
      prototype (contacts.html's own seed data leaves theirs blank too),
      so if a reorder promotes one into the top 3, its call button renders
-     disabled instead of linking a fake tel:. They also don't have a real
-     photo, so they get a dedicated placeholder avatar (avatar-grandson.svg)
-     rather than reusing Son/Daughter's — same silhouette construction,
-     just the same teal placeholder palette add-contact.html/profile.html
-     use elsewhere in the app for "no photo yet", instead of the cream one
-     that's specifically Son/Daughter's.
+     disabled instead of linking a fake tel:. They don't have a real photo
+     either, so they fall back to the same generic avatar.svg placeholder
+     Son and Daughter use — no `avatar` override below, same as those two.
 
      Row 1 sits fractionally lower in Figma than rows 2–3 (26/26/36 vs
      24/24/34 for avatar/text/call-button --y) — an export quirk of the
@@ -106,8 +103,8 @@
     son:       { en: 'Son (David)',       cn: '儿子（大卫）',     phone: '0412345678', type: 'person' },
     daughter:  { en: 'Daughter (Lily)',   cn: '女儿（莉莉）',     phone: '0423456789', type: 'person' },
     emergency: { en: 'Emergency',         cn: '紧急联络',         phone: '000',        type: 'emergency' },
-    alex:      { en: 'Grandson (Alex)',   cn: '孙子（亚历克斯）', phone: '',           type: 'person', avatar: '../assets/avatar-grandson.svg' },
-    harry:     { en: 'Grandson (Harry)',  cn: '孙子（哈利）',     phone: '',           type: 'person', avatar: '../assets/avatar-grandson.svg' },
+    alex:      { en: 'Grandson (Alex)',   cn: '孙子（亚历克斯）', phone: '',           type: 'person' },
+    harry:     { en: 'Grandson (Harry)',  cn: '孙子（哈利）',     phone: '',           type: 'person' },
   };
   var DEFAULT_ORDER = ['son', 'daughter', 'emergency', 'alex', 'harry'];
   var ORDER_STORAGE_KEY = 'guitu.emergencyContactOrder';
