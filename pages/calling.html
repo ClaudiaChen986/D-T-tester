@@ -36,9 +36,12 @@
   <img class="callscreen__avatar" id="callAvatar" src="../assets/avatar.svg" alt="">
 
   <!-- ------------------------------------------------------------- keypad
-       Decorative, like Location/Speaker below — no DTMF/typed-digits
-       display wired up in this prototype. -->
-  <div class="callscreen__keypad" aria-hidden="true">
+       No DTMF/typed-digits display wired up in this prototype, but the
+       keys are real, clickable buttons once the panel below is dragged
+       down out of the way — starts hidden behind it (aria-hidden +
+       tabindex="-1"), toggled by js/calling.js as the panel's state
+       changes. -->
+  <div class="callscreen__keypad" id="keypad" aria-hidden="true">
     <button class="callkey" type="button" style="--x:77px;--y:479px" tabindex="-1">1</button>
     <button class="callkey" type="button" style="--x:161px;--y:479px" tabindex="-1">2</button>
     <button class="callkey" type="button" style="--x:245px;--y:479px" tabindex="-1">3</button>
@@ -52,8 +55,9 @@
   </div>
 
   <!-- -------------------------------------------------------- call panel -->
-  <div class="callpanel">
-    <div class="callpanel__handle" aria-hidden="true"></div>
+  <div class="callpanel" id="callpanel">
+    <button class="callpanel__handle" id="callpanelHandle" type="button"
+            aria-controls="keypad" aria-expanded="false" aria-label="Show keypad"></button>
 
     <div class="callbtn-group" style="--x:31px">
       <button class="callbtn" id="speakerBtn" type="button" aria-pressed="false" aria-label="Speaker 扬声器">

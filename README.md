@@ -179,17 +179,21 @@ matching a real in-call screen.
 The cream button panel is draggable: Figma's own layer tree names it
 "Slide up card" and it's a literal instance of the *same* component
 `home.html`'s slide-up card uses (confirmed via `get_metadata` — same
-handle, same base frame), so it drags too, revealing the decorative keypad
-stacked underneath it (also visual-only, no DTMF or typed-digits display).
-Unlike home's card, there's no separate collapsed state to leave it in —
-Hung up has to stay reachable, and the panel is tall enough that fully
-collapsing it would carry Hung up off-screen — so this is a bounded
-rubber-band peek (`js/calling.js`) rather than a real toggle: drag down to
-preview the keypad, let go, it always springs back. Same deferred
-pointer-capture trick as the home sheet (capture only engages once real
-movement crosses a threshold) so a plain tap on Speaker/Mute/Location/Hung
-up — all of them descendants of the same draggable panel — keeps working
-untouched.
+handle, same base frame), so it drags the same way too — dragged down past
+a quarter of its travel, it *stays* down (a real collapsed/expanded
+toggle, `js/calling.js`, not a spring-back), exposing the keypad
+underneath and leaving the handle strip poking up above the bottom edge
+to drag (or tap) back up by. The keypad's keys are real, clickable
+buttons once revealed — kept out of the tab order via `tabindex`/
+`aria-hidden` while the panel still covers them, toggled alongside the
+panel's own state — though still no DTMF or typed-digits display behind
+them, same as Location/Speaker having no real audio routing or location
+sharing. Hung up rides along with the panel: while it's parked down
+showing the keypad, dragging (or tapping the handle) back up is the way
+to reach it again. Same deferred pointer-capture trick as the home sheet
+(capture only engages once real movement crosses a threshold) so a plain
+tap on Speaker/Mute/Location/Hung up — all of them descendants of the
+same draggable panel — keeps working untouched.
 
 Every contact's call button is a working link to this page, including
 ones with no phone number on file anywhere in this prototype (both

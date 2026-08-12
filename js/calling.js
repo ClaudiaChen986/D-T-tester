@@ -72,28 +72,45 @@
   wireToggle('muteBtn', 'muteIcon', '../assets/icon-call-mute-off.svg', '../assets/icon-call-mute-on.svg');
   wireToggle('locationBtn', 'locationIcon', '../assets/icon-call-location-off.svg', '../assets/icon-call-location-on.svg');
 
-  /* ------------------------------------------------ call panel: peek drag
-     Same deferred-pointer-capture drag as home.html's slide-up card (see
-     js/app.js) — capture is only taken once real movement crosses the
-     threshold, so a plain tap on Speaker/Mute/Location/Hung up (all
-     descendants of the panel, which is the whole drag target, same as
-     the home sheet) keeps working untouched. Unlike that card, this one
-     always springs back on release: the keypad is decorative and Hung up
-     has to stay reachable, so there's no persisted "collapsed" resting
-     state to drag to, only a bounded peek. PEEK_MAX (320px) is just past
-     the keypad's lowest row (0), so a full drag reveals every key. */
-  var callpanel = document.querySelector('.callpanel');
-  var PEEK_MAX = 320;
+  /* ---------------------------------------------------- call panel: drag
+     Same collapsed/expanded drag as home.html's slide-up card (see
+     js/app.js: deferred pointer capture so a plain tap on Speaker/Mute/
+     Location/Hung up — all descendants of the panel, which is the whole
+     drag target — keeps working untouched; only real movement past the
+     threshold takes over the gesture). Dragged down past a quarter of
+     PANEL_OFFSET, it *stays* down (collapsed) instead of springing back,
+     exposing the keypad underneath and making its keys real, clickable
+     buttons — tabindex/aria-hidden on them tracks the panel's state so
+     they're not reachable by keyboard while the panel still covers them.
+     PANEL_OFFSET (320px) clears the keypad's lowest row (0) with the
+     panel's own handle strip still poking up above the bottom edge to
+     drag back up by. */
+  var callpanel       = document.getElementById('callpanel');
+  var callpanelHandle = document.getElementById('callpanelHandle');
+  var keypad           = document.getElementById('keypad');
+  var keypadButtons    = keypad.querySelectorAll('.callkey');
+  var PANEL_OFFSET = 320;
   var DRAG_THRESHOLD = 4;
   var panelDrag = null;
+  var justDraggedPanel = false;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function setPanelState(collapsed) {
+    callpanel.dataset.state = collapsed ? 'collapsed' : 'expanded';
+    keypad.setAttribute('aria-hidden', String(!collapsed));
+    keypadButtons.forEach(function (btn) { btn.tabIndex = collapsed ? 0 : -1; });
+    callpanelHandle.setAttribute('aria-expanded', String(collapsed));
+    callpanelHandle.setAttribute('aria-label', collapsed ? 'Show call controls' : 'Show keypad');
+  }
+  function currentTranslateY() { return callpanel.dataset.state === 'collapsed' ? PANEL_OFFSET : 0; }
 
   callpanel.addEventListener('pointerdown', function (e) {
     if (e.button != null && e.button !== 0) return;
     panelDrag = {
       pointerId: e.pointerId,
       startClientY: e.clientY,
+      startY: currentTranslateY(),
       scale: parseFloat(getComputedStyle(stage).getPropertyValue('--scale')) || 1,
       moved: false,
     };
@@ -108,18 +125,30 @@
       callpanel.classList.add('is-dragging');
       try { callpanel.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     }
-    var y = clamp(deltaScreen / panelDrag.scale, 0, PEEK_MAX);
+    var y = clamp(panelDrag.startY + deltaScreen / panelDrag.scale, 0, PANEL_OFFSET);
     callpanel.style.transform = 'translateY(' + y + 'px)';
   });
 
   function endPanelDrag(e) {
     if (!panelDrag || e.pointerId !== panelDrag.pointerId) return;
-    if (panelDrag.moved) {
+    var deltaScreen = e.clientY - panelDrag.startClientY;
+    var endY = clamp(panelDrag.startY + deltaScreen / panelDrag.scale, 0, PANEL_OFFSET);
+    var moved = panelDrag.moved;
+    var wasCollapsed = panelDrag.startY !== 0;
+    var draggedFraction = Math.abs(endY - panelDrag.startY) / PANEL_OFFSET;
+
+    if (moved) {
       callpanel.classList.remove('is-dragging');
       callpanel.style.transform = '';
       try { callpanel.releasePointerCapture(panelDrag.pointerId); } catch (err) { /* ignore */ }
     }
     panelDrag = null;
+
+    if (moved) {
+      justDraggedPanel = true;
+      setTimeout(function () { justDraggedPanel = false; }, 0);
+      setPanelState(draggedFraction > 0.25 ? !wasCollapsed : wasCollapsed);
+    }
   }
   callpanel.addEventListener('pointerup', endPanelDrag);
   callpanel.addEventListener('pointercancel', function (e) {
@@ -129,6 +158,15 @@
       callpanel.style.transform = '';
     }
     panelDrag = null;
+  });
+
+  callpanelHandle.addEventListener('click', function () {
+    if (justDraggedPanel) { justDraggedPanel = false; return; }
+    setPanelState(callpanel.dataset.state !== 'collapsed');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && callpanel.dataset.state === 'collapsed') setPanelState(false);
   });
 
   /* -------------------------------------------------------------- hang up */
