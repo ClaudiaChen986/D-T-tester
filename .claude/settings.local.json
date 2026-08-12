@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_figma_figma__get_design_context",
+      "Bash(python -c ' *)",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "Bash(node -e ' *)",
+      "Bash(rm -f \"C:/Users/cheny/AppData/Local/Temp/claude/c--Users-cheny-D-T-tester/80f19f5a-e71e-475b-ab55-9b2a34540f13/scratchpad\"/*.png 2>/dev/null; echo done)",
+      "Bash(mkdir -p pages css js)",
+      "Bash(mv edit-contacts.html contacts.html add-contact.html pages/)",
+      "Bash(mv styles.css soundwave.css edit.css contacts.css add-contact.css css/)",
+      "Bash(mv app.js edit.js contacts.js add-contact.js js/)",
+      "Bash(rm -rf \"C:/Users/cheny/AppData/Local/Temp/claude/c--Users-cheny-D-T-tester/80f19f5a-e71e-475b-ab55-9b2a34540f13/scratchpad\"/*.png 2>/dev/null; echo done)",
+      "Bash(npm -v)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p app/public/assets)",
+      "Bash(cp assets/* app/public/assets/)",
+      "Bash(mkdir -p app/src/styles)",
+      "Bash(cp css/*.css app/src/styles/)",
+      "Bash(rm -f src/App.css src/index.css public/vite.svg public/icons.svg public/favicon.svg)",
+      "Bash(rm -rf src/assets)",
+      "Bash(timeout 15 npm run dev)",
+      "Bash(node -e \"console.log\\(require.resolve\\('vite/package.json'\\)\\)\")",
+      "Bash(npx vite *)",
+      "Bash(node ./node_modules/vite/bin/vite.js --version)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(rm -f \"C:/Users/cheny/AppData/Local/Temp/claude/c--Users-cheny-D-T-tester/80f19f5a-e71e-475b-ab55-9b2a34540f13/scratchpad\"/*.png)",
+      "Bash(node ./node_modules/vite/bin/vite.js build)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -State Listen -OwningProcess 17608 -ErrorAction SilentlyContinue | Select-Object LocalPort\")",
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=17608' | Select-Object CommandLine\")",
+      "Bash(grep -Hm1 ^description: 'c:/Users/cheny/D&T tester/.claude/skills/*/SKILL.md')",
+      "Bash(chromium-cli --help)",
+      "PowerShell(Get-Command chromium-cli -ErrorAction SilentlyContinue)",
+      "PowerShell(npm list -g --depth=0 2>$null)",
+      "Bash(mkdir -p \"/c/Users/cheny/AppData/Local/Temp/claude/c--Users-cheny-D-T-tester/00f7e959-f975-46ec-b2ba-23e59e415e1c/scratchpad/pptest\" && cd \"/c/Users/cheny/AppData/Local/Temp/claude/c--Users-cheny-D-T-tester/00f7e959-f975-46ec-b2ba-23e59e415e1c/scratchpad/pptest\" && npm init -y >/dev/null 2>&1 && npm install puppeteer-core --no-audit --no-fund 2>&1 | tail -20)",
+      "Bash(powershell -Command 'Get-NetTCPConnection -State Listen | Where-Object {$_.LocalPort -ge 5170 -and $_.LocalPort -le 5180} | Select-Object LocalPort')",
+      "PowerShell(Set-Location \"c:\\\\Users\\\\cheny\\\\D&T tester\\\\app\"; Start-Process -FilePath \"node\" -ArgumentList \"node_modules/vite/bin/vite.js\" -RedirectStandardOutput \"$env:TEMP\\\\claude\\\\c--Users-cheny-D-T-tester\\\\00f7e959-f975-46ec-b2ba-23e59e415e1c\\\\scratchpad\\\\vite2.log\" -RedirectStandardError \"$env:TEMP\\\\claude\\\\c--Users-cheny-D-T-tester\\\\00f7e959-f975-46ec-b2ba-23e59e415e1c\\\\scratchpad\\\\vite2err.log\" -WorkingDirectory \"c:\\\\Users\\\\cheny\\\\D&T tester\\\\app\" -PassThru | Select-Object Id)",
+      "Bash(curl -sv http://127.0.0.1:5173/)",
+      "PowerShell(Get-Process -Id 17456 -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,StartTime; Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object {$_.LocalPort -eq 5173})",
+      "Bash(node node_modules/vite/bin/vite.js)",
+      "Bash(curl -s \"http://[::1]:5173/\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\cheny\\AppData\\Local\\Temp\\claude\\c--Users-cheny-D-T-tester\\80f19f5a-e71e-475b-ab55-9b2a34540f13\\scratchpad"
+    ]
+  }
+}

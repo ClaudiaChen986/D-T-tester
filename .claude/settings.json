@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i \"s|animation-play-state:paused!important;animation-delay:0s!important|animation:none!important|\" shot.js)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(mv call-btn-teal.svg call-btn.svg)",
+      "Bash(mv call-btn-red.svg call-btn-plain.svg)",
+      "Bash(node --check app.js)",
+      "Bash(curl -sSL -o return-button.png \"https://www.figma.com/api/mcp/asset/46b99742-1b48-4991-9a1f-3a3f83213057.png\")",
+      "Bash(curl -sSL -o edit-header.svg \"https://www.figma.com/api/mcp/asset/29139754-fa92-49b8-a6e9-458364ef3c8a.svg\")",
+      "Bash(curl -sSL -o row-red.svg \"https://www.figma.com/api/mcp/asset/cb222665-8aed-41bd-85ef-716129dc7181.svg\")",
+      "Bash(curl -sSL -o row-cream.svg \"https://www.figma.com/api/mcp/asset/548f5d7b-e848-4c96-90e0-016198b93793.svg\")",
+      "Bash(curl -sSL -o icon-menu.svg \"https://www.figma.com/api/mcp/asset/10f5fc54-1501-4b09-8c70-bdf49b770488.svg\")",
+      "Bash(curl -sSL -o g6-son.svg \"https://www.figma.com/api/mcp/asset/cfce165b-1ad4-42d7-8a16-14bd1d1fda51.svg\")",
+      "Bash(curl -sSL -o g6-daughter.svg \"https://www.figma.com/api/mcp/asset/e1058d6b-2723-419e-9fc7-ab80d1ad9131.svg\")",
+      "Bash(curl -sSL -o g6-alex.svg \"https://www.figma.com/api/mcp/asset/158b637c-e138-430f-a139-e12404d649df.svg\")",
+      "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Select-Object Id,ProcessName\")"
+    ]
+  }
+}

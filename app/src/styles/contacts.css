@@ -1,0 +1,173 @@
+/* ============================================================================
+   归途 GuiTu — "My Contact" (Figma node 7:1121)
+   ----------------------------------------------------------------------------
+   Every other screen in this project is a fixed 390×844 mock scaled to fit
+   the viewport (see .stage/.screen in styles.css). This page can't work that
+   way: the contact list genuinely grows (seed contacts + whatever the user
+   saves from add-contact.html), so its height is not a fixed design constant.
+   It's built as a real scrolling page instead — width capped at 390px and
+   centered, height whatever the content needs. Reuses styles.css for
+   tokens/fonts and the .crop / .return / .wordmark helpers; only this page's
+   own layout lives here.
+   ========================================================================== */
+
+.contactspage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--c-red);
+  font-family: var(--font-en);
+}
+.contactspage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/assets/bg-texture2.png') repeat;
+  opacity: .16;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ header
+   Same artwork/positions as the home screen's header, just in normal flow
+   (position: relative, not absolute) and sticky, since this page scrolls. */
+.chheader {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 390px;
+  height: 209.144px;
+}
+/* "My Contact 我的联系人" is longer than "Home 首页", the text .header__title
+   was sized for. Without this, the browser's Latin/CJK auto-break rule (the
+   thing that neatly stacks "Home" over "首页" with no markup help) also
+   finds break points *inside* "My Contact" and inside "我的联系人" — the
+   English splits mid-phrase and the Chinese splits between arbitrary
+   characters. Keeping each phrase nowrap forces exactly the one intended
+   break, between the two spans; .header__title's fixed width just lets the
+   (now wider) lines overflow it while staying right-aligned to its edge. */
+.chheader .header__title .t-en,
+.chheader .header__title .t-cn { white-space: nowrap; }
+
+/* --------------------------------------------------------------- sections */
+.section {
+  position: relative;
+  z-index: 1;
+  width: 327px;
+  margin: 18px auto 0;
+  padding: 26px 20px 26px;
+  border-radius: 24px;
+  background: rgba(215, 187, 137, .82);
+}
+.section:last-of-type { margin-bottom: 32px; }
+
+.section__title {
+  margin: 0 0 20px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #fff;
+}
+.section__title > span { display: inline; font-weight: 500; }
+.section__title .t-en { font-family: var(--font-en); font-size: 20px; }
+.section__title .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; margin-left: 6px; }
+
+.section__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 16px;
+  row-gap: 18px;
+  align-items: stretch;
+}
+
+/* ------------------------------------------------------------------ cards
+   Flow-laid-out, not pixel-absolute like the rest of the app: this grid
+   holds a variable number of contacts, so a fixed height per card (as
+   Figma's two seed heights, 153/162px, imply) can't scale to real data. */
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 150px;
+  padding: 18px 12px 18px;
+  border-radius: 20px;
+  background: #edd8b4;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card__avatar {
+  width: 43.809px;
+  height: 43.809px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: none;
+}
+.card__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.card__call {
+  width: 43.809px;
+  height: 43.809px;
+  border-radius: 50%;
+  background: #37848c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  cursor: pointer;
+}
+.card__call img { width: 24px; height: 25px; }
+.card__call[href] { cursor: pointer; }
+span.card__call { cursor: default; opacity: .55; }
+
+.card__name {
+  margin-top: 14px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.card__name > span { display: block; }
+.card__name .t-en { font-family: var(--font-en); font-size: 18px; font-weight: 400; }
+.card__name .t-cn { font-family: var(--font-cn); font-size: 16px; font-weight: 400; letter-spacing: .8px; }
+
+/* the "+ Add" tile that ends every grid */
+.card--add {
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.card--add .crop { position: relative; left: 0; top: 0; }
+
+/* -------------------------------------------------------------- back bar */
+.backbar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 390px;
+  height: 134px;
+  margin: 6px 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.backbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.backbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.backbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.backbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }

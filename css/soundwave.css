@@ -1,0 +1,93 @@
+/* ============================================================================
+   Listening state — animated soundwave
+   ----------------------------------------------------------------------------
+   Geometry from Figma "prototype-5":
+     · scrim      — Rectangle 43, 390 × 844, rgba(0,0,0,.3)   (node 276:746)
+     · soundwave  — 290 × 187 at (50, 328)                    (node 276:806)
+     · 12 bars, 15px wide, 10px apart, radius 20, white, vertically centred
+       (12 × 15 + 11 × 10 = 290 — so plain flex + gap reproduces it exactly)
+
+   The Soundwave component (node 253:974) ships four authored states. Rather
+   than invent a waveform, each bar interpolates through its own four designed
+   heights, so every quarter of the cycle lands on a frame the designer drew.
+     --h1  Default    --h2  Variant2    --h3  Variant3    --h4  Variant4
+   ========================================================================== */
+
+.listening {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .18s ease, visibility 0s linear .18s;
+}
+.screen.is-listening .listening {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .18s ease, visibility 0s;
+}
+
+.listening__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--c-scrim);
+}
+
+.wave {
+  position: absolute;
+  left: 50px;
+  top: 328px;
+  width: 290px;
+  height: 187px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: scale(.94);
+  transition: transform .24s cubic-bezier(.2, .8, .3, 1);
+}
+.screen.is-listening .wave { transform: none; }
+
+.wave__bar {
+  flex: none;
+  width: 15px;
+  height: var(--h1);
+  border-radius: 20px;
+  background: #fff;
+  will-change: height;
+}
+
+.screen.is-listening .wave__bar {
+  animation: wave-morph var(--wave-cycle, 1.6s) ease-in-out infinite;
+  /* a 12ms-per-bar phase offset keeps the designed silhouettes while making
+     the wave read as travelling rather than blinking */
+  animation-delay: calc(var(--i) * -12ms);
+}
+
+@keyframes wave-morph {
+  0%, 100% { height: var(--h1); }
+  25%      { height: var(--h2); }
+  50%      { height: var(--h3); }
+  75%      { height: var(--h4); }
+}
+
+/* --- authored bar heights, left → right ---------------------------------- */
+.wave__bar:nth-child(1)  { --i:  0; --h1:  33px; --h2:  63px; --h3:  16px; --h4: 110px; }
+.wave__bar:nth-child(2)  { --i:  1; --h1:  93px; --h2:  46px; --h3:  21px; --h4:  68px; }
+.wave__bar:nth-child(3)  { --i:  2; --h1: 119px; --h2:  21px; --h3:  43px; --h4:  87px; }
+.wave__bar:nth-child(4)  { --i:  3; --h1:  95px; --h2:  31px; --h3:  84px; --h4:  45px; }
+.wave__bar:nth-child(5)  { --i:  4; --h1:  51px; --h2:  64px; --h3:  51px; --h4:  22px; }
+.wave__bar:nth-child(6)  { --i:  5; --h1:  34px; --h2:  97px; --h3:  29px; --h4:  29px; }
+.wave__bar:nth-child(7)  { --i:  6; --h1:  55px; --h2: 129px; --h3:  21px; --h4:  46px; }
+.wave__bar:nth-child(8)  { --i:  7; --h1:  77px; --h2: 163px; --h3:  40px; --h4:  87px; }
+.wave__bar:nth-child(9)  { --i:  8; --h1: 132px; --h2: 116px; --h3:  71px; --h4:  69px; }
+.wave__bar:nth-child(10) { --i:  9; --h1: 187px; --h2:  80px; --h3:  32px; --h4:  97px; }
+.wave__bar:nth-child(11) { --i: 10; --h1: 160px; --h2:  34px; --h3:  82px; --h4:  38px; }
+.wave__bar:nth-child(12) { --i: 11; --h1:  92px; --h2:  47px; --h3: 115px; --h4:  23px; }
+
+/* Hold the Default frame instead of animating when motion is unwelcome. */
+@media (prefers-reduced-motion: reduce) {
+  .listening { transition: none; }
+  .wave { transform: none; transition: none; }
+  .screen.is-listening .wave__bar { animation: none; }
+}

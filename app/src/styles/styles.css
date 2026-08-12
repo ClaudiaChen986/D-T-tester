@@ -1,0 +1,493 @@
+/* ============================================================================
+   归途 GuiTu — home screen
+   Implemented 1:1 from Figma "prototype-5" › home - both (node 2:40).
+   All geometry is expressed in the design's own 390 × 844 pixel space; the
+   whole screen is scaled to the viewport as a single unit (see .stage).
+   ========================================================================== */
+
+:root {
+  --screen-w: 390px;
+  --screen-h: 844px;
+
+  /* palette lifted from the design */
+  --c-red:        #832118;   /* screen background            */
+  --c-cream:      #ffdfdc;   /* header sub-copy              */
+  --c-ink:        #000000;   /* tile + card headings         */
+  --c-ink-soft:   #4e3e37;   /* "press to speak" hint        */
+  --c-teal:       #56a8b0;   /* bottom-bar pills             */
+  --c-scrim:      rgba(0, 0, 0, .3);
+
+  /* how far the slide-up card travels when opened */
+  --sheet-offset: 540px;
+
+  --font-en: "Inria Serif", "Times New Roman", serif;
+  --font-cn: "Noto Serif SC", "Songti SC", "SimSun", serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: #1b1210;
+}
+
+body {
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The static prototype centered every fixed-size screen by styling <body>
+   directly — fine when each screen was its own HTML document, not once
+   they're all routes sharing one <body>. Any page built on the fixed
+   390×844 .stage/.screen convention (Home, edit-contacts, add-contact —
+   everything except the real-scrolling contacts page) wraps its .stage in
+   this instead. */
+.app-center {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------- device stage */
+.stage {
+  width: var(--screen-w);
+  height: var(--screen-h);
+  transform: scale(var(--scale, 1));
+  transform-origin: center;
+}
+
+.screen {
+  position: relative;
+  width: var(--screen-w);
+  height: var(--screen-h);
+  overflow: hidden;
+  background: var(--c-red);
+  color: var(--c-ink);
+  font-family: var(--font-en);
+  user-select: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------- generic primitives */
+
+/* An absolutely placed window onto a larger sprite image. Figma exports a
+   number of the illustrations as crops of a bigger sheet, so the frame gets
+   --x/--y/--w/--h and the image inside gets --ix/--iy/--iw/--ih. */
+.crop {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w, var(--s));
+  height: var(--h, var(--s));
+  overflow: hidden;
+  pointer-events: none;
+}
+.crop > img {
+  position: absolute;
+  left: var(--ix);
+  top: var(--iy);
+  width: var(--iw);
+  height: var(--ih);
+  max-width: none;
+}
+
+/* Tile affordance: the source glyph points up, the design rotates it to ">". */
+.chevron {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  transform: rotate(90deg);
+}
+.chevron > img {
+  position: absolute;
+  left: 25%;
+  top: 33.333%;
+  width: 50%;
+  height: 30.84%;
+}
+
+/* ---- type runs ---------------------------------------------------------- */
+.t-en { font-family: var(--font-en); }
+.t-cn { font-family: var(--font-cn); letter-spacing: .05em; }
+.t-num { font-family: var(--font-en); font-weight: 700; letter-spacing: .05em; }
+
+/* ------------------------------------------------------------- background */
+.bg-texture {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: .2;
+  pointer-events: none;
+}
+.bg-texture > img {
+  position: absolute;
+  left: -191.18px;
+  top: -56.29px;
+  width: 674.66px;
+  height: 922.32px;
+  max-width: none;
+}
+
+/* ----------------------------------------------------------------- header */
+.header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 390px;
+  height: 209.144px;
+}
+.header__bg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 209.144px;
+}
+
+.header__logo {
+  position: absolute;
+  left: 24px;
+  top: 35px;
+  width: 123px;
+  height: 123px;
+  overflow: hidden;
+}
+.header__logo > img {
+  position: absolute;
+  left: -177.4px;
+  top: -172.42px;
+  width: 467.35px;
+  height: 322.48px;
+  max-width: none;
+}
+
+.header__title {
+  position: absolute;
+  left: 200px;
+  top: 53px;
+  width: 166px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: right;
+  color: #fff;
+}
+.header__title .t-en { font-size: 32px; font-weight: 700; }
+.header__title .t-cn { font-size: 30px; font-weight: 700; }
+
+.header__welcome {
+  position: absolute;
+  left: 170px;
+  top: 105px;
+  width: 196px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: right;
+  color: var(--c-cream);
+}
+.header__welcome > span { display: block; font-weight: 400; }
+.header__welcome .t-en { font-size: 24px; }
+.header__welcome .t-cn { font-size: 22px; }
+
+/* wordmark — each glyph is its own rotated box in the source */
+.wordmark > span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wordmark i {
+  font: 400 20px/normal var(--font-cn);
+  font-style: normal;
+  color: #fff;
+  white-space: nowrap;
+  transform: rotate(var(--r));
+}
+/* the "返回 return" wordmark (edit-contacts, contacts) sits at 14px, smaller
+   than the home screen's "归途 GuiTu" wordmark it shares a base style with */
+.wordmark--return i { font-size: 14px; }
+
+/* circular return-button hit target, shared by every page that has one */
+.return {
+  /* .crop (also on this element, for the sprite-crop sizing) sets
+     pointer-events: none — override it back on, or the button is
+     unclickable despite looking and measuring perfectly normal. */
+  pointer-events: auto;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.return:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* centered header title used by every "return button" page (edit-contacts,
+   add-contact) — distinct from the home screen's right-aligned .header__title */
+.header-title-centered {
+  position: absolute;
+  left: 50%;
+  top: 55px;
+  transform: translateX(-50%);
+  margin: 0;
+  width: max-content;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #fff;
+  white-space: nowrap;
+}
+.header-title-centered > span { display: block; font-weight: 700; }
+.header-title-centered .t-en { font-family: var(--font-en); font-size: 24px; }
+.header-title-centered .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
+
+/* ------------------------------------------------------------------ tiles */
+.tile {
+  display: block;
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 167px;
+  height: 147px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.tile:active { transform: scale(.975); }
+
+.tile__bg {
+  position: absolute;
+  left: -4.008px;
+  top: 0;
+  width: 175px;
+  height: 155px;
+}
+
+.tile__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: var(--c-ink);
+}
+.tile__label > span { display: block; font-weight: 400; }
+.tile__label .t-en { font-size: 24px; }
+.tile__label .t-cn { font-size: 22px; }
+
+/* -------------------------------------------------------- voice assistant */
+.voice {
+  position: absolute;
+  left: 20px;
+  top: 565px;
+  width: 345px;
+  height: 135px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  touch-action: none;              /* keep press-and-hold from scrolling */
+  -webkit-touch-callout: none;
+}
+/* No press transform here on purpose: the design answers a press with the
+   scrim + soundwave, and moving the card under the scrim reads as a glitch. */
+
+.voice__bg   { position: absolute; left: -4.002px; top: 0;      width: 353px;     height: 149px; }
+.voice__ring { position: absolute; left: 15px;     top: 10px;   width: 115.363px; height: 115.363px; }
+.voice__mic  { position: absolute; left: 59px;     top: 48.81px; width: 26.368px; height: 39.149px; }
+
+.voice__title {
+  position: absolute;
+  left: 137px;
+  top: 23px;
+  width: 188px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: var(--c-ink);
+}
+.voice__title > span { display: block; font-weight: 700; }
+.voice__title .t-en { font-size: 24px; }
+.voice__title .t-cn { font-size: 22px; }
+
+.voice__hint {
+  position: absolute;
+  left: 121px;
+  top: 86px;
+  width: 219px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: var(--c-ink-soft);
+}
+.voice__hint .t-en  { font-size: 18px; font-weight: 400; }
+.voice__hint .sp    { font-size: 16px; }
+.voice__hint .t-cn  { font-size: 16px; font-weight: 400; }
+
+/* --------------------------------------------------------- slide up card */
+.sheet {
+  position: absolute;
+  left: 0;
+  top: 710px;
+  width: 390px;
+  height: 685px;
+  transition: transform .38s cubic-bezier(.22, .61, .36, 1);
+}
+.sheet[data-state="expanded"] { transform: translateY(calc(-1 * var(--sheet-offset))); }
+
+.sheet__bg    { position: absolute; left: 0;   top: 0;        width: 390px; height: 685px; }
+.sheet__panel { position: absolute; left: 23px; top: 139.549px; width: 345px; height: 512.349px; }
+
+/* bottom-bar pills */
+.navbtn {
+  display: block;
+  position: absolute;
+  top: 67.227px;
+  width: 119px;
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  background: var(--c-teal);
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.navbtn--calls   { left: 23px;  height: 144.639px; }
+.navbtn--profile { left: 253px; height: 57.041px; }
+
+.navbtn__icon {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+}
+.navbtn__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: var(--c-ink);
+}
+.navbtn__label > span { display: block; font-weight: 700; }
+.navbtn__label .t-en { font-size: 18px; }
+.navbtn__label .t-cn { font-size: 16px; }
+
+/* contact rows */
+.row {
+  position: absolute;
+  left: 40px;
+  top: var(--y);
+  width: 312px;
+  height: 122px;
+}
+.row__bg     { position: absolute; left: -3.994px; top: 0; width: 320px; height: 130px; }
+.row__avatar { position: absolute; left: 24px; top: var(--y); width: 70px; height: 70px; }
+
+.row__text {
+  position: absolute;
+  left: 102px;
+  top: var(--y);
+  font-size: 0;
+  line-height: normal;
+  white-space: nowrap;
+  color: var(--c-ink);
+}
+.row__text > span { display: block; }
+.row__text .t-en  { font-size: 20px; font-weight: 400; }
+.row__text .t-cn  { font-size: 18px; font-weight: 400; letter-spacing: .05em; }
+.row__text .t-num { font-size: 20px; }
+
+.row__call {
+  position: absolute;
+  left: 242px;
+  top: var(--y);
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.row__call:active { transform: scale(.93); }
+.row__call > img { position: absolute; inset: 0; width: 50px; height: 50px; }
+
+.row__warn {
+  position: absolute;
+  left: 39.2px;
+  top: 41px;
+  width: 38.594px;
+  height: 34.75px;
+}
+.row__warn-mark {
+  position: absolute;
+  left: 49px;
+  top: 47px;
+  font: 400 20px/normal var(--font-en);
+  color: #fff;
+  white-space: nowrap;
+}
+.row__call--sos .row__call-glyph {
+  position: absolute;
+  left: 10.5px;                    /* 292.5 − 282 within the 50px circle */
+  top: 11.25px;                    /* 1247.25 − 1236                     */
+  width: 28px;
+  height: 29px;
+  inset: auto;
+}
+
+/* handle + medallion */
+.sheet__handle {
+  position: absolute;
+  left: 160px;
+  top: 81px;
+  width: 70px;
+  height: 49px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.sheet__handle > img {
+  position: absolute;
+  left: 26px;
+  top: 14px;
+  width: 19px;
+  height: 17.25px;
+  transition: transform .38s cubic-bezier(.22, .61, .36, 1);
+}
+.sheet[data-state="expanded"] .sheet__handle > img { transform: rotate(180deg); }
+
+.sheet__medallion { z-index: 1; }
+
+/* --------------------------------------------------- reduced-motion opt-out */
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .voice,
+  .row__call,
+  .sheet,
+  .sheet__handle > img { transition: none; }
+}

@@ -1,0 +1,193 @@
+/* ============================================================================
+   归途 GuiTu — "Adding contact" (Figma node 120:408)
+   Shares .stage/.screen, tokens, and the .crop/.return/.wordmark helpers
+   with styles.css; only this page's own layout lives here.
+   ========================================================================== */
+
+.screen--add {
+  background: linear-gradient(to bottom, rgba(166, 49, 38, .8), var(--c-red));
+}
+
+/* ----------------------------------------------------------------- content */
+.content-bg { position: absolute; left: 0; width: 390px; }
+.content-bg--band { top: 147px; height: 81px; background: #37848c; border-radius: 30px 30px 0 0; }
+.content-bg--fill { top: 228px; height: 616px; background: #efefef; }
+
+/* Name — a real inline "label: value" field. The whole row shares one
+   underline, matching Figma's Line 2 sitting directly under the label. */
+.namefield {
+  position: absolute;
+  left: 36px;
+  top: 162px;
+  width: 318px;
+  height: 34px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border-bottom: 1px solid #56a8b0;
+  padding-bottom: 6px;
+  cursor: text;
+}
+.namefield__label {
+  flex: none;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.namefield__label > span { font-weight: 700; }
+.namefield__label .t-en { font-family: var(--font-en); font-size: 24px; }
+.namefield__label .sp   { font-size: 20px; }
+.namefield__label .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
+
+.namefield input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #fff;
+  font: 22px/1.3 var(--font-en), var(--font-cn);
+  padding: 0;
+}
+.namefield input::placeholder { color: rgba(255, 255, 255, .55); }
+
+/* Relationship / Phone no. / Avatar — bold two-line bilingual labels,
+   identical pattern to the other black-on-#efefef field labels in the app. */
+.fieldlabel {
+  position: absolute;
+  left: 36px;
+  top: var(--y);
+  width: 318px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  white-space: nowrap;
+  color: #000;
+}
+.fieldlabel > span { font-weight: 700; }
+.fieldlabel .t-en { font-family: var(--font-en); font-size: 24px; }
+.fieldlabel .sp   { font-size: 20px; }
+.fieldlabel .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
+
+/* teal pill text inputs — Relationship, and the tail of Phone no. */
+.pillinput {
+  position: absolute;
+  top: var(--y);
+  height: 42px;
+  border: 0;
+  border-radius: 21px;
+  background: #37848c;
+  color: #fff;
+  font: 18px var(--font-en), var(--font-cn);
+  padding: 0 18px;
+  outline: none;
+}
+.pillinput::placeholder {
+  font-family: var(--font-cn);
+  font-size: 16px;
+  letter-spacing: .8px;
+  color: rgba(204, 204, 204, .8);
+}
+.pillinput:focus { box-shadow: 0 0 0 2px #154c52 inset; }
+.pillinput--wide   { left: 36px;  width: 318px; }
+.pillinput--narrow { left: 102px; width: 252px; padding: 0 12px; }
+
+.phonechip {
+  position: absolute;
+  left: 36px;
+  top: var(--y);
+  width: 48.541px;
+  height: 42px;
+  border-radius: 21px;
+  background: #d7bb89;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-en);
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* ------------------------------------------------------------------ avatar */
+.avatar {
+  position: absolute;
+  left: 97px;
+  top: 527px;
+  width: 196px;
+  height: 196px;
+}
+.avatar__img {
+  position: absolute;
+  inset: 0;
+  width: 196px;
+  height: 196px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #37848c;
+}
+.avatar__edit {
+  position: absolute;
+  left: 176px;
+  top: 67px;
+  width: 63px;
+  height: 63px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.avatar__edit-bg  { position: absolute; inset: 0; width: 63px; height: 63px; }
+.avatar__edit-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 29.828px;
+  height: 29.828px;
+  transform: translate(-50%, -50%);
+}
+.avatar__edit:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; border-radius: 50%; }
+
+/* -------------------------------------------------------------------- save */
+.save {
+  position: absolute;
+  left: 37px;
+  top: 763px;
+  width: 317px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  background: #154c52;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  color: #fff;
+  font-size: 0;
+  line-height: normal;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.save:active { transform: scale(.98); }
+.save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }
+
+.namefield.is-invalid { border-bottom-color: #b44439; }
+
+/* Validation/photo feedback. This used to be visually hidden (sr-only) —
+   fine for a screen reader, but a sighted user who clicks Save with an
+   empty name saw literally nothing happen and reasonably assumed the
+   button was broken. Visible text in the one gap left in this layout (the
+   40px between the avatar and Save) fixes that without moving anything. */
+.formstatus {
+  position: absolute;
+  left: 37px;
+  top: 731px;
+  width: 317px;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 700;
+  color: #154c52;
+}
+.formstatus.is-error { color: #b44439; }
