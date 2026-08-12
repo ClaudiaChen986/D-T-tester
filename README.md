@@ -1,6 +1,6 @@
 # 归途 GuiTu — screens
 
-Eight screens from the Figma file
+Nine screens from the Figma file
 [`prototype-5`](https://www.figma.com/design/xeQNx3M5eHj129RIIwGdQO/prototype-5),
 wired together into one click-through prototype. Open `index.html` in a
 browser — no build step, no dependencies.
@@ -14,6 +14,9 @@ pages/
   home.html                Home screen (node 2:40) — what index.html used to
                             be before the language screen became the entry
                             point; every language button leads here
+  calling.html              "Calling…" (node 7:365 / 7:438) — one template
+                             for every contact's call button across the app,
+                             including Emergency
   profile.html              "Your profile" view (node 2:544) — Home's Profile
                              button leads here; shows the fields saved below
   edit-profile.html         "Your profile (edit)" (node 2:552) — step 1 of
@@ -30,6 +33,7 @@ css/
                             header/return/wordmark/crop helpers — every page
   soundwave.css             listening state: scrim + animated soundwave (home)
   language.css              index.html's own layout
+  calling.css                calling.html's own layout
   profile.css                profile.html's own layout
   edit-profile.css           edit-profile.html's own layout
   edit.css                  edit-contacts.html's own layout
@@ -40,6 +44,8 @@ js/
   language.js               index.html: viewport fit, remembers the chosen
                              language (localStorage + ?lang= on the link)
   app.js                    pages/home.html: viewport fit, press-to-speak, slide-up
+  calling.js                  calling.html: reads which contact was tapped,
+                               Speaker/Mute/Location toggles, hang up
   profile.js                  profile.html: renders saved (or seed) profile fields
   edit-profile.js             edit-profile.html: prefill, validation, save + handoff
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
@@ -141,3 +147,43 @@ blank fields every time would mean retyping everything to change one. First
 visit (nothing saved yet) has `profile.html` fall back to Figma's own sample
 values (`User.123@example.com` etc.) instead of showing an empty card, the
 same seed-data reasoning `contacts.html` already uses for Family/Friends.
+
+## "Calling…" — one template for every call
+
+`calling.html` implements node `7:365` (a regular contact) and `7:438`
+(Emergency) as a single page, since the two differ only in what's shown —
+name/avatar vs. "Emergency service 紧急联络"/a warning-triangle icon, both
+driven by the same `guitu.callTarget` handoff — not in layout. Every call
+button across the app (`home.html`'s slide-up card rows, `contacts.html`'s
+cards) now points here instead of a bare `tel:` link: the tapped contact
+(name, phone, photo if it has one) is written to `sessionStorage` right
+before the browser follows the link, and this page reads it back on load.
+A saved contact's photo can be a sizeable data URL — too unwieldy to
+round-trip through an HTML attribute on every card — so `contacts.js`
+instead keeps the real contact objects in memory and has each call link
+carry only an index into that list; a click handler resolves the actual
+contact from it at the moment of navigation instead of ahead of time.
+
+Speaker, Mute, and Location are plain on/off toggles (icon swap + a
+red/cream background swap, both taken directly from Figma's own two states
+for each button — see node `7:470`, a 9-variant component covering all
+three toggle combinations) with no real audio routing, microphone, or
+location sharing behind them — consistent with the rest of this
+prototype's "the interaction is real, the backend isn't" posture (the
+keypad is likewise visual-only, no DTMF or typed-digits display). Hung up
+ends the call via `history.back()`, returning to wherever the call was
+placed from, since it can legitimately be either `home.html` or
+`contacts.html`. This is also the one screen in the whole app with no
+`.return` arrow at all — there's deliberately no way out except hanging up,
+matching a real in-call screen.
+
+Nearly every supporting asset here turned out to already exist elsewhere in
+the app — the background texture, and (surprisingly) even the hangup
+button's hand-drawn ring backdrop, which is pixel-identical to
+`icon-field-backdrop.png` from the profile pages, reused outright rather
+than re-exported. The Speaker/Mute icons' "on" (white) variants aren't
+separate Figma exports either: comparing the "off" and "on" SVGs Figma *did*
+export for Location showed they're the exact same path data, just
+recolored, so the other two buttons' "on" states were derived the same way
+(swap `#37848C` for `white`) instead of two more round-trips to fetch
+assets that would have come back identical anyway.

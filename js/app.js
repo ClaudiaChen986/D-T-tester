@@ -135,7 +135,7 @@
     var c = CONTACTS[id];
     var numHtml = c.phone ? '<span class="t-num">' + formatAuPhone(c.phone) + '</span>' : '';
     var callHtml = c.phone
-      ? '<a class="row__call" href="tel:' + c.phone + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
+      ? '<a class="row__call" href="calling.html" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
           '<img src="../assets/call-btn.svg" alt="">' +
         '</a>'
       : '<span class="row__call" aria-hidden="true" style="--y:' + slot.callY + 'px">' +
@@ -168,7 +168,7 @@
           '<span class="t-cn">' + c.cn + '</span>' +
           '<span class="t-num">' + c.phone + '</span>' +
         '</span>' +
-        '<a class="row__call row__call--sos" href="tel:' + c.phone + '" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
+        '<a class="row__call row__call--sos" href="calling.html" data-call-id="emergency" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
           '<img src="../assets/call-btn-plain.svg" alt="">' +
           '<img class="row__call-glyph" src="../assets/icon-phone-white.svg" alt="">' +
         '</a>' +
@@ -181,6 +181,16 @@
     var slot = SLOTS[i];
     return CONTACTS[id].type === 'emergency' ? emergencyRowHtml(slot) : personRowHtml(id, slot);
   }).join('');
+
+  // Call buttons link straight to calling.html; this just hands off which
+  // contact was tapped before the browser follows that href — see
+  // js/calling.js for how it's read back on the other side.
+  sheetRows.addEventListener('click', function (e) {
+    var link = e.target.closest('a[data-call-id]');
+    if (!link) return;
+    var c = CONTACTS[link.dataset.callId];
+    try { sessionStorage.setItem('guitu.callTarget', JSON.stringify(c)); } catch (err) { /* best effort only */ }
+  });
 
   /* ------------------------------------------------------- slide-up card */
   function setSheet(expanded) {

@@ -76,10 +76,20 @@
     return '<img src="../assets/avatar-sm.svg" alt="">';
   }
 
+  /* Calls hand off to calling.html the same way home.html's rows do (see
+     js/app.js) — except a saved contact's photo can be a sizeable data
+     URL, too unwieldy to round-trip through an HTML attribute, so instead
+     of stashing the target directly on the link, the link just carries an
+     index into this in-memory list and a delegated click handler (below)
+     looks the real contact up out of it right before the browser follows
+     the href. */
+  var CALL_TARGETS = [];
+
   function callButtonHtml(contact) {
     var icon = '<img src="../assets/icon-call-white.svg" alt="">';
     if (contact.phone) {
-      return '<a class="card__call" href="tel:' + escapeHtml(contact.phone) + '" ' +
+      var index = CALL_TARGETS.push(contact) - 1;
+      return '<a class="card__call" href="calling.html" data-call-index="' + index + '" ' +
              'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
     }
     return '<span class="card__call" aria-hidden="true">' + icon + '</span>';
@@ -135,4 +145,13 @@
 
   renderGrid(document.getElementById('familyGrid'), SEED_FAMILY, 'family', saved);
   renderGrid(document.getElementById('friendsGrid'), SEED_FRIENDS, 'friends', saved);
+
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('a[data-call-index]');
+    if (!link) return;
+    var contact = CALL_TARGETS[Number(link.dataset.callIndex)];
+    if (!contact) return;
+    var target = { en: contact.name, cn: contact.cn || '', phone: contact.phone, photo: contact.photo || null, type: 'person' };
+    try { sessionStorage.setItem('guitu.callTarget', JSON.stringify(target)); } catch (err) { /* best effort only */ }
+  });
 }());

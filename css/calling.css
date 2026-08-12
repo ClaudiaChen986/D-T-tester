@@ -1,0 +1,213 @@
+/* ============================================================================
+   归途 GuiTu — "Calling…" (Figma node 7:365 / 7:438 / button states 7:470)
+   ----------------------------------------------------------------------------
+   One template for every call — regular contact or the Emergency entry —
+   driven by pages/calling.html + js/calling.js reading whichever contact
+   was tapped (sessionStorage, see js/calling.js). No .return arrow on this
+   screen at all: unlike every other page, there's deliberately no way
+   back except "Hung up", matching a real in-call screen.
+   ========================================================================== */
+
+.screen--call {
+  background: linear-gradient(to bottom, #37848c, #154c52);
+}
+
+.callscreen__caption {
+  position: absolute;
+  left: 50%;
+  top: 55px;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-en);
+  font-size: 18px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.callscreen__name {
+  position: absolute;
+  left: 50%;
+  top: 79px;
+  transform: translateX(-50%);
+  margin: 0;
+  width: max-content;
+  max-width: 340px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #fff;
+}
+.callscreen__name > span { display: block; }
+.callscreen__name .t-en { font-family: var(--font-en); font-size: 32px; }
+.callscreen__name .t-cn { font-family: var(--font-cn); font-size: 30px; letter-spacing: 1.5px; }
+
+.callscreen__status {
+  position: absolute;
+  left: 50%;
+  top: 208px;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  white-space: nowrap;
+  color: #fff;
+}
+.callscreen__status .t-en { font-family: var(--font-en); font-size: 18px; }
+.callscreen__status .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+
+.callscreen__avatar {
+  position: absolute;
+  left: 95px;
+  top: 249px;
+  width: 199.236px;
+  height: 199.236px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fbefda;
+}
+
+/* ------------------------------------------------------------------ keypad
+   Decorative — this prototype doesn't wire DTMF tones or a typed-digits
+   display, matching Location/Speaker's non-functional-but-visible
+   affordances elsewhere on this same screen. */
+.callscreen__keypad { position: absolute; left: 0; top: 0; width: 390px; height: 844px; pointer-events: none; }
+.callkey {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 67.2px;
+  height: 67.2px;
+  border-radius: 50%;
+  border: 0;
+  background: #fbecd1;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  font-family: var(--font-en);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 1.6px;
+  color: #000;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform .1s ease;
+}
+.callkey:active { transform: scale(.93); }
+
+/* -------------------------------------------------------------- call panel
+   Always expanded — a fixed in-call control panel, not the draggable
+   collapsed/expanded slide-up card the home screen uses (there's nothing
+   to collapse it *to* here). */
+.callpanel {
+  position: absolute;
+  left: 0;
+  top: 464px;
+  width: 390px;
+  height: 380px;
+  border-radius: 30px 30px 0 0;
+  background: #edd8b4;
+}
+.callpanel__handle {
+  position: absolute;
+  left: 160px;
+  top: 9.07px;
+  width: 70px;
+  height: 7.94px;
+  border-radius: 20px;
+  background: #d7bb89;
+}
+
+/* One group per button (speaker/mute/location) — --x positions the whole
+   85px-wide group (matching Figma's own per-button wrapper), the button
+   circle sits inset 2.5px within it (centering the 80px circle in the
+   85px column) and the label fills the full width below. */
+.callbtn-group {
+  position: absolute;
+  left: var(--x);
+  top: 40px;
+  width: 85px;
+}
+.callbtn {
+  position: absolute;
+  left: 2.5px;
+  top: 0;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fbecd1;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  cursor: pointer;
+  transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+}
+.callbtn:active { transform: scale(.95); }
+.callbtn.is-active {
+  background: #d42628;
+  box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
+}
+.callbtn__icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+}
+
+.callbtn-label {
+  position: absolute;
+  left: 0;
+  top: 88px;
+  width: 85px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.callbtn-label > span { display: block; }
+.callbtn-label .t-en { font-family: var(--font-en); font-size: 16px; }
+.callbtn-label .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
+
+.callscreen__hangup {
+  position: absolute;
+  left: 135px;
+  top: 187px;
+  width: 120px;
+  height: 120px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.callscreen__hangup:active { transform: scale(.96); }
+.callscreen__hangup-bg {
+  position: absolute;
+  left: -26.412px;
+  top: 0;
+  width: 172.68px;
+  height: 120px;
+  max-width: none;
+}
+.callscreen__hangup-icon {
+  position: absolute;
+  left: 33px;
+  top: 32px;
+  width: 54px;
+  height: 56px;
+}
+
+.callscreen__hangup-label {
+  position: absolute;
+  left: 152.5px;
+  top: 309px;
+  width: 85px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.callscreen__hangup-label > span { display: block; }
+.callscreen__hangup-label .t-en { font-family: var(--font-en); font-size: 20px; }
+.callscreen__hangup-label .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
