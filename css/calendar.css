@@ -124,7 +124,13 @@
 .timeline__day:nth-of-type(1) { grid-column: 2; }
 .timeline__day:nth-of-type(2) { grid-column: 4; }
 .timeline__day:nth-of-type(3) { grid-column: 6; }
-.timeline__day > span { display: block; font-weight: 700; }
+/* "2 Days" is wider than its own 50px lane, so its EN line needs
+   white-space:nowrap + visible overflow to stay one line ("2 Days") in
+   its own row instead of wrapping mid-phrase into a third line above
+   "后天" — doesn't disturb the lane grid the pills below actually align
+   to, since only the label text overflows, not the grid track itself. */
+.timeline__day { overflow: visible; }
+.timeline__day > span { display: block; font-weight: 700; white-space: nowrap; }
 .timeline__day .t-en { font-family: var(--font-en); font-size: 20px; }
 .timeline__day .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
 
@@ -290,7 +296,7 @@
 .calsheet__handle {
   position: absolute;
   left: 50%;
-  top: 71px;
+  top: 85px;
   width: 70px;
   height: 49px;
   padding: 0;
@@ -343,7 +349,11 @@
    The card's own scrollable content — "inside the slide up card the
    timeline should also be scrollable" — a single overflow-y:auto region
    holding the plan-tomorrow button and today's detail timeline together,
-   so the button scrolls with the list instead of eating fixed space. */
+   so the button scrolls with the list instead of eating fixed space.
+   No border-radius on this seam: a rounded top here read as two stacked
+   pieces (nav bar, then a separate rounded card below it) rather than
+   one continuous card, which is what dragging the whole thing as a unit
+   should look like. */
 .calsheet__body {
   flex: 1;
   min-height: 0;
@@ -351,7 +361,6 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   background: var(--c-accent);
-  border-radius: 30px 30px 0 0;
   padding: 0 20px 24px;
 }
 
