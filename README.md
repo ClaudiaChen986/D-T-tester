@@ -527,11 +527,16 @@ celebrations — and picking one both closes the strip and renders that
 glyph inside the circle, which is also what shows up as the event's icon
 back on `calendar.html`'s pills and list rows. Figma's own "Date and Time
 - Wheels" component (an iOS-style scroll picker, per its own linked Apple
-HIG docs) is approximated here with native `<input type="date">` /
-`<input type="time">` fields, styled to match the app's pill language
-rather than reproduced as a custom wheel widget — the same kind of
-native-control simplification this app already makes elsewhere. Duration
-keeps Figma's own preset-chip design (5/10/15/30 min, 1h/2h/3h) as plain
+HIG docs) is approximated here as two different native controls: Date
+keeps a plain `<input type="date">`, styled to match the app's pill
+language; Time is a drag-left-to-right `<input type="range">` (0:00-24:00
+in 5-minute steps) instead — closer to "slide to choose" than a native
+time field reads, without building a custom wheel widget. Its teal/cream
+fill and the live "8:00 pm" label above it both repaint on every `input`
+event (`js/add-event.js`), not just on release, so the picked time is
+visible continuously while dragging, the same way the label on Figma's
+own wheel tracks whatever's under the selection band. Duration keeps
+Figma's own preset-chip design (5/10/15/30 min, 1h/2h/3h) as plain
 selectable buttons.
 
 This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add

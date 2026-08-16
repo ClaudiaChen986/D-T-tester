@@ -113,8 +113,7 @@
 .fieldgroup__label .t-en { font-family: var(--font-en); font-size: 22px; }
 .fieldgroup__label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
 
-.datepill,
-.timepill {
+.datepill {
   width: 100%;
   height: 50px;
   border: 0;
@@ -126,10 +125,82 @@
   outline: none;
   box-sizing: border-box;
 }
-.datepill::-webkit-calendar-picker-indicator,
-.timepill::-webkit-calendar-picker-indicator {
+.datepill::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
+}
+
+/* -------------------------------------------------------------- time slider
+   A drag-left-to-right pill in place of Figma's own iOS-style wheel picker
+   — same native-control simplification as Date, just a range input this
+   time. Track fill (teal up to the thumb, cream past it) is painted as a
+   plain CSS background on the input itself, with both pseudo-element track
+   variants forced transparent so that background shows through in every
+   browser; js/add-event.js recomputes the gradient's stop on every `input`
+   event so the fill tracks the thumb continuously while dragging, not just
+   on release. */
+.timeslider { position: relative; }
+.timeslider__value {
+  margin: 0 0 10px;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+}
+.timeslider__input {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 50px;
+  margin: 0;
+  border-radius: 30px;
+  background: #edd8b4;
+  outline: none;
+  cursor: pointer;
+}
+.timeslider__input::-webkit-slider-runnable-track {
+  height: 50px;
+  border-radius: 30px;
+  background: transparent;
+}
+.timeslider__input::-moz-range-track {
+  height: 50px;
+  border-radius: 30px;
+  background: transparent;
+}
+.timeslider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 34px;
+  height: 34px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #154c52;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
+  cursor: grab;
+}
+.timeslider__input::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #154c52;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
+  cursor: grab;
+}
+.timeslider__input:active::-webkit-slider-thumb,
+.timeslider__input:active::-moz-range-thumb { cursor: grabbing; }
+.timeslider__input:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; }
+
+.timeslider__ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-en);
+  font-size: 13px;
+  color: rgba(0, 0, 0, .45);
 }
 
 .durationrow {

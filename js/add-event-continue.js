@@ -37,17 +37,16 @@
   summaryTitle.textContent = draft.title;
   summaryWhen.innerHTML = formatWhen(draft.date, draft.time);
 
-  function formatWhen(dateValue, timeValue) {
+  function formatWhen(dateValue, timeMinutes) {
     var MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var d = new Date(dateValue + 'T00:00:00');
     var dateLine = MONTHS_EN[d.getMonth()] + ' ' + d.getDate() +
       ' <span class="t-cn">（' + (d.getMonth() + 1) + '月' + d.getDate() + '日）</span>, ' + d.getFullYear();
 
-    var parts = timeValue.split(':');
-    var h = parseInt(parts[0], 10), m = parts[1];
+    var h = Math.floor(timeMinutes / 60), m = timeMinutes % 60;
     var isPm = h >= 12;
     var h12 = h % 12 === 0 ? 12 : h % 12;
-    var timeLine = h12 + ':' + m + ' ' + (isPm ? 'pm' : 'am') +
+    var timeLine = h12 + ':' + (m < 10 ? '0' : '') + m + ' ' + (isPm ? 'pm' : 'am') +
       ' <span class="t-cn">（' + (isPm ? '下午' : '上午') + '）</span>';
 
     return dateLine + '<br>' + timeLine;

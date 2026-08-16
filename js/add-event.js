@@ -2,6 +2,11 @@
    归途 GuiTu — Adding event behaviour (Figma node 19:1501)
      · the round icon-picker toggles a small selection bar of Material
        Symbols (fonts.google.com/icons) — pick one, it lands in the circle
+     · Time is a drag-left-to-right range slider (0:00-24:00 in 5-minute
+       steps) rather than Figma's own wheel picker — the live value label
+       and the teal/cream fill both update on every `input` event, so
+       dragging shows the picked time continuously instead of only on
+       release
      · Save doesn't write the event yet — it's only step 1 of the flow.
        It hands the title/icon/date/time/duration to
        add-event-continue.html (node 19:1547, Repeat + optional sub-task)
@@ -23,6 +28,7 @@
   var titleInput  = document.getElementById('titleInput');
   var dateInput   = document.getElementById('dateInput');
   var timeInput   = document.getElementById('timeInput');
+  var timeValue   = document.getElementById('timeValue');
   var durationRow = document.getElementById('durationRow');
   var status      = document.getElementById('formStatus');
 
@@ -82,14 +88,33 @@
   if (dayParam === 1 || dayParam === 2) defaultDate.setDate(defaultDate.getDate() + dayParam);
   dateInput.value = toDateInputValue(defaultDate);
 
-  var now = new Date();
-  now.setMinutes(Math.round(now.getMinutes() / 5) * 5, 0, 0);
-  timeInput.value = pad(now.getHours()) + ':' + pad(now.getMinutes());
-
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function toDateInputValue(d) {
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
+
+  /* ----------------------------------------------------------- time slider */
+  function formatTime(minutes) {
+    var h = Math.floor(minutes / 60), m = minutes % 60;
+    var isPm = h >= 12;
+    var h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + pad(m) + ' ' + (isPm ? 'pm' : 'am');
+  }
+
+  function updateTimeSlider() {
+    var minutes = parseInt(timeInput.value, 10);
+    var pct = (minutes / timeInput.max) * 100;
+    timeValue.textContent = formatTime(minutes);
+    timeInput.setAttribute('aria-valuetext', formatTime(minutes));
+    timeInput.style.background =
+      'linear-gradient(to right, #37848c ' + pct + '%, #edd8b4 ' + pct + '%)';
+  }
+
+  var now = new Date();
+  now.setMinutes(Math.round(now.getMinutes() / 5) * 5, 0, 0);
+  timeInput.value = String(now.getHours() * 60 + now.getMinutes());
+  updateTimeSlider();
+  timeInput.addEventListener('input', updateTimeSlider);
 
   /* ------------------------------------------------------------------ save */
   function dayOffset(dateValue) {
@@ -110,20 +135,19 @@
       titleInput.focus();
       return;
     }
-    if (!dateInput.value || !timeInput.value) {
-      status.textContent = 'Please set a date and time 请设置日期和时间';
+    if (!dateInput.value) {
+      status.textContent = 'Please set a date 请设置日期';
       return;
     }
 
-    var parts = timeInput.value.split(':');
-    var startMinutes = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    var startMinutes = parseInt(timeInput.value, 10);
 
     var draft = {
       title: title,
       icon: selectedIcon || 'event',
       day: dayOffset(dateInput.value),
       date: dateInput.value,
-      time: timeInput.value,
+      time: startMinutes,
       start: startMinutes,
       duration: selectedMinutes,
     };

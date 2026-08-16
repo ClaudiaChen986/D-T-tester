@@ -75,7 +75,14 @@
 
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Time</span> <span class="t-cn">时间</span></p>
-        <input class="timepill" type="time" id="timeInput" name="time" required>
+        <div class="timeslider">
+          <div class="timeslider__value" id="timeValue" aria-hidden="true"></div>
+          <input class="timeslider__input" type="range" id="timeInput" name="time"
+                 min="0" max="1435" step="5" aria-label="Time 时间">
+          <div class="timeslider__ends" aria-hidden="true">
+            <span>0:00</span><span>24:00</span>
+          </div>
+        </div>
       </div>
 
       <div class="fieldgroup">
