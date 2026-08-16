@@ -1,0 +1,104 @@
+/* ============================================================================
+   归途 GuiTu — "Adding journal" (Figma node 19:1534, "add task - both")
+   Shares .stage/.screen, tokens, and the .crop/.return/.wordmark/
+   .header-title-centered helpers with styles.css — same gradient-and-two-
+   flat-panels layout add-contact.css already established (teal band under
+   the header, cream/gray fill below it, a pinned Save pill at the bottom),
+   just with this node's own pixel offsets and a single title input instead
+   of a multi-field form.
+   ========================================================================== */
+
+.screen--addjournal {
+  background: linear-gradient(to bottom, rgba(166, 49, 38, .8), var(--c-red));
+}
+
+/* ----------------------------------------------------------------- content */
+.content-bg { position: absolute; left: 0; width: 390px; }
+.content-bg--band { top: 128px; height: 81px; background: #37848c; border-radius: 30px 30px 0 0; }
+.content-bg--fill { top: 209px; height: 637px; background: #efefef; }
+
+/* Title — a real input sitting directly in the teal band, styled to match
+   Figma's bold placeholder text; typed text keeps the same bold treatment
+   since there's no separate label here (unlike add-contact's Name field). */
+.titlefield {
+  position: absolute;
+  left: 36px;
+  top: 153px;
+  width: 318px;
+  height: 34px;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #56a8b0;
+  outline: none;
+  padding: 0 0 6px;
+  color: #fff;
+  font: 700 24px/1.2 var(--font-en), var(--font-cn);
+}
+.titlefield::placeholder {
+  font-family: var(--font-cn);
+  font-weight: 700;
+  color: rgba(255, 255, 255, .85);
+}
+.titlefield:focus { border-bottom-color: #fff; }
+
+/* Body — the entry text itself, filling the rest of the gray panel above
+   the Save pill. */
+.bodyfield {
+  position: absolute;
+  left: 36px;
+  top: 251px;
+  width: 318px;
+  height: 470px;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  outline: none;
+  resize: none;
+  color: #000;
+  font: 400 18px/1.5 var(--font-en), var(--font-cn);
+}
+.bodyfield::placeholder {
+  font-family: var(--font-cn);
+  font-size: 16px;
+  letter-spacing: .8px;
+  color: #979797;
+}
+.bodyfield.is-invalid { box-shadow: 0 0 0 2px #b44439 inset; border-radius: 6px; }
+
+/* -------------------------------------------------------------------- save
+   Identical position/style to add-contact.html's own Save pill. */
+.save {
+  position: absolute;
+  left: 37px;
+  top: 763px;
+  width: 317px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  background: #154c52;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  color: #fff;
+  font-size: 0;
+  line-height: normal;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.save:active { transform: scale(.98); }
+.save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }
+
+.formstatus {
+  position: absolute;
+  left: 37px;
+  top: 733px;
+  width: 317px;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 700;
+  color: #154c52;
+}
+.formstatus.is-error { color: #b44439; }

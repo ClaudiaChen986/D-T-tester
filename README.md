@@ -40,6 +40,13 @@ pages/
   event-location.html      Routed Google Maps view for a senior event's
                             venue — reads ?name=&address= off the link that
                             sent it here
+  journal.html              "My Journal" (node 19:1577) — Other's My
+                             Journal tile leads here; real scrolling page,
+                             seeded with Figma's three sample entries plus
+                             anything saved from add-journal.html
+  add-journal.html          "Adding journal" (node 19:1534) — journal.html's
+                             Add button leads here; title + body form, Save
+                             writes a new entry and returns to journal.html
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -56,6 +63,8 @@ css/
   todays-events.css          todays-events.html's own layout
   senior-events.css          senior-events.html's own layout
   event-location.css         event-location.html's own layout
+  journal.css                journal.html's own layout
+  add-journal.css            add-journal.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -71,6 +80,9 @@ js/
   other.js                  other.html: viewport fit only
   event-location.js         event-location.html: viewport fit, reads
                              ?name=&address=, live routed Google Maps embed
+  journal.js                 journal.html: seeds + saved-entry rendering,
+                              CJK/Latin script-run splitting per entry
+  add-journal.js              add-journal.html: validation, save, handoff
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -129,6 +141,12 @@ file under `css/`.
   is denied/unavailable — same posture as every map on this project). Its
   return arrow goes back to `senior-events.html`; its "Back to homepage" bar
   goes to `home.html`.
+- Other's *My Journal* tile → `journal.html`. Its **Add** button →
+  `add-journal.html`; Save there validates, writes the new entry to
+  `localStorage`, and returns to `journal.html`, where it now appears ahead
+  of every other entry. `add-journal.html`'s return arrow (cancel) goes back
+  to `journal.html`; `journal.html`'s own return arrow and "Back to
+  homepage" bar go to `other.html` and `home.html` respectively.
 
 ## "Choose your language" — the real entry point
 
@@ -259,8 +277,9 @@ assets that would have come back identical anyway.
 `other.html` (node 142:824) is structurally the same menu Translation's
 Figma node uses — same scalloped card shape, same round badge artwork, same
 chevron and bottom-bar geometry — just with three different cards (Today's
-new events, My Calendar, My Journal; only the first leads anywhere yet, see
-below). Header, return button, background texture, and
+new events, My Calendar, My Journal; the first and third lead somewhere,
+see below — My Calendar has no destination screen yet). Header, return
+button, background texture, and
 bottom bar are all pixel-identical assets to what every other return-button
 page already ships (confirmed by comparing exported bytes), so the only
 genuinely new assets are the card background/badge (re-exported under this
@@ -352,3 +371,53 @@ content (`width: max-content`) works for short fixed strings, but an
 event name is arbitrary, caller-supplied text that can run long enough to
 span the whole screen and sit on top of the return button; a bounded,
 right-aligned box wraps within itself instead of growing into it.
+
+## "My Journal" — real entries, sized to whatever's actually written
+
+`journal.html` (node 19:1577, "My journal - both") is Other's *My Journal*
+tile, and — like every other open-ended list in this app — a real
+scrolling page. Header, return button, and bottom bar are all
+pixel-identical assets to what other pages already ship (confirmed by
+comparing exported bytes); the only genuinely new asset is the entry card
+shape itself, `journal-card-bg.svg` (Figma calls it "Union") — a scalloped
+cream card distinct from the ticket shape `today-card-bg-lg.svg`/
+`other-card-bg.svg` use elsewhere, so it isn't a reuse of either.
+
+Figma's three sample entries are all sized to a fixed 365px-tall card,
+eyeballed per sample. A real journal entry is arbitrary, user-typed text
+with no predictable length, so — the same lesson `event-location.html`'s
+title bar just taught above, applied to a list this time instead of a
+header — the card sizes to its own content (padding, not a fixed height)
+rather than risking overflow or an oddly empty box. The three Figma
+samples are seeded as-is (`js/journal.js`) and always render last; entries
+saved from `add-journal.html` are read from `localStorage`
+(`guitu.journal`) and rendered *ahead* of them, newest first — the order
+an actual journal reads in — since `add-journal.js` is the one that
+`unshift`s a new entry onto the stored array rather than appending.
+
+Figma's own "学习新单词" sample switches font mid-sentence — Chinese prose
+quoting two English phrases in Inria Serif rather than Noto Serif SC.
+Reproducing that for genuinely-typed entries (where nothing about the
+split is known ahead of time) means detecting it at render time: each
+entry's title and body are split into runs of CJK vs. non-CJK characters
+and each run gets its own font span, the same script-detection idea
+`contacts.js` already uses to pick a saved contact name's font
+(`CJK_RE`/`nameFontClass` there; `journal.js` reuses the same character
+ranges for its own `richTextHtml`). The three seed entries render through
+this same function rather than hand-placed spans, since it reproduces
+Figma's own mixed-script rendering anyway.
+
+`add-journal.html` (node 19:1534, "add task - both") reuses
+add-contact.html's established shape for a form screen — a teal band
+under the header, a cream/gray fill below it, a pinned Save pill at the
+bottom — with this node's own pixel offsets and just two fields: a bold
+title input sitting directly in the teal band (styled to match Figma's
+bold placeholder text, underlined the same way add-contact.css's Name
+field is, via `border-bottom` rather than a separate line asset) and a
+body textarea filling the rest of the panel. Only the body is required to
+save — an entry with a title but nothing written in it isn't a journal
+entry — matching the "one required field, the rest optional" posture
+add-contact.js already established for Name. Save falls back to handing
+the new entry to `journal.html` via a URL parameter if `localStorage`
+throws (the same file://-Firefox contingency add-contact.js already
+guards against), so Save never silently does nothing.

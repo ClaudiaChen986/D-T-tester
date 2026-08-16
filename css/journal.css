@@ -1,0 +1,166 @@
+/* ============================================================================
+   归途 GuiTu — "My Journal" (Figma node 19:1577, "My journal - both")
+   ----------------------------------------------------------------------------
+   A real (unbounded-height) scrolling page, same reasoning as contacts.css
+   and todays-events.css: entries are open-ended, user-written content, not
+   something a fixed 390×844 mock scaled as one unit can hold. Header,
+   return button, and bottom bar are all pixel-identical assets to what
+   every other page already ships (confirmed by comparing exported bytes)
+   — the only genuinely new asset is the entry card shape itself
+   (`journal-card-bg.svg`, a scalloped card Figma calls "Union" — different
+   from the ticket shape `today-card-bg-lg.svg`/`other-card-bg.svg` use
+   elsewhere, so it isn't a reuse).
+
+   Figma's three sample entries all use a fixed 365px-tall card sized by
+   eye to that specific sample text. Real journal entries are arbitrary
+   user-typed text with no predictable length, so — same lesson as every
+   other real list in this app — the card here sizes to its own content
+   (padding, not a fixed height) instead of risking clipped or
+   badly-whitespaced text. See js/journal.js for how entries are rendered
+   and how the seed content models the three Figma samples.
+   ========================================================================== */
+
+.journal-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: var(--c-red);
+}
+
+.journalpage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--c-red);
+  font-family: var(--font-en);
+}
+.journalpage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../assets/bg-texture2.png') repeat;
+  opacity: .16;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ header */
+.journalhead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 390px;
+  height: 209.144px;
+}
+/* "My Journal 我的日志" is longer than "Home 首页", the text .header__title
+   was sized for — same fix contacts.css's own "My Contact 我的联系人" title
+   needs and for the same reason: without it, the browser's Latin/CJK
+   auto-break rule finds break points inside each phrase instead of only
+   between the two spans, and the extra wrapped line collides with the Add
+   button below. */
+.journalhead .header__title .t-en,
+.journalhead .header__title .t-cn { white-space: nowrap; }
+
+.addbtn {
+  position: absolute;
+  left: 247px;
+  top: 157px;
+  width: 119px;
+  height: 56px;
+  border-radius: 30px;
+  background: var(--c-teal);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.addbtn:active { transform: scale(.96); }
+.addbtn__label {
+  position: absolute;
+  left: 59px;
+  top: 10px;
+  width: 54px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.addbtn__label > span { display: block; font-weight: 700; }
+.addbtn__label .t-en { font-size: 16px; }
+.addbtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+
+/* -------------------------------------------------------------------- list */
+.journallist {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 23px 0 32px;
+}
+
+.entry {
+  position: relative;
+  width: 342px;
+  padding: 63px 23px 46px;
+  box-sizing: border-box;
+}
+.entry__bg {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  pointer-events: none;
+}
+
+.entry__title {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 14px;
+  font-weight: 700;
+  color: #000;
+}
+.entry__title .t-en { font-size: 32px; }
+.entry__title .t-cn { font-size: 30px; }
+
+.entry__body {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #000;
+  white-space: pre-wrap;
+}
+.entry__body .t-en { font-size: 18px; }
+.entry__body .t-cn { font-size: 16px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry as contacts.html's own .backbar. */
+.journalbar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 390px;
+  height: 134px;
+  margin: 6px 0 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.journalbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.journalbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.journalbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.journalbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .addbtn { transition: none; }
+}
