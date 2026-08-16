@@ -1,0 +1,51 @@
+/* ============================================================================
+   归途 GuiTu — "Go home" (Figma node 120:317)
+   ----------------------------------------------------------------------------
+   No curved header.svg on this page — Figma's own node doesn't have one,
+   just the plain red screen background (already .screen's default) with
+   the shared background texture, a return button, and a centered title
+   (reusing .header-title-centered from styles.css, which already matches
+   this page's own 24px/22px centered-title styling exactly). Return button,
+   bottom bar, and logo are the same pixel-identical assets every other
+   page uses.
+   ========================================================================== */
+
+.gohome-map {
+  position: absolute;
+  left: 0;
+  top: 131px;
+  width: 390px;
+  height: 700px;
+  border-radius: 30px 30px 0 0;
+  overflow: hidden;
+}
+.gohome-map > iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* -------------------------------------------------------------- back bar */
+.gohomebar {
+  position: absolute;
+  left: 0;
+  top: 710px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.gohomebar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.gohomebar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.gohomebar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.gohomebar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
