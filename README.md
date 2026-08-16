@@ -237,11 +237,19 @@ return button, background texture, and every piece of the card's own chrome
 (background, panel, handle, medallion, Calls/Profile pills, even the
 contact-row background shape the new rows sit on) are pixel-identical
 assets to what `home.html` already ships (confirmed by comparing exported
-bytes) — the only genuinely new asset is the map screenshot
-(`navigation-map.png`) and the small medallion icon on the two "Set
-destination" rows (`navigation-destination-icon.png`, a different art
-iteration of the same knot logo used elsewhere, not a crop of the existing
-sprite — confirmed those don't match byte-for-byte).
+bytes) — the only genuinely new asset is the small medallion icon on the
+two "Set destination" rows (`navigation-destination-icon.png`, a different
+art iteration of the same knot logo used elsewhere, not a crop of the
+existing sprite — confirmed those don't match byte-for-byte).
+
+The **map itself is a live, embedded Google Map** (`.navmap > iframe`),
+not the static screenshot Figma's own mock uses — draggable and
+pinch/scroll-zoomable the way any Google Maps view is, via Maps' keyless
+embed endpoint (`maps.google.com/maps?...&output=embed`), which needs
+neither an API key nor billing to render. The query centers it on the
+same Chatswood/Roseville corner of Sydney Figma's mock shows. This also
+means `navigation-map.png` is gone from `assets/` — nothing renders it
+anymore.
 
 The **share-location button** reuses Figma's two authored states (idle:
 cream circle, drop shadow; active: red circle, inset shadow) but not as

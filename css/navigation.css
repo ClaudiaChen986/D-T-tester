@@ -7,12 +7,17 @@
    home.html already uses (confirmed by comparing exported bytes) — this
    screen reuses the exact same "Slide up card" component/animation Figma
    itself reuses, so js/navigation.js's drag logic is the same one from
-   js/app.js, just without the dynamic contact list. Only the map photo, the
+   js/app.js, just without the dynamic contact list. Only the live map, the
    two new sheet rows (Go home / Set destination), and the share-location
    button are new.
    ========================================================================== */
 
-/* ------------------------------------------------------------------- map */
+/* ------------------------------------------------------------------- map
+   A real, embedded Google Map — draggable and pinch/scroll-zoomable like
+   any other Google Maps view, not a static screenshot — via Maps' keyless
+   embed endpoint (maps.google.com/maps?...&output=embed), so it needs
+   neither an API key nor billing to work. Figma's own mock centers on the
+   Chatswood/Roseville area of Sydney; the embed query keeps that. */
 .navmap {
   position: absolute;
   left: -3px;
@@ -21,10 +26,10 @@
   height: 821px;
   overflow: hidden;
 }
-.navmap > img {
+.navmap > iframe {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  border: 0;
   display: block;
 }
 
