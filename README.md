@@ -31,9 +31,10 @@ pages/
                             tile leads here
   daily-english.html       "Daily English" (node 7:812) — a word-of-the-day
                             card with real, spoken pronunciation
-  voice-translation.html   "Voice translation" (node 7:886, listening state
-                            257:444) — real English/Chinese text fields, a
-                            swap button, and home.html's press-and-hold
+  voice-translation.html   "Voice translation" (node 7:886; listening
+                            257:444; swapped 255:1584; swapped+listening
+                            257:489) — real text fields, a direction-swap
+                            button, and home.html's press-and-hold
                             listening overlay
   phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
                             page, like contacts.html; sixteen seed phrases +
@@ -315,14 +316,26 @@ of re-implementing it is what guarantees that.
 The English/Chinese boxes are real `<textarea>`s, not fake output panels
 that were only ever going to show placeholder text — there's no
 translation backend to call, so pretending one of them displays a live
-translation would be more dishonest than useful. That also gives the
-**swap** button something real to do (it exchanges the two boxes' text)
-instead of pressing and doing nothing. Where the browser exposes live
-speech recognition (`webkitSpeechRecognition` — Chrome/Edge; not
+translation would be more dishonest than useful. Where the browser exposes
+live speech recognition (`webkitSpeechRecognition` — Chrome/Edge; not
 universal, same tier of support as the calendar/location APIs elsewhere in
-the platform), holding the mic also transcribes real speech into the
-English box while the soundwave plays; unsupported browsers still get the
-full press-and-hold animation, just not the transcription.
+the platform), holding the mic also transcribes real speech into the top
+box, in whichever language currently sits there, while the soundwave
+plays; unsupported browsers still get the full press-and-hold animation,
+just not the transcription.
+
+**Swap** (node 255:1584, listening: 257:489) turned out to be a direction
+toggle, not a text-exchange button: Figma's swapped node shows the top
+card's *style* change too — translucent becomes solid and vice versa,
+traveling with the language — while the keyboard button stays on the top
+physical slot regardless of which language ends up there. So the two
+fields are two fixed slots whose label/card-style/placeholder is set by
+`js/voice-translation.js` from one `topLang` flag rather than hardcoded
+per position, and swapping moves each field's typed text along with its
+language (English text stays labeled English after a swap, wherever it
+physically lands) instead of leaving it mislabeled in place. Recognition
+language follows the same flag, so holding the mic recognizes whichever
+language currently sits on top.
 
 Two longer titles on this page ("Voice translation" in the header,
 "Translate by voice" on the button) needed the same fix every longer title

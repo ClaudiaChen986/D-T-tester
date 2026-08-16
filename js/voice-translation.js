@@ -1,22 +1,30 @@
 /* ============================================================================
-   归途 GuiTu — "Voice translation" (Figma node 7:886, listening state 257:444)
+   归途 GuiTu — "Voice translation"
+   (Figma node 7:886, listening 257:444, swapped 255:1584, swapped+listening
+   257:489)
    ----------------------------------------------------------------------------
    Press-and-hold the mic → the exact same listening overlay (scrim +
    animated soundwave) as home.html's voice assistant — this page reuses
    soundwave.css unchanged and just toggles the same `.screen.is-listening`
    class app.js does.
 
-   Two small real interactions on top of that, in keeping with "the
-   interaction is real, the backend isn't" (there's no translation backend
-   here to fake, so nothing pretends to translate):
-     - the keyboard button focuses the English box, since it really is a
-       plain, real textarea a person can type into
-     - the swap button swaps the two boxes' text, a real (if modest) thing
-       to do given there's nothing to actually translate
-   Where the browser supports live speech recognition (webkitSpeechRecognition
-   — Chrome/Edge; not universal), holding the mic also transcribes real
-   speech into the English box while the soundwave plays, same graceful
-   no-op-if-unsupported posture as daily-english.js's speech synthesis.
+   Two physical slots (top card, bottom card) that don't move; which
+   language each one currently shows does. Swapping toggles `topLang` and
+   re-renders both fields' label/card style/placeholder from it — and
+   moves each field's typed text along with its language, so a sentence
+   typed as English stays labeled English after a swap instead of quietly
+   becoming mislabeled as Chinese. The keyboard button and the mic both
+   always target the top slot, matching Figma (the keyboard button doesn't
+   move to the bottom card in the swapped node either).
+
+   In keeping with "the interaction is real, the backend isn't" (there's
+   no translation backend here to fake, so nothing pretends to translate):
+   the two boxes are plain, real textareas, and where the browser supports
+   live speech recognition (webkitSpeechRecognition — Chrome/Edge, not
+   universal) holding the mic transcribes real speech into the top box,
+   in whichever language currently sits there, while the soundwave plays —
+   same graceful no-op-if-unsupported posture as daily-english.js's speech
+   synthesis.
    ========================================================================== */
 (function () {
   'use strict';
@@ -25,8 +33,13 @@
   var stage    = document.querySelector('.stage');
   var voiceBtn = document.getElementById('voiceBtn');
   var status   = document.getElementById('status');
-  var enWell   = document.getElementById('enWell');
-  var cnWell   = document.getElementById('cnWell');
+
+  var topField    = document.getElementById('topField');
+  var topLabel    = document.getElementById('topLabel');
+  var topWell     = document.getElementById('topWell');
+  var bottomField = document.getElementById('bottomField');
+  var bottomLabel = document.getElementById('bottomLabel');
+  var bottomWell  = document.getElementById('bottomWell');
 
   /* ---------------------------------------------------------------- scaling */
   function fit() {
@@ -41,15 +54,54 @@
   window.addEventListener('resize', fit);
   window.addEventListener('orientationchange', fit);
 
+  /* ------------------------------------------------------- language state */
+  var LANG = {
+    en: {
+      label: '<span class="t-en">English</span><span class="t-cn"> 英语：</span>',
+      placeholder: 'Speak or type in English…',
+      style: 'transfield--light',
+      ariaLabel: 'English text 英语',
+      recognition: 'en-US',
+    },
+    cn: {
+      label: '<span class="t-en">Chinese</span><span class="t-cn"> 中文：</span>',
+      placeholder: '说中文或在此输入',
+      style: 'transfield--solid',
+      ariaLabel: 'Chinese text 中文',
+      recognition: 'zh-CN',
+    },
+  };
+  function otherLang(key) { return key === 'en' ? 'cn' : 'en'; }
+
+  var topLang = 'en'; // bottom is always whichever language top isn't
+
+  function applyField(fieldEl, labelEl, wellEl, langKey) {
+    var lang = LANG[langKey];
+    fieldEl.classList.remove('transfield--light', 'transfield--solid');
+    fieldEl.classList.add(lang.style);
+    labelEl.innerHTML = lang.label;
+    wellEl.placeholder = lang.placeholder;
+    wellEl.setAttribute('aria-label', lang.ariaLabel);
+  }
+
+  function render() {
+    applyField(topField, topLabel, topWell, topLang);
+    applyField(bottomField, bottomLabel, bottomWell, otherLang(topLang));
+  }
+  render();
+
   /* ---------------------------------------------------- type instead / swap */
   document.getElementById('keyboardBtn').addEventListener('click', function () {
-    enWell.focus();
+    topWell.focus();
   });
 
   document.getElementById('swapBtn').addEventListener('click', function () {
-    var en = enWell.value;
-    enWell.value = cnWell.value;
-    cnWell.value = en;
+    var oldTopText = topWell.value;
+    var oldBottomText = bottomWell.value;
+    topLang = otherLang(topLang);
+    topWell.value = oldBottomText;
+    bottomWell.value = oldTopText;
+    render();
   });
 
   /* ------------------------------------------------------- press-to-speak
@@ -58,13 +110,12 @@
   var recognizer = null;
   if (SpeechRecognition) {
     recognizer = new SpeechRecognition();
-    recognizer.lang = 'en-US';
     recognizer.continuous = true;
     recognizer.interimResults = true;
     recognizer.onresult = function (e) {
       var text = '';
       for (var i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
-      enWell.value = text.trim();
+      topWell.value = text.trim();
     };
     recognizer.onerror = function () { /* mic denied, no network, etc. — the overlay/animation still ran */ };
   }
@@ -78,6 +129,7 @@
     voiceBtn.setAttribute('aria-pressed', 'true');
     status.textContent = 'Listening… 正在聆听';
     if (recognizer) {
+      recognizer.lang = LANG[topLang].recognition;
       try { recognizer.start(); } catch (e) { /* already started, or mic unavailable */ }
     }
   }

@@ -17,6 +17,8 @@
 <!-- ============================================================
      Voice translation - both  ·  390 × 844   (Figma node 7:886)
      listening state: node 257:444 — same scrim + soundwave as home.html
+     swapped direction: node 255:1584 (listening+swapped: 257:489) —
+     js/voice-translation.js swaps which field is English/Chinese
      ============================================================ -->
 <div class="screen" id="screen">
 
@@ -48,31 +50,30 @@
     </h1>
   </header>
 
-  <!-- ------------------------------------------------------------ English field -->
-  <div class="transfield transfield--en" style="--y:162px">
-    <p class="transfield__label" style="--x:98px;--y2:53px">
-      <span class="t-en">English</span><span class="t-cn"> 英语：</span>
-    </p>
-    <textarea class="transfield__well" id="enWell" style="--x:20px;--y2:96px"
-              placeholder="Speak or type in English…" aria-label="English text 英语"></textarea>
+  <!-- ------------------------------------------------------------------ fields
+       Two fixed physical slots (top/bottom); which language each one shows
+       — label, card background (translucent vs solid), placeholder — is
+       set by js/voice-translation.js and flips on swap, not hardcoded to
+       "English"/"Chinese" here. The keyboard button stays with the top
+       slot regardless of language, matching Figma (it doesn't move to the
+       bottom card in the swapped node either). -->
+  <div class="transfield" id="topField" style="--y:162px">
+    <p class="transfield__label" id="topLabel" style="--x:98px;--y2:53px"></p>
+    <textarea class="transfield__well" id="topWell" style="--x:20px;--y2:96px" aria-label="Top text field"></textarea>
     <button class="transkeyboard" id="keyboardBtn" type="button" aria-label="Type instead 改为打字">
       <img src="../assets/icon-keyboard.svg" alt="">
     </button>
   </div>
 
-  <!-- ------------------------------------------------------------ Chinese field -->
-  <div class="transfield transfield--cn" style="--y:452px">
-    <p class="transfield__label" style="--x:101px;--y2:33px">
-      <span class="t-en">Chinese</span><span class="t-cn"> 中文：</span>
-    </p>
-    <textarea class="transfield__well" id="cnWell" style="--x:19px;--y2:74px"
-              placeholder="说中文或在此输入" aria-label="Chinese text 中文"></textarea>
+  <div class="transfield" id="bottomField" style="--y:452px">
+    <p class="transfield__label" id="bottomLabel" style="--x:101px;--y2:33px"></p>
+    <textarea class="transfield__well" id="bottomWell" style="--x:19px;--y2:74px" aria-label="Bottom text field"></textarea>
   </div>
 
   <!-- --------------------------------------------------------------- swap button
        Painted after both fields (not between them) so it sits visually on
        top of the seam between the two cards, matching Figma. -->
-  <button class="transswap" id="swapBtn" type="button" aria-label="Swap English and Chinese text 交换文本">
+  <button class="transswap" id="swapBtn" type="button" aria-label="Swap translation direction 切换翻译方向">
     <span class="crop transswap__badge" style="--x:0px;--y:0px;--w:80px;--h:80px">
       <img src="../assets/translation-icon-badge.png" alt=""
            style="--iw:115.152px;--ih:80.024px;--ix:-16.968px;--iy:-0.008px">

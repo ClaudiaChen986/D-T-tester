@@ -13,6 +13,15 @@
    No "Back to homepage" bar on this page — Figma's own node doesn't have
    one (the voice button already reaches the bottom of the screen), same
    as calling.html omits its own return arrow for a different reason.
+
+   The swap button (node 255:1607/257:502) doesn't just re-tag the two
+   fields — Figma's swapped node (255:1584) shows the *card style*
+   (translucent vs. solid) travels with the language too, while the
+   keyboard button stays on the top physical slot regardless of which
+   language currently sits there. So `.transfield--light`/`--solid` below
+   are named by look, not by language, and js/voice-translation.js adds
+   whichever one belongs to the field's current language, alongside its
+   label/placeholder, and moves both together on swap.
    ========================================================================== */
 
 .voice { left: 23px; top: 685px; }
@@ -43,8 +52,8 @@
   height: 307px;
   border-radius: 20px;
 }
-.transfield--en { background: rgba(237, 216, 180, .8); }
-.transfield--cn { background: #edd8b4; }
+.transfield--light { background: rgba(237, 216, 180, .8); }
+.transfield--solid { background: #edd8b4; }
 
 .transfield__label {
   position: absolute;
@@ -99,7 +108,9 @@
 .transkeyboard:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ------------------------------------------------------------- swap button
-   Swaps the two boxes' text — a small, real thing to do given there's no
+   Flips translation direction: label, card style, and placeholder swap
+   between the two fields, and their text travels with its language so
+   nothing ends up mislabeled — a small, real thing to do given there's no
    backend to actually translate, instead of a button that presses and
    does nothing. */
 .transswap {
