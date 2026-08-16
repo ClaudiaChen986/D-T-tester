@@ -613,27 +613,26 @@ their intended behaviour is specified. Concretely, right now:
   follows). Its placeholder is a custom two-line overlay rather than the
   native `placeholder` attribute — see the "two-line, two-font
   placeholder" note further down.
-- **Date** is real again too: a black rounded-square calendar badge plus
+- **Date** is real again, matched directly against a fresh `get_design_context`
+  + screenshot of its own node (`19:1529`) rather than a reference photo
+  this time: a plain black calendar glyph sitting straight on the
+  `#37848c` pill — no background box, border, or shadow behind it — plus
   the date text in its own nested lighter pill
-  (`rgba(255,255,255,.16)` on the `#37848c` teal) — confirmed against a
-  reference screenshot as the correct look. (A flatter version without
-  the nested pill was tried in between, on the theory that Figma's own
-  render was plainer than that — a screenshot comparison showed that
-  reasoning was wrong; the nested-pill look is the one to keep.) The
-  badge is a real `<button>` calling a hidden `<input type="date">`'s
-  own `showPicker()` to open the browser's native date-picker pop-up
-  (falling back to `.focus()`/`.click()` where `showPicker` isn't
-  supported) — an earlier version instead made the *entire* pill a
-  fully transparent input overlay, fussier to get reliably clickable
-  everywhere and with no visible indication anything was there to tap.
-  The badge now also carries a small orange chevron badge in its
-  bottom-right corner (a literal "tap here" cue, `border` ring, and a
-  drop shadow lifting it off the pill) since a lone flat calendar icon
-  still read as decorative rather than interactive. `change` re-renders
-  the visible text in the "Jun 5 （6月5日）, 2023" format rather than the
-  input's own locale-formatted display. Defaults to today (or the date
-  `?day=` implies), and picking a different one now genuinely changes
-  which of the 3-day lanes the saved event lands in.
+  (`rgba(255,255,255,.16)`) to its right. A couple of earlier passes had
+  added a dark rounded-square badge behind the icon, then a border ring
+  plus drop shadow plus a small orange corner chevron as extra "this is
+  clickable" cues, then made the entire pill (icon *and* text) the
+  click target — none of that is in Figma; the icon-only screenshot
+  settled it. Only the icon itself (`.datepill__badge`, a real
+  `<button>`) is the date-picker trigger now — the text next to it is
+  plain, non-interactive markup, per instruction. It calls a hidden
+  `<input type="date">`'s own `showPicker()` to open the browser's
+  native date-picker pop-up (falling back to `.focus()`/`.click()`
+  where `showPicker` isn't supported); `change` re-renders the visible
+  text in the "Jun 5 （6月5日）, 2023" format rather than the input's own
+  locale-formatted display. Defaults to today (or the date `?day=`
+  implies), and picking a different one now genuinely changes which of
+  the 3-day lanes the saved event lands in.
 - **Time** (`19:1527`, "Date and Time - Wheels") is a frosted, blurred
   card with three static columns (hour/minute/AM-PM) and a pill-shaped
   selection band behind the middle row, reading "8:00 pm" — the
