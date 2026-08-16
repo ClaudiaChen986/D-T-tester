@@ -1,0 +1,89 @@
+/* ============================================================================
+   归途 GuiTu — "Translation" (Figma node 7:705)
+   ----------------------------------------------------------------------------
+   Fixed 390×844 screen, same as home/profile. Header (return button +
+   right-aligned title) and the bottom "back to homepage" bar reuse the same
+   assets/geometry as every other return-button page (header.svg,
+   return-button.png, bottomnav-bg.svg, logo-sprite.png — see .header /
+   .return / .wordmark--return / .header__title in styles.css). Only the
+   three menu cards are new: a scalloped ticket background shared by all
+   three, a round icon badge (also shared, identically cropped each time),
+   and a small glyph on top of the badge that's the only thing that actually
+   differs between Daily English / Voice translation / Phrase library.
+   The sub-screens those three cards would open aren't part of this design
+   yet, so — same convention as the still-unbuilt Navigation/Other tiles on
+   the home screen — they're inert <button>s, not links to nowhere.
+   ========================================================================== */
+
+.transcard {
+  display: block;
+  position: absolute;
+  left: 37px;
+  top: var(--y);
+  width: 317px;
+  height: 135px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.transcard:active { transform: scale(.975); }
+
+.transcard__bg { position: absolute; left: -4px; top: 0; width: 325px; height: 149px; }
+
+.transcard__icon { pointer-events: none; }
+
+.transcard__glyph {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  pointer-events: none;
+}
+
+.transcard__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.transcard__label > span { display: block; font-weight: 400; }
+.transcard__label .t-en { font-size: 24px; }
+.transcard__label .t-cn { font-size: 22px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset and geometry as profile.html's .profilebar. */
+.transbar {
+  position: absolute;
+  left: 0;
+  top: 712px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.transbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.transbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.transbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.transbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .transcard { transition: none; }
+}

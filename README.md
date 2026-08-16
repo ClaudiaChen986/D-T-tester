@@ -27,6 +27,9 @@ pages/
                             to profile.html
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
+  translation.html         "Translation" menu (node 7:705) — Home's Translation
+                            tile leads here; Daily English/Voice translation/
+                            Phrase library have no destination screen yet
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -39,6 +42,7 @@ css/
   edit.css                  edit-contacts.html's own layout
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
+  translation.css           translation.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -51,6 +55,7 @@ js/
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
+  translation.js            translation.html: viewport fit only
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -88,6 +93,11 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
+- Home's *Translation* tile → `translation.html`. Its three menu cards
+  (Daily English, Voice translation, Phrase library) aren't designed yet, so
+  — same as Home's still-unbuilt Navigation/Other tiles — they're inert
+  `<button>`s rather than links to nowhere; its return arrow and "Back to
+  homepage" bar both go to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -212,3 +222,20 @@ export for Location showed they're the exact same path data, just
 recolored, so the other two buttons' "on" states were derived the same way
 (swap `#37848C` for `white`) instead of two more round-trips to fetch
 assets that would have come back identical anyway.
+
+## "Translation" — first of three Home tile menus
+
+`translation.html` (node 7:705) is the first of Home's four tiles to get a
+destination screen (Navigation and Other are still the plain, non-navigating
+`<button>`s they were before). Header, return button, background texture,
+and bottom "Back to homepage" bar are all pixel-identical assets/geometry to
+what `profile.html` already uses, so nothing new was exported for those.
+What *is* new: `translation-card-bg.svg` (the scalloped ticket shape behind
+each of the three menu rows — one asset, reused three times, same seam-bleed
+pattern as `tile-bg.svg`), `translation-icon-badge.png` (the round teal
+badge, also reused identically all three times — the badge itself never
+changes), and one small glyph per row (`translation-icon-book.svg`,
+`translation-icon-voice.svg`, `translation-icon-phrase.svg`) laid on top of
+that badge — the only thing that actually differs between Daily English,
+Voice translation, and Phrase library. Each row's chevron reuses
+`icon-chevron.svg` via the same `.chevron` helper the Home tiles use.
