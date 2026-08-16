@@ -1,0 +1,132 @@
+/* ============================================================================
+   归途 GuiTu — "Voice translation" (Figma node 7:886, listening state 257:444)
+   ----------------------------------------------------------------------------
+   Header, return button, background texture, and the "Translate by voice"
+   button (background, mic ring, badge, mic icon — see .voice/.voice__* in
+   styles.css) are all pixel-identical assets/geometry to what home.html
+   already ships, so the press-and-hold button just repositions that shared
+   component rather than redefining it. The listening overlay (scrim +
+   soundwave) is the exact same one too — this page just links
+   soundwave.css and toggles the same `.screen.is-listening` class
+   js/app.js does, no new CSS for it at all.
+
+   No "Back to homepage" bar on this page — Figma's own node doesn't have
+   one (the voice button already reaches the bottom of the screen), same
+   as calling.html omits its own return arrow for a different reason.
+   ========================================================================== */
+
+.voice { left: 23px; top: 685px; }
+/* "Translate by voice" is longer than .voice__title's box was sized for
+   (home.html's own "Voice assistant" just barely fit at 188px) — widen it
+   and stop it wrapping, same fix every longer title elsewhere in the app
+   needs (contacts.css, phrase-library.css, this page's own header title
+   below). Recentered around the same point Figma's own (unconstrained,
+   auto-width) title text sits at. */
+.voice__title { left: 105px; width: 260px; }
+.voice__title .t-en,
+.voice__title .t-cn { white-space: nowrap; }
+
+/* "Voice translation" is longer than .header__title's box was sized for —
+   same fix as translation.css's siblings. */
+.header__title {
+  left: 85px;
+  width: 281px;
+}
+.header__title .t-en,
+.header__title .t-cn { white-space: nowrap; }
+
+.transfield {
+  position: absolute;
+  left: 37px;
+  top: var(--y);
+  width: 317px;
+  height: 307px;
+  border-radius: 20px;
+}
+.transfield--en { background: rgba(237, 216, 180, .8); }
+.transfield--cn { background: #edd8b4; }
+
+.transfield__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y2);
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+  white-space: nowrap;
+}
+.transfield__label .t-en { font-family: var(--font-en); font-size: 24px; }
+.transfield__label .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
+
+/* the recessed "type here" well every field has — a plain, honest text
+   area (not a fake translated-output box that never fills in) so typing
+   in either one is a real interaction, and the swap button below has
+   something real to swap. */
+.transfield__well {
+  position: absolute;
+  left: var(--x);
+  top: var(--y2);
+  width: 277px;
+  height: 174px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(217, 217, 217, .2);
+  box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
+  resize: none;
+  outline: none;
+  color: #000;
+  font: 18px var(--font-en), var(--font-cn);
+}
+.transfield__well::placeholder { color: rgba(0, 0, 0, .45); }
+.transfield__well:focus { box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25), 0 0 0 2px #154c52; }
+
+.transkeyboard {
+  position: absolute;
+  left: 235px;
+  top: 217px;
+  width: 49px;
+  height: 49px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, .35);
+  cursor: pointer;
+}
+.transkeyboard img { width: 100%; height: 100%; }
+.transkeyboard:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ------------------------------------------------------------- swap button
+   Swaps the two boxes' text — a small, real thing to do given there's no
+   backend to actually translate, instead of a button that presses and
+   does nothing. */
+.transswap {
+  position: absolute;
+  left: 156px;
+  top: 412px;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.transswap:active { transform: scale(.92); }
+.transswap__badge { pointer-events: none; }
+.transswap__icon {
+  position: absolute;
+  left: 15px;
+  top: 16px;
+  width: 48px;
+  height: 48px;
+  transform: rotate(90deg);
+  pointer-events: none;
+}
+.transswap__icon > img { width: 100%; height: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .transswap { transition: none; }
+}

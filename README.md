@@ -28,10 +28,13 @@ pages/
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
   translation.html         "Translation" menu (node 7:705) — Home's Translation
-                            tile leads here; Voice translation has no
-                            destination screen yet
+                            tile leads here
   daily-english.html       "Daily English" (node 7:812) — a word-of-the-day
                             card with real, spoken pronunciation
+  voice-translation.html   "Voice translation" (node 7:886, listening state
+                            257:444) — real English/Chinese text fields, a
+                            swap button, and home.html's press-and-hold
+                            listening overlay
   phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
                             page, like contacts.html; sixteen seed phrases +
                             anything saved from add-phrase.html
@@ -52,6 +55,7 @@ css/
   add-contact.css           add-contact.html's own layout
   translation.css           translation.html's own layout
   daily-english.css         daily-english.html's own layout
+  voice-translation.css     voice-translation.html's own layout
   phrase-library.css        phrase-library.html's own layout
   add-phrase.css            add-phrase.html's own layout
 
@@ -69,6 +73,9 @@ js/
   translation.js            translation.html: viewport fit only
   daily-english.js          daily-english.html: viewport fit, speaks the word/
                              sentence aloud via the Web Speech API
+  voice-translation.js      voice-translation.html: viewport fit, press-to-speak
+                             listening overlay, swap fields, live speech-to-text
+                             where the browser supports it
   phrase-library.js         phrase-library.html: renders seed + saved phrases
   add-phrase.js             add-phrase.html: validation, save + handoff
 
@@ -108,14 +115,16 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
-- Home's *Translation* tile → `translation.html`. Voice translation isn't
-  designed yet, so — same as Home's still-unbuilt Navigation/Other tiles —
-  it's an inert `<button>` rather than a link to nowhere; its return arrow
-  and "Back to homepage" bar both go to `home.html`.
+- Home's *Translation* tile → `translation.html`, all three of whose cards
+  now lead somewhere (Daily English, Voice translation, Phrase library);
+  its return arrow and "Back to homepage" bar both go to `home.html`.
 - Translation's *Daily English* card → `daily-english.html`; its two
   speaker buttons actually speak (Web Speech API), no destination screen
   needed for that. Its return arrow and "Back to homepage" bar both go to
   `translation.html`.
+- Translation's *Voice translation* card → `voice-translation.html`. No
+  return "Back to homepage" bar on this one — Figma's own node doesn't
+  have one — so only its return arrow goes back to `translation.html`.
 - Translation's *Phrase library* card → `phrase-library.html`. Its **Add**
   button (in the sticky header) → `add-phrase.html`, whose **Save** button
   validates the English phrase, writes it to `localStorage`, and returns to
@@ -289,6 +298,38 @@ there was no reason to fake it. A brief pulse (`.is-speaking`, plain CSS
 `@keyframes`) plays on the badge while speech is in progress so the button
 gives feedback instead of looking inert once tapped; browsers without
 speech synthesis available just get a quiet no-op.
+
+## "Voice translation" — home.html's press-and-hold, borrowed whole
+
+`voice-translation.html` (node 7:886; listening state node 257:444) reuses
+home.html's "Translate/Voice assistant" button — background, mic ring,
+badge, mic icon, all pixel-identical assets — just moved to this page's
+own position, and its press-and-hold listening overlay (scrim + animated
+soundwave) *exactly*: `js/voice-translation.js`'s `startListening`/
+`stopListening` pair is app.js's, unchanged, toggling the same
+`.screen.is-listening` class `soundwave.css` already animates off of. That
+was the one explicit ask here — "the animation of the soundwave is the
+same as the one on homepage" — and reusing the actual component instead
+of re-implementing it is what guarantees that.
+
+The English/Chinese boxes are real `<textarea>`s, not fake output panels
+that were only ever going to show placeholder text — there's no
+translation backend to call, so pretending one of them displays a live
+translation would be more dishonest than useful. That also gives the
+**swap** button something real to do (it exchanges the two boxes' text)
+instead of pressing and doing nothing. Where the browser exposes live
+speech recognition (`webkitSpeechRecognition` — Chrome/Edge; not
+universal, same tier of support as the calendar/location APIs elsewhere in
+the platform), holding the mic also transcribes real speech into the
+English box while the soundwave plays; unsupported browsers still get the
+full press-and-hold animation, just not the transcription.
+
+Two longer titles on this page ("Voice translation" in the header,
+"Translate by voice" on the button) needed the same fix every longer title
+elsewhere in the app does — `.header__title`/`.voice__title` were both
+sized for shorter Home-screen copy, so without widening the box and
+stopping mid-phrase wrapping, the browser breaks the English words
+themselves instead of only between the English and Chinese lines.
 
 ## "Phrase library" and "Add phrase" — the app's second real scrolling page
 
