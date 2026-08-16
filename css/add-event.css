@@ -241,11 +241,13 @@
 }
 
 /* --------------------------------------------------- time (wheel picker)
-   Static reproduction of Figma's "Date and Time - Wheels" component
-   (19:1527): a frosted card with three columns (hour/minute/AM-PM), a
-   pill-shaped selection band behind the middle row, and the flanking
-   rows faded to simulate the wheel curving away — without the real
-   scroll/drag physics an iOS-style picker needs, which is a later pass. */
+   A real iOS-style roller now: each column is its own vertically
+   scrolling, CSS scroll-snap track (js/add-event.js builds the rows and
+   owns which one counts as "selected" — the one nearest the fixed
+   selection band in the middle). Native scroll-snap handles the
+   momentum/rubber-banding/settling in every browser that supports it,
+   which is the whole point of reaching for it instead of hand-rolling
+   drag physics with pointer events. */
 .wheelcard {
   position: relative;
   width: 317px;
@@ -260,10 +262,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 4px;
-  overflow: hidden;
 }
 .wheelcard__selection {
   position: absolute;
@@ -279,23 +278,35 @@
 .wheelcol {
   position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  outline: none;
 }
+.wheelcol::-webkit-scrollbar { display: none; }
 .wheelcol--ampm { flex: .7; }
-.wheelcol__row {
+.wheelcol:focus-visible { box-shadow: inset 0 0 0 2px #154c52; border-radius: 7px; }
+
+.wheelcol__pad { flex: none; scroll-snap-align: none; }
+.wheelcol__item {
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
   font-family: var(--font-en);
   font-size: 20px;
   font-weight: 600;
   color: #000;
-  line-height: 35px;
-  height: 35px;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity .1s linear;
 }
-.wheelcol__row--sel { font-weight: 700; }
-.wheelcol__row--1 { opacity: .45; }
-.wheelcol__row--2 { opacity: .18; }
+.wheelcol__item.is-selected { font-weight: 700; }
 
 /* ----------------------------------------------------------------- duration
    Static reproduction of Figma's own two-layer highlight (19:1514/28/8):

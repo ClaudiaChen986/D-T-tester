@@ -98,27 +98,11 @@
 
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Time&nbsp;</span><span class="t-cn">时间</span></p>
-        <div class="wheelcard" aria-hidden="true">
-          <div class="wheelcard__selection"></div>
-          <div class="wheelcol">
-            <span class="wheelcol__row wheelcol__row--2">6</span>
-            <span class="wheelcol__row wheelcol__row--1">7</span>
-            <span class="wheelcol__row wheelcol__row--sel">8</span>
-            <span class="wheelcol__row wheelcol__row--1">9</span>
-            <span class="wheelcol__row wheelcol__row--2">10</span>
-          </div>
-          <div class="wheelcol">
-            <span class="wheelcol__row wheelcol__row--2">58</span>
-            <span class="wheelcol__row wheelcol__row--1">59</span>
-            <span class="wheelcol__row wheelcol__row--sel">00</span>
-            <span class="wheelcol__row wheelcol__row--1">01</span>
-            <span class="wheelcol__row wheelcol__row--2">02</span>
-          </div>
-          <div class="wheelcol wheelcol--ampm">
-            <span class="wheelcol__row wheelcol__row--1">AM</span>
-            <span class="wheelcol__row wheelcol__row--sel">PM</span>
-            <span class="wheelcol__row wheelcol__row--1">&nbsp;</span>
-          </div>
+        <div class="wheelcard">
+          <div class="wheelcard__selection" aria-hidden="true"></div>
+          <div class="wheelcol" id="hourWheel" role="listbox" tabindex="0" aria-label="Hour 小时"></div>
+          <div class="wheelcol" id="minuteWheel" role="listbox" tabindex="0" aria-label="Minute 分钟"></div>
+          <div class="wheelcol wheelcol--ampm" id="ampmWheel" role="listbox" tabindex="0" aria-label="AM/PM 上午/下午"></div>
         </div>
       </div>
 

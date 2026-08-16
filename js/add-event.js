@@ -12,12 +12,16 @@
        showPicker); its `change` re-renders the button's own text in
        Figma's own style ("Jun 5 （6月5日）, 2023") instead of the
        input's native locale format
-     · "Date and Time - Wheels" and Duration are still plain,
-       non-interactive markup matching Figma's mock exactly (its own
-       literal sample values — 8:00 pm, 1h) — real interactivity for
-       those is a later pass, per instruction. Save uses fixed values
-       for them meanwhile (not read from the static markup), so the
-       flow keeps working while they wait.
+     · "Date and Time - Wheels" is a real iOS-style roller now: each of
+       the three columns (hour/minute/AM-PM) is its own CSS scroll-snap
+       track — native scroll-snap owns the momentum/settling, this file
+       just figures out which row ended up nearest the fixed selection
+       band and treats that as the picked value (also updated live while
+       dragging, and tapping any row scrolls it to centre directly).
+       Duration is still plain, non-interactive markup matching Figma's
+       mock exactly (its own literal sample value, 1h) — real
+       interactivity for it is a later pass, per instruction. Save uses
+       a fixed value for it meanwhile (not read from the static markup).
      · Save doesn't write the event yet — it's only step 1 of the flow.
        It hands the title/icon/day/start/duration to
        add-event-continue.html (node 19:1547, Repeat + optional sub-task)
@@ -130,11 +134,123 @@
     return Math.max(0, Math.min(2, diffDays));
   }
 
+  /* ----------------------------------------------------------- time wheels
+     Each column is a native scroll-snap track: .wheelcol__pad top/bottom
+     (half the visible height minus half a row) lets the first/last real
+     row scroll all the way to the centre selection band, and every real
+     row is scroll-snap-align:center. `settle()` figures out which row is
+     nearest centre — called continuously on `scroll` (so dragging shows
+     the pick updating live, not just on release) and once more after
+     scrolling stops, to correct for any sub-pixel rounding and make sure
+     the value reported matches exactly what's visually centred. */
+  var ITEM_H = 35;
+
+  function buildWheel(col, values) {
+    col.innerHTML = '';
+    var topPad = document.createElement('div');
+    topPad.className = 'wheelcol__pad';
+    col.appendChild(topPad);
+
+    var items = values.map(function (v) {
+      var item = document.createElement('div');
+      item.className = 'wheelcol__item';
+      item.textContent = v.label;
+      item.dataset.value = v.value;
+      col.appendChild(item);
+      return item;
+    });
+
+    var bottomPad = document.createElement('div');
+    bottomPad.className = 'wheelcol__pad';
+    col.appendChild(bottomPad);
+
+    var selectedIndex = 0;
+    var settleTimer = null;
+
+    function sizePads() {
+      var half = Math.max(0, (col.clientHeight - ITEM_H) / 2);
+      topPad.style.height = half + 'px';
+      bottomPad.style.height = half + 'px';
+    }
+
+    function paintSelection(index) {
+      items.forEach(function (item, i) {
+        item.classList.toggle('is-selected', i === index);
+        var dist = Math.abs(i - index);
+        item.style.opacity = String(Math.max(.18, 1 - dist * .38));
+      });
+    }
+
+    function settle(smooth) {
+      var index = Math.max(0, Math.min(items.length - 1,
+        Math.round(col.scrollTop / ITEM_H)));
+      selectedIndex = index;
+      paintSelection(index);
+      var target = index * ITEM_H;
+      if (Math.abs(col.scrollTop - target) > 1) {
+        col.scrollTo({ top: target, behavior: smooth ? 'smooth' : 'auto' });
+      }
+      return index;
+    }
+
+    col.addEventListener('scroll', function () {
+      // live-update the bolded/faded rows while dragging or momentum-
+      // scrolling, then settle (and correct) once motion actually stops.
+      var index = Math.max(0, Math.min(items.length - 1,
+        Math.round(col.scrollTop / ITEM_H)));
+      if (index !== selectedIndex) { selectedIndex = index; paintSelection(index); }
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () { settle(false); }, 120);
+    });
+
+    items.forEach(function (item, i) {
+      item.addEventListener('click', function () {
+        col.scrollTo({ top: i * ITEM_H, behavior: 'smooth' });
+      });
+    });
+
+    col.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); col.scrollTo({ top: (selectedIndex + 1) * ITEM_H, behavior: 'smooth' }); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); col.scrollTo({ top: (selectedIndex - 1) * ITEM_H, behavior: 'smooth' }); }
+    });
+
+    return {
+      init: function (index) {
+        sizePads();
+        col.scrollTop = index * ITEM_H;
+        settle(false);
+      },
+      getValue: function () { return values[selectedIndex].value; },
+    };
+  }
+
+  var HOURS = [];
+  for (var h = 1; h <= 12; h++) HOURS.push({ value: h, label: String(h) });
+  var MINUTES = [];
+  for (var m = 0; m < 60; m++) MINUTES.push({ value: m, label: pad(m) });
+  var AMPM = [{ value: 'AM', label: 'AM' }, { value: 'PM', label: 'PM' }];
+
+  var hourWheel = buildWheel(document.getElementById('hourWheel'), HOURS);
+  var minuteWheel = buildWheel(document.getElementById('minuteWheel'), MINUTES);
+  var ampmWheel = buildWheel(document.getElementById('ampmWheel'), AMPM);
+
+  // Default to 8:00 pm — the value Figma's own mock shows selected.
+  hourWheel.init(7);   // index 7 -> HOURS[7].value === 8
+  minuteWheel.init(0);
+  ampmWheel.init(1);   // index 1 -> AMPM[1].value === 'PM'
+
+  function wheelStartMinutes() {
+    var hour12 = hourWheel.getValue();
+    var minute = minuteWheel.getValue();
+    var isPm = ampmWheel.getValue() === 'PM';
+    var hour24 = (hour12 % 12) + (isPm ? 12 : 0);
+    return hour24 * 60 + minute;
+  }
+
   /* ------------------------------------------------------------------ save
-     Time/Duration are still fixed values matching what the static
-     mockup displays (8:00 pm, 1h) — not read from the page, since
-     they're not real controls yet. */
-  var FIXED_START = 20 * 60;   // 8:00 pm
+     Duration is still a fixed value matching what the static mockup
+     displays (1h) — not read from the page, since it's not a real
+     control yet. */
   var FIXED_DURATION = 60;     // 1h
 
   form.addEventListener('submit', function (e) {
@@ -152,13 +268,14 @@
       return;
     }
 
+    var startMinutes = wheelStartMinutes();
     var draft = {
       title: title,
       icon: selectedIcon || 'event',
       day: dayOffset(dateInput.value),
       date: dateInput.value,
-      start: FIXED_START,
-      time: FIXED_START,
+      start: startMinutes,
+      time: startMinutes,
       duration: FIXED_DURATION,
     };
 

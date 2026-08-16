@@ -57,10 +57,11 @@ pages/
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
                               "plan tomorrow" button) leads here; icon
-                              picker + title + Date are real, Time/
-                              Duration are still a literal static mockup
-                              of Figma's design (non-interactive,
-                              matching the mock's own sample values).
+                              picker + title + Date + Time (a real
+                              scroll-snap roller) are all real, Duration
+                              is still a literal static mockup of
+                              Figma's design (non-interactive, matching
+                              the mock's own sample value).
                               Step 1 of 2
                               — Save hands off to
                               add-event-continue.html rather than writing
@@ -114,10 +115,11 @@ js/
   calendar.js                  calendar.html: renders the 3-day overview
                                 timeline plus today's own detail timeline
                                 from localStorage, tick-box save
-  add-event.js                 add-event.html: icon picker, title, real
-                                date picker + validation (time/duration
-                                are still static); Save hands off a
-                                draft, doesn't write the event
+  add-event.js                 add-event.html: icon picker, real date
+                                picker + scroll-snap time roller,
+                                validation (duration is still static);
+                                Save hands off a draft, doesn't write
+                                the event
   add-event-continue.js        add-event-continue.html: fills the summary
                                 from the handed-off draft, Repeat chips,
                                 sub-task toggle, and the real save
@@ -584,17 +586,19 @@ and, like those other two pages, is a real scrolling page rather than a
 fixed stage: even in its current form there's more content here than one
 screen reliably holds.
 
-**Time and Duration are still a literal static mockup of Figma's
-design** — non-interactive markup reproducing the mock exactly, including
-its own literal sample values (8:00 pm, 1h) — while the **icon circle,
-title, and Date are all real again**. The full history: an earlier pass
-turned all four (plus the icon picker) into live controls (a
-click-to-pick Material Symbols icon strip, a native date input, a
-drag-slider for Duration, no Time field at all); matching Figma's actual
-mock pixel-for-pixel meant reverting all four to what it literally shows;
-then the icon picker and Date were both asked back explicitly, one after
-the other. Time/Duration are still waiting on their own "later pass" once
-their intended behaviour is specified. Concretely, right now:
+**Duration is still a literal static mockup of Figma's design** —
+non-interactive markup reproducing the mock exactly, including its own
+literal sample value (1h) — while **the icon circle, title, Date, and
+now Time are all real**. The full history: an earlier pass turned all
+four fields (plus the icon picker) into live controls (a click-to-pick
+Material Symbols icon strip, a native date input, a drag-slider for
+Duration, no Time field at all); matching Figma's actual mock
+pixel-for-pixel meant reverting all four to what it literally shows;
+then the icon picker, Date, and Time each came back real again, one
+after the other, this last one (the roller) as a genuine iOS-style
+scroll-snap picker rather than a native `<input>`. Duration is still
+waiting on its own "later pass" once its intended behaviour is
+specified. Concretely, right now:
 
 - The **icon circle** (`19:1506`) is a real button again: tapping it
   reveals a horizontal, scrollable strip of common Material Symbols (the
@@ -631,11 +635,24 @@ their intended behaviour is specified. Concretely, right now:
   than the input's own locale-formatted display. Defaults to today (or
   the date `?day=` implies), and picking a different one now genuinely
   changes which of the 3-day lanes the saved event lands in.
-- **Time** (`19:1527`, "Date and Time - Wheels") is a frosted, blurred
-  card with three static columns (hour/minute/AM-PM) and a pill-shaped
-  selection band behind the middle row, reading "8:00 pm" — the
-  surrounding rows are faded to suggest the wheel curving away, but
-  there's no scroll/drag physics behind it yet.
+- **Time** (`19:1527`, "Date and Time - Wheels") is a real roller now —
+  the frosted, blurred card is unchanged, but its three columns
+  (hour/minute/AM-PM) are each a native CSS scroll-snap track
+  (`js/add-event.js`'s `buildWheel()`) instead of five static rows. Each
+  real row is `scroll-snap-align: center`, flanked by a `.wheelcol__pad`
+  top and bottom sized to exactly half the column's visible height minus
+  half a row — that's what lets the very first/last value (1 and 12,
+  00 and 59, AM and PM) scroll all the way to the fixed selection band
+  in the middle rather than stopping short of it. Native scroll-snap
+  owns the momentum, rubber-banding, and settling — no hand-rolled
+  pointer-event drag physics — while a `scroll` listener continuously
+  figures out which row is nearest centre and bolds/fades the rows
+  around it live, correcting once more (`settle()`) a beat after
+  scrolling actually stops in case of sub-pixel rounding. Tapping any
+  row scrolls it to centre directly; the focused column also responds to
+  Arrow Up/Down. Defaults to 8:00 pm, the value Figma's own mock shows
+  selected, and Save now reads the real picked time instead of a fixed
+  default.
 - **Duration** (`19:1514`/`19:1515`/`19:1516`) is a white pill with
   Figma's own two-layer highlight — a lighter-teal capsule (`#56A8B0`)
   under the "common" values 5/10/15/30/1h, and a darker-teal capsule
@@ -672,15 +689,13 @@ to zero width and running the two words together ("Date日期"). Fixed the
 same way `Save&nbsp;`/`Add&nbsp;` already handle it elsewhere in this
 app: the space moved *inside* the sized `t-en` span as `&nbsp;`.
 
-Save still works end-to-end in the meantime: `js/add-event.js` uses fixed
-values for Date/Time/Duration matching what's on screen (8:00 pm start,
-1h duration) instead of reading them from the still-static markup, but
-reads the real icon/title now that those are live again — so the
-calendar → add-event → add-event-continue flow keeps working while
-Date/Time/Duration wait for their own real behaviour. The `?day=` query
-param still picks which of the 3-day lanes the event lands in — that's
-plumbing, invisible on this screen, not something Figma's mock shows
-either way.
+Save reads the real icon/title/date/time now, and only Duration still
+uses a fixed value (1h) matching what's on screen instead of reading it
+from the still-static markup — so the calendar → add-event →
+add-event-continue flow keeps working while Duration waits for its own
+real behaviour. The `?day=` query param still picks which of the 3-day
+lanes the event lands in — that's plumbing, invisible on this screen,
+not something Figma's mock shows either way.
 
 This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add
 task （continue） - both", not covered by this static-mockup pass), is a
