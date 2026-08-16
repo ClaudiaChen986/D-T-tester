@@ -27,6 +27,9 @@ pages/
                             to profile.html
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
+  other.html               "Other" menu (node 142:824) — Home's Other tile
+                            leads here; the three cards have no destination
+                            screen yet
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -39,6 +42,7 @@ css/
   edit.css                  edit-contacts.html's own layout
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
+  other.css                 other.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -51,6 +55,7 @@ js/
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
+  other.js                  other.html: viewport fit only
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -88,6 +93,11 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
+- Home's *Other* tile → `other.html`. Its three cards (Today's new events,
+  My Calendar, My Journal) have no destination screen yet, so — same as
+  Home's still-unbuilt Translation/Navigation tiles — they're inert
+  `<button>`s; its return arrow and "Back to homepage" bar both go to
+  `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -212,3 +222,28 @@ export for Location showed they're the exact same path data, just
 recolored, so the other two buttons' "on" states were derived the same way
 (swap `#37848C` for `white`) instead of two more round-trips to fetch
 assets that would have come back identical anyway.
+
+## "Other" — a second three-card menu, one Figma layout reused
+
+`other.html` (node 142:824) is structurally the same menu Translation's
+Figma node uses — same scalloped card shape, same round badge artwork, same
+chevron and bottom-bar geometry — just with three different cards (Today's
+new events, My Calendar, My Journal) and none of them wired to a
+destination screen yet. Header, return button, background texture, and
+bottom bar are all pixel-identical assets to what every other return-button
+page already ships (confirmed by comparing exported bytes), so the only
+genuinely new assets are the card background/badge (re-exported under this
+page's own name rather than assumed to match a previous export byte-for-
+byte) and the three glyphs on top of the badge — which Figma exports in the
+app's cream `#EDD8B4` here, not the white used elsewhere, so that's kept
+as designed rather than normalized. (The calendar glyph looked like it
+might already exist as `icon-calendar.svg` from the profile pages — same
+icon, confirmed by comparing path data — but that copy is white and sized
+for a different backdrop, so this page re-exports its own cream version
+instead of recoloring a shared asset two other pages still depend on.)
+
+This header also carries a subtitle Translation/Navigation don't ("Find
+your activity today! 来寻找你喜欢的活动吧!"), wider than
+`.header__welcome`'s default box — widened and forced to `nowrap` in
+`other.css` the same way `contacts.css` widens `.header__title` for its
+own longer title, rather than letting it wrap mid-phrase.

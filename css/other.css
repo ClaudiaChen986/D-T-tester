@@ -1,0 +1,100 @@
+/* ============================================================================
+   归途 GuiTu — "Other" (Figma node 142:824)
+   ----------------------------------------------------------------------------
+   Structurally identical to the Translation menu (same card shape, badge
+   artwork, chevron, and bottom bar geometry) — see css/translation.css for
+   that page's own version of this comment. Header, return button,
+   background texture, and bottom bar are all pixel-identical assets to the
+   ones every other return-button page already uses (confirmed by comparing
+   exported bytes). The three glyphs on top of the badge (events list,
+   calendar, pen) are new — but unlike Translation's, Figma exports them all
+   in the app's cream `#EDD8B4`, not white, so that's kept as-is rather than
+   normalized to match.
+
+   The header here also carries a subtitle Translation/Navigation don't
+   ("Find your activity today! 来寻找你喜欢的活动吧!") — wider than
+   .header__welcome's default box, so it's overridden below the same way
+   contacts.html widens .header__title for its own longer title.
+   ========================================================================== */
+
+.header__welcome {
+  left: 92px;
+  width: 274px;
+}
+.header__welcome .t-en,
+.header__welcome .t-cn { white-space: nowrap; }
+
+.othercard {
+  display: block;
+  position: absolute;
+  left: 36px;
+  top: var(--y);
+  width: 317px;
+  height: 135px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.othercard:active { transform: scale(.975); }
+
+.othercard__bg { position: absolute; left: -4px; top: 0; width: 325px; height: 149px; }
+
+.othercard__icon { pointer-events: none; }
+
+.othercard__glyph {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  pointer-events: none;
+}
+
+.othercard__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.othercard__label > span { display: block; font-weight: 400; }
+.othercard__label .t-en { font-size: 24px; }
+.othercard__label .t-cn { font-size: 22px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry family as translation.css's .transbar and
+   profile.html's .profilebar, just this page's own top (710px here,
+   matching this node's own "bottom navigation" frame position). */
+.otherbar {
+  position: absolute;
+  left: 0;
+  top: 710px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.otherbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.otherbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.otherbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.otherbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .othercard { transition: none; }
+}
