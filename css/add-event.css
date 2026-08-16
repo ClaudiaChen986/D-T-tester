@@ -179,17 +179,17 @@
    background box, border, or shadow behind it, nothing added beyond
    what Figma's own "Calendar" component renders — plus the date text in
    its own nested lighter pill (rgba(255,255,255,.16)) to the right.
-   Earlier passes had put a dark badge/border/shadow/corner-chevron
-   behind the icon as an extra "this is clickable" cue; none of that is
-   in Figma, so it's gone.
 
-   Only the icon (.datepill__badge, a real <button>) is the date-picker
-   trigger — the text on its own is not part of the button, per
-   instruction. It calls the hidden <input type="date">'s own
-   showPicker() to open the browser's native date-picker pop-up (falls
-   back to .focus()/.click() where showPicker isn't supported); `change`
-   on that input updates .datepill__text, formatted in Figma's own style
-   ("Jun 5 （6月5日）, 2023") rather than the input's own locale format. */
+   The nested text pill (.datepill__text) is the real <button> and
+   date-picker trigger now — not the icon, per instruction. It calls the
+   hidden <input type="date">'s own showPicker() to open the browser's
+   native date-picker pop-up (falls back to .focus()/.click() where
+   showPicker isn't supported); `change` on that input updates this
+   button's own text, formatted in Figma's own style
+   ("Jun 5 （6月5日）, 2023") rather than the input's own locale format.
+   The icon is now purely decorative — no cursor/click affordance of its
+   own — matching Figma's own "Calendar" component, which isn't
+   interactive there either. */
 .datepill {
   position: relative;
   display: flex;
@@ -204,21 +204,14 @@
 }
 .datepill__badge {
   flex: none;
-  padding: 4px;
-  margin: -4px;
-  border: 0;
-  background: none;
   display: grid;
   place-items: center;
-  cursor: pointer;
 }
-.datepill__badge:active .material-symbols-outlined { transform: scale(.9); }
 .datepill__badge .material-symbols-outlined {
   font-size: 28px;
   color: #000;
   font-variation-settings: 'FILL' 0, 'wght' 500;
   display: block;
-  transition: transform .12s ease;
 }
 .datepill__text {
   flex: 1;
@@ -226,14 +219,19 @@
   display: flex;
   align-items: center;
   padding: 0 16px;
+  border: 0;
   border-radius: 21px;
   background: rgba(255, 255, 255, .16);
   color: #fff;
   font: 18px var(--font-en), var(--font-cn);
   font-weight: 700;
+  text-align: left;
   overflow: hidden;
   white-space: nowrap;
+  cursor: pointer;
+  transition: transform .12s ease;
 }
+.datepill__text:active { transform: scale(.97); }
 .datepill__input {
   position: absolute;
   width: 1px;
