@@ -1,10 +1,18 @@
 /* ============================================================================
    归途 GuiTu — "Adding event" (Figma node 19:1501, "add task - both")
    ----------------------------------------------------------------------------
-   A real scrolling page rather than a fixed 390×844 stage: the icon picker's
-   selection bar adds a row of content on demand, so the page needs to be
-   able to grow and scroll instead of clipping it — same reasoning as
-   todays-events.css/journal.css elsewhere in this app.
+   A real scrolling page rather than a fixed 390×844 stage: even in its
+   current literal-static-mockup form there's more content here than one
+   screen reliably holds — same reasoning as todays-events.css/journal.css
+   elsewhere in this app.
+
+   Literal static mockup pass: Date, "Date and Time - Wheels", and Duration
+   are rendered exactly as Figma's own mock shows them (down to its literal
+   sample values), not as live controls — interactivity for them is a
+   later pass. Only the title field is real input, matching what Figma's
+   own mock actually is there (a text field shown in its placeholder/empty
+   state, same as this app's other text fields), and the icon circle stays
+   a plain empty shape with no picker behaviour, matching 19:1506 exactly.
    ========================================================================== */
 
 .addevent-body {
@@ -54,52 +62,15 @@
   gap: 7px;
 }
 
-/* Plain white, empty circle — matches Figma exactly (19:1506, an empty
-   placeholder, no icon picked yet and no hint glyph drawn inside it).
-   Nothing in the idle state signals it's tappable beyond cursor:pointer
-   on hover — a deliberate fidelity-over-affordance trade-off; see the
-   chat note on this page for the alternative (a faint hint glyph) if
-   that's ever preferred over matching the mock exactly. */
+/* Plain white, empty circle — matches Figma exactly (19:1506): an empty
+   placeholder, no icon and no picker behaviour. */
 .iconpicker {
   flex: none;
-  display: grid;
-  place-items: center;
   width: 96px;
   height: 96px;
-  padding: 0;
-  border: 0;
   border-radius: 50%;
   background: #fff;
-  cursor: pointer;
-  transition: transform .12s ease;
 }
-.iconpicker:active { transform: scale(.96); }
-.iconpicker__display { display: grid; place-items: center; }
-.iconpicker .material-symbols-outlined { font-size: 44px; color: #832118; }
-
-.iconbar {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 14px 2px 4px;
-}
-.iconbar[hidden] { display: none; }
-.iconbar__btn {
-  flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  background: rgba(255, 255, 255, .18);
-  color: #fff;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
-.iconbar__btn .material-symbols-outlined { font-size: 24px; }
-.iconbar__btn.is-selected { background: #edd8b4; border-color: #fff; }
-.iconbar__btn.is-selected .material-symbols-outlined { color: #832118; }
 
 .titleinput {
   display: block;
@@ -115,10 +86,9 @@
 }
 .titleinput::placeholder { color: #ccc; }
 
-/* the divider (19:1507) is Figma's own fixed-position line, not the
-   input's own underline — it sits at a constant 108px below the teal
-   band's top regardless of exactly where the input's text baseline
-   lands, so it's drawn separately rather than as a border on the input. */
+/* the divider (19:1507) is Figma's own fixed-position line — sits at a
+   constant 108px below the teal band's top regardless of exactly where
+   the input's text baseline lands. */
 .addevent__divider {
   position: absolute;
   left: 30px;
@@ -131,7 +101,7 @@
 /* ------------------------------------------------------------------ fields */
 .addevent__fields { background: #efefef; padding: 24px 37px 40px; }
 
-.fieldgroup { margin-bottom: 26px; }
+.fieldgroup { margin-bottom: 21px; }
 .fieldgroup__label {
   margin: 0 0 12px;
   font-size: 0;
@@ -142,103 +112,139 @@
 .fieldgroup__label .t-en { font-family: var(--font-en); font-size: 24px; }
 .fieldgroup__label .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
 
+/* --------------------------------------------------------------------- date
+   Static: Figma's own "Date Picker - Collapsed" component renders custom
+   bilingual text ("Jun 5 （6月5日）, 2023") plus a calendar-icon component —
+   neither is something a native <input type="date"> can be styled to
+   show, so this is a plain div with the literal sample text for now. */
 .datepill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   height: 50px;
-  border: 0;
   border-radius: 30px;
   background: var(--c-teal);
   color: #fff;
-  font: 18px var(--font-en);
-  padding: 0 20px;
-  outline: none;
+  padding: 0 16px;
   box-sizing: border-box;
 }
-.datepill::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  cursor: pointer;
-}
-
-/* ---------------------------------------------------------- duration slider
-   A drag-left-to-right pill snapping between Figma's own seven preset
-   stops (5/10/15/30 min, 1h/2h/3h) rather than separate chip buttons —
-   the native range input drives the drag physics and snapping, and a
-   decorative tick row on top renders the labels + which one is currently
-   selected. Track fill (teal up to the thumb, cream past it) is painted
-   as a plain CSS background on the input itself, with both pseudo-element
-   track variants forced transparent so that background shows through in
-   every browser; js/add-event.js recomputes the gradient's stop — and
-   which tick is highlighted — on every `input` event, so both track the
-   thumb continuously while dragging, not just on release. Tapping a tick
-   label directly also jumps the slider there. */
-.durationslider { position: relative; }
-.durationslider__input {
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
-  width: 100%;
-  height: 50px;
-  margin: 0;
-  border-radius: 30px;
-  background: #edd8b4;
-  outline: none;
-  cursor: pointer;
-}
-.durationslider__input::-webkit-slider-runnable-track {
-  height: 50px;
-  border-radius: 30px;
-  background: transparent;
-}
-.durationslider__input::-moz-range-track {
-  height: 50px;
-  border-radius: 30px;
-  background: transparent;
-}
-.durationslider__input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 34px;
-  height: 34px;
-  margin-top: 8px;
+.datepill__badge {
+  flex: none;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid #154c52;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
-  cursor: grab;
+  background: #154c52;
+  display: grid;
+  place-items: center;
 }
-.durationslider__input::-moz-range-thumb {
-  width: 34px;
-  height: 34px;
-  border: 3px solid #154c52;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
-  cursor: grab;
-}
-.durationslider__input:active::-webkit-slider-thumb,
-.durationslider__input:active::-moz-range-thumb { cursor: grabbing; }
-.durationslider__input:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; }
+.datepill__badge .material-symbols-outlined { font-size: 19px; color: #fff; }
+.datepill__text { font: 18px var(--font-en), var(--font-cn); }
 
-.durationslider__ticks {
-  position: absolute;
-  inset: 0;
+/* --------------------------------------------------- time (wheel picker)
+   Static reproduction of Figma's "Date and Time - Wheels" component
+   (19:1527): a frosted card with three columns (hour/minute/AM-PM), a
+   pill-shaped selection band behind the middle row, and the flanking
+   rows faded to simulate the wheel curving away — without the real
+   scroll/drag physics an iOS-style picker needs, which is a later pass. */
+.wheelcard {
+  position: relative;
+  width: 317px;
+  max-width: 100%;
+  height: 214px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  border-radius: 30px;
+  background: rgba(179, 179, 179, .35);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 14px;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+}
+.wheelcard__selection {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
+  height: 35px;
+  transform: translateY(-50%);
+  border-radius: 7px;
+  background: rgba(120, 120, 128, .12);
   pointer-events: none;
 }
-.durationslider__tick {
-  pointer-events: auto;
-  cursor: pointer;
-  padding: 5px 8px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .55);
+.wheelcol {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.wheelcol--ampm { flex: .7; }
+.wheelcol__row {
   font-family: var(--font-en);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  line-height: 35px;
+  height: 35px;
+}
+.wheelcol__row--sel { font-weight: 700; }
+.wheelcol__row--1 { opacity: .45; }
+.wheelcol__row--2 { opacity: .18; }
+
+/* ----------------------------------------------------------------- duration
+   Static reproduction of Figma's own two-layer highlight (19:1514/28/8):
+   a white pill, a lighter-teal capsule under the "common" values
+   (5/10/15/30/1h), and a darker-teal capsule nested at its right end
+   marking "1h" as the current selection — 2h/3h sit outside both, plain
+   on the white pill. Exact fill colours/shapes lifted from Figma's own
+   exported paths (#56A8B0 / #37848C). */
+.durationpill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 317px;
+  max-width: 100%;
+  height: 50px;
+  margin: 0 auto;
+  border-radius: 30px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.durationpill__highlight {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 215px;
+  height: 42px;
+  border-radius: 21px;
+  background: #56a8b0;
+}
+.durationpill__select {
+  position: absolute;
+  left: 172px;
+  top: 4px;
+  width: 49px;
+  height: 42px;
+  border-radius: 21px;
+  background: #37848c;
+}
+.durationpill__value {
+  position: relative;
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 20px;
+  font-weight: 600;
   color: #000;
 }
-.durationslider__tick.is-selected { background: #154c52; color: #fff; }
+.durationpill__value--selected { color: #fff; font-weight: 700; }
 
 .save {
   display: block;

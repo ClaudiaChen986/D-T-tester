@@ -17,13 +17,17 @@
      add task - both  ·  Figma node 19:1501
      Reached from calendar.html's Add button (or its "plan tomorrow"
      button, which arrives with ?day=1 pre-selecting tomorrow). A real
-     scrolling page, not a fixed stage — the icon-selection bar and the
-     fields below it need room to grow past one screen. No Time field —
-     the event's start defaults silently to right now, and Duration is a
-     drag-left-to-right slider snapping between Figma's own preset stops
-     (5/10/15/30 min, 1h/2h/3h). Step 1 of 2: Save here hands off to
-     add-event-continue.html (node 19:1547) rather than writing the event
-     itself — see js/add-event.js.
+     scrolling page, not a fixed stage.
+
+     Literal static mockup pass: the icon circle, Date, "Date and Time -
+     Wheels", and Duration are all rendered exactly as Figma's own mock
+     shows them (including its literal sample values — Jun 5 2023, 8:00
+     pm, 1h) rather than as live controls. Only the title field is real
+     input, matching Figma's own intent there (it's shown in its
+     placeholder/empty state, same as every other text field in this
+     app). Interactivity for the static pieces is coming in a later
+     pass, per instruction — see js/add-event.js for what Save does with
+     them meanwhile (fixed defaults, not read from these elements).
      ================================================================ -->
 <div class="addeventpage">
 
@@ -56,17 +60,13 @@
 
     <div class="addevent__teal">
       <div class="addevent__row">
-        <button class="iconpicker" id="iconPicker" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Choose an icon 选择图标">
-          <span class="iconpicker__display" id="iconDisplay"></span>
-        </button>
+        <div class="iconpicker" aria-hidden="true"></div>
 
         <input class="titleinput" type="text" id="titleInput" name="title" autocomplete="off"
                placeholder="Enter text here 在此输入文本" aria-label="Event title 日程标题">
       </div>
 
       <div class="addevent__divider" aria-hidden="true"></div>
-
-      <div class="iconbar" id="iconBar" hidden role="listbox" aria-label="Event icon 日程图标"></div>
     </div>
 
     <div class="addevent__fields">
@@ -75,23 +75,50 @@
 
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Date</span> <span class="t-cn">日期</span></p>
-        <input class="datepill" type="date" id="dateInput" name="date" required>
+        <div class="datepill" aria-hidden="true">
+          <span class="datepill__badge"><span class="material-symbols-outlined">calendar_month</span></span>
+          <span class="datepill__text">Jun 5 （6月5日）, 2023</span>
+        </div>
+      </div>
+
+      <div class="fieldgroup">
+        <p class="fieldgroup__label"><span class="t-en">Time</span> <span class="t-cn">时间</span></p>
+        <div class="wheelcard" aria-hidden="true">
+          <div class="wheelcard__selection"></div>
+          <div class="wheelcol">
+            <span class="wheelcol__row wheelcol__row--2">6</span>
+            <span class="wheelcol__row wheelcol__row--1">7</span>
+            <span class="wheelcol__row wheelcol__row--sel">8</span>
+            <span class="wheelcol__row wheelcol__row--1">9</span>
+            <span class="wheelcol__row wheelcol__row--2">10</span>
+          </div>
+          <div class="wheelcol">
+            <span class="wheelcol__row wheelcol__row--2">58</span>
+            <span class="wheelcol__row wheelcol__row--1">59</span>
+            <span class="wheelcol__row wheelcol__row--sel">00</span>
+            <span class="wheelcol__row wheelcol__row--1">01</span>
+            <span class="wheelcol__row wheelcol__row--2">02</span>
+          </div>
+          <div class="wheelcol wheelcol--ampm">
+            <span class="wheelcol__row wheelcol__row--1">AM</span>
+            <span class="wheelcol__row wheelcol__row--sel">PM</span>
+            <span class="wheelcol__row wheelcol__row--1">&nbsp;</span>
+          </div>
+        </div>
       </div>
 
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Duration</span> <span class="t-cn">时长</span></p>
-        <div class="durationslider">
-          <input class="durationslider__input" type="range" id="durationInput" name="duration"
-                 min="0" max="6" step="1" value="4" aria-label="Duration 时长">
-          <div class="durationslider__ticks" id="durationTicks" aria-hidden="true">
-            <span class="durationslider__tick" data-index="0" data-minutes="5">5</span>
-            <span class="durationslider__tick" data-index="1" data-minutes="10">10</span>
-            <span class="durationslider__tick" data-index="2" data-minutes="15">15</span>
-            <span class="durationslider__tick" data-index="3" data-minutes="30">30</span>
-            <span class="durationslider__tick is-selected" data-index="4" data-minutes="60">1h</span>
-            <span class="durationslider__tick" data-index="5" data-minutes="120">2h</span>
-            <span class="durationslider__tick" data-index="6" data-minutes="180">3h</span>
-          </div>
+        <div class="durationpill" aria-hidden="true">
+          <span class="durationpill__highlight"></span>
+          <span class="durationpill__select"></span>
+          <span class="durationpill__value">5</span>
+          <span class="durationpill__value">10</span>
+          <span class="durationpill__value">15</span>
+          <span class="durationpill__value">30</span>
+          <span class="durationpill__value durationpill__value--selected">1h</span>
+          <span class="durationpill__value">2h</span>
+          <span class="durationpill__value">3h</span>
         </div>
       </div>
 

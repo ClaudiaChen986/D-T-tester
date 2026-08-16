@@ -56,10 +56,12 @@ pages/
                               something
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
-                              "plan tomorrow" button) leads here; icon
-                              picker + title + date + a drag-slider
-                              Duration field (start defaults silently to
-                              "now"). Step 1 of 2 — Save hands off to
+                              "plan tomorrow" button) leads here; a
+                              literal static mockup of Figma's design right
+                              now (icon circle/Date/Time/Duration are all
+                              non-interactive, matching the mock's own
+                              sample values — only the title field is
+                              real). Step 1 of 2 — Save hands off to
                               add-event-continue.html rather than writing
                               the event itself
   add-event-continue.html    "Adding event (continue)" (node 19:1547, "add
@@ -111,9 +113,10 @@ js/
   calendar.js                  calendar.html: renders the 3-day overview
                                 timeline plus today's own detail timeline
                                 from localStorage, tick-box save
-  add-event.js                 add-event.html: icon picker, date default,
-                                duration slider, validation; Save hands
-                                off a draft, doesn't write the event
+  add-event.js                 add-event.html: title validation only
+                                (icon/date/time/duration are static for
+                                now); Save hands off a fixed-value draft,
+                                doesn't write the event
   add-event-continue.js        add-event-continue.html: fills the summary
                                 from the handed-off draft, Repeat chips,
                                 sub-task toggle, and the real save
@@ -182,10 +185,13 @@ file under `css/`.
   homepage" bar go to `other.html` and `home.html` respectively.
 - Other's *My Calendar* tile → `calendar.html`. Its **Add** pill and the
   today panel's **plan tomorrow** button both → `add-event.html` (the
-  latter with `?day=1`, pre-selecting tomorrow's date). That page's Save
-  validates step 1 (title/icon/date/duration) and hands off to
-  `add-event-continue.html` (step 2: Repeat + optional sub-task) rather
-  than writing anything yet; *that* page's own Save is what writes the
+  latter with `?day=1`, which still decides the lane the eventual event
+  lands in, even though this page's own Date field is currently Figma's
+  static "Jun 5, 2023" sample text, not a real field). That page's Save
+  validates step 1's title (the only real field right now — see its own
+  section below) and hands off to `add-event-continue.html` (step 2:
+  Repeat + optional sub-task) rather than writing anything yet; *that*
+  page's own Save is what writes the
   finished event to `localStorage` and returns to `calendar.html`, where
   it now appears on the timeline and, if it's today's, in the today panel
   too. `add-event.html`'s return arrow (cancel) goes back to
@@ -571,59 +577,63 @@ persisted back into the same stored event, with the row's text struck
 through once done.
 
 `add-event.html` (node 19:1501, "add task - both") is reached from either
-of `calendar.html`'s two entry points — the header's **Add** pill (which
-defaults the date to today) and the today panel's **plan tomorrow**
-button (which arrives with `?day=1`, pre-selecting tomorrow) — and, like
-those other two pages, is a real scrolling page rather than a fixed
-stage: the icon-selection bar and the fields beneath it are more content
-than one screen reliably holds once the bar is open, so the page needs to
-be able to grow and scroll instead of clipping it.
+of `calendar.html`'s two entry points — the header's **Add** pill and the
+today panel's **plan tomorrow** button (which arrives with `?day=1`) —
+and, like those other two pages, is a real scrolling page rather than a
+fixed stage: even in its current form there's more content here than one
+screen reliably holds.
 
-The round shape at the top of the teal band is plain white in Figma
-(`19:1506`, `bg-white`) — an empty placeholder, no icon picked yet — and
-stays that colour here too; the faint "add a photo"-style glyph inside it
-is this app's own affordance for "tap to choose an icon," not something
-Figma draws there. Tapping it reveals a horizontal, scrollable strip of
-common Material Symbols (the
-[fonts.google.com/icons](https://fonts.google.com/icons) library, loaded
-as the `Material Symbols Outlined` webfont alongside the existing Inria
-Serif/Noto Serif SC fonts) — walking, meals, socialising, home tasks,
-sleep, medication, shopping, exercise, work, health, reading, and
-celebrations — and picking one both closes the strip and renders that
-glyph inside the circle, which is also what shows up as the event's icon
-back on `calendar.html`'s pills. The icon sits beside the title field
-(Figma places them side by side, not stacked), and the teal band itself
-starts 81px before the 209.144px header actually ends — Figma's own
-number for how far the band's rounded top corners overlap the header's
-curve, not the 30px approximation an earlier pass used. Date keeps a
-plain `<input type="date">`, styled to match the app's pill language —
-the simplest approximation of Figma's own "Date Picker - Collapsed"
-component that still reads as one native control rather than a custom
-widget.
+**This page is currently a literal static mockup of Figma's design,
+not a live form** — the icon circle, Date, Time, and Duration are all
+non-interactive markup reproducing the mock exactly, including its own
+literal sample values (Jun 5 2023, 8:00 pm, 1h). An earlier pass had
+turned these into real controls (a click-to-pick Material Symbols icon
+strip, a native date input, a drag-slider for Duration, no Time field at
+all) — all deliberate, explicitly requested changes at the time — but
+matching Figma's actual mock pixel-for-pixel meant reverting to what it
+literally shows, with real interactivity for these fields coming back in
+a later pass once their intended behaviour ("animation") is specified.
+Concretely, right now:
 
-There's deliberately no Time field here (Figma's own "Date and Time -
-Wheels" component covers both on one screen) — the event's start just
-defaults silently to whatever moment Save is actually pressed, rounded to
-the nearest 5 minutes, the same value this page used to prefill a
-since-removed time picker with. **Duration**, in exchange, is a drag-
-left-to-right `<input type="range">` snapping between Figma's own seven
-preset stops (5/10/15/30 min, 1h/2h/3h) instead of separate chip buttons —
-a decorative tick row of those seven labels sits on top of the track,
-and both its teal/cream fill and which tick is highlighted repaint on
-every `input` event (`js/add-event.js`), not just on release, so the
-picked duration is visible continuously while dragging. Tapping a tick
-label directly also jumps the slider straight there.
+- The **icon circle** (`19:1506`) is a plain white circle, no picker, no
+  glyph — matches Figma exactly.
+- **Date** (`19:1531`) is a teal pill with a calendar-badge icon and the
+  literal text "Jun 5 （6月5日）, 2023" — Figma's own "Date Picker -
+  Collapsed" component's sample value, not a real date field.
+- **Time** (`19:1527`, "Date and Time - Wheels") is a frosted, blurred
+  card with three static columns (hour/minute/AM-PM) and a pill-shaped
+  selection band behind the middle row, reading "8:00 pm" — the
+  surrounding rows are faded to suggest the wheel curving away, but
+  there's no scroll/drag physics behind it yet.
+- **Duration** (`19:1514`/`19:1515`/`19:1516`) is a white pill with
+  Figma's own two-layer highlight — a lighter-teal capsule (`#56A8B0`)
+  under the "common" values 5/10/15/30/1h, and a darker-teal capsule
+  (`#37848C`) nested at its right end marking "1h" as selected, both
+  colours read directly off Figma's exported paths — with 2h/3h sitting
+  plain outside either capsule, exactly as the mock shows.
+- Only the **title field** stays real input — that matches what Figma's
+  own mock actually is there too (a text field shown in its
+  placeholder/empty state, the same convention every other text field in
+  this app follows), so there was nothing to revert.
+
+Save still works end-to-end in the meantime: `js/add-event.js` uses fixed
+values matching what's on screen (8:00 pm start, 1h duration, a generic
+"event" icon) instead of reading them from the now-static markup, so the
+calendar → add-event → add-event-continue flow keeps working while these
+fields wait for their real behaviour. The `?day=` query param still picks
+which of the 3-day lanes the event lands in — that's plumbing, invisible
+on this screen, not something Figma's mock shows either way.
 
 This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add
-task （continue） - both"), is a second screen, not this one finishing.
-Save here validates that a title and date are set, then hands everything
-off as a `sessionStorage` draft (`guitu.addEventDraft`) and moves on to
-`add-event-continue.html`, rather than writing anything to the real
-calendar yet — `sessionStorage`, not `localStorage`, for the same reason
-`js/app.js` uses it for `guitu.callTarget`: it's scoped to this one
-handoff, so abandoning the flow on step 2 (closing the tab, navigating
-away) doesn't leave a half-finished event sitting in
-`guitu.calendarEvents`.
+task （continue） - both", not covered by this static-mockup pass), is a
+second screen, not this one finishing. Save here validates that a title
+is set, then hands everything off as a `sessionStorage` draft
+(`guitu.addEventDraft`) and moves on to `add-event-continue.html`, rather
+than writing anything to the real calendar yet — `sessionStorage`, not
+`localStorage`, for the same reason `js/app.js` uses it for
+`guitu.callTarget`: it's scoped to this one handoff, so abandoning the
+flow on step 2 (closing the tab, navigating away) doesn't leave a
+half-finished event sitting in `guitu.calendarEvents`.
 
 `add-event-continue.html` reads that draft back out on load — if it's
 missing (a direct visit, or a refresh after the draft was already
