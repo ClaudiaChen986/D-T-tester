@@ -42,6 +42,11 @@ pages/
   add-phrase.html          "Add phrase" — modeled on Figma's "Set destination"
                             (node 120:387) with the map removed and its copy
                             swapped for phrase entry
+  show-phrase.html         "Display page" (node 7:928) — flash-card view of
+                            one phrase (white/black, not the app's red theme),
+                            held up for someone else to read; every phrase
+                            row in phrase-library.html, seed or saved, opens
+                            its own text here
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -59,6 +64,7 @@ css/
   voice-translation.css     voice-translation.html's own layout
   phrase-library.css        phrase-library.html's own layout
   add-phrase.css            add-phrase.html's own layout
+  show-phrase.css           show-phrase.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -78,8 +84,11 @@ js/
                              listening overlay, direction swap, real MyMemory-API
                              translation, speech-to-text where the browser
                              supports it
-  phrase-library.js         phrase-library.html: renders seed + saved phrases
+  phrase-library.js         phrase-library.html: renders seed + saved phrases,
+                             each linking to show-phrase.html
   add-phrase.js             add-phrase.html: validation, save + handoff
+  show-phrase.js            show-phrase.html: reads the tapped phrase from
+                             sessionStorage, falls back to Figma's sample
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -132,6 +141,9 @@ file under `css/`.
   validates the English phrase, writes it to `localStorage`, and returns to
   `phrase-library.html`, where it now appears after the sixteen seed
   phrases. Its return arrow goes back to `translation.html`.
+- Every row in `phrase-library.html` — seed or saved — → `show-phrase.html`,
+  the flash-card display of that one phrase. Its return arrow goes back to
+  `phrase-library.html`; its "Back to homepage" bar goes to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -396,3 +408,30 @@ pixels of empty grey space where the map used to be. Its own save flow
 mirrors `add-contact.js` exactly, down to the same `?new=` URL-parameter
 fallback for browsers (Firefox, for `file://` pages) that disable
 `localStorage` outright.
+
+## "Display page" — the one screen that isn't red
+
+`show-phrase.html` (node 7:928) is a flash-card view of a single phrase,
+reached by tapping any row in `phrase-library.html` — seed or user-added
+alike. It's the one screen in the whole app that isn't built on the red
+theme: white background, black text and wordmark, a very faint (5%,
+against the usual 20%) version of the shared hexagon texture, because the
+point of this screen is to be held up and read by someone else (a
+stranger being asked for help), where the app's usual dark-red-on-cream
+palette would just be harder to read at arm's length. Return button,
+bottom bar, and logo medallion are the same pixel-identical assets every
+other page uses; only the background texture is a new export — same
+artwork, re-colored black instead of red-tinted, since it now sits on
+white instead of on `var(--c-red)`.
+
+Which phrase to show is a `sessionStorage` handoff (`guitu.showPhrase`),
+the same pattern `calling.html` uses for `guitu.callTarget`: `js/phrase-
+library.js` keeps the real phrase objects in an in-memory array (seed
+*and* saved) rather than baking them into each row's markup — a saved
+phrase's text could contain quotes or other HTML-sensitive characters
+awkward to round-trip through a `data-` attribute — and a delegated click
+handler on the list resolves the tapped row back to its phrase and writes
+it to `sessionStorage` right before the browser follows the link. Opened
+directly with nothing set, `show-phrase.html` falls back to Figma's own
+sample phrase ("I am lost, please help me." / 我迷路了，请帮助我), the
+same seed-data-fallback reasoning every other page's fallback uses.

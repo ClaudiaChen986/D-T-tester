@@ -5,6 +5,15 @@
    are kept verbatim as seed data, anything saved from add-phrase.html is
    read from localStorage and appended after them. No fit()/--scale here —
    like contacts.html, this is a real scrolling page, not a fixed stage.
+
+   Every row — seed or saved — links to show-phrase.html (Figma's "Display
+   page", node 7:928), the flash-card view meant to be held up and read by
+   someone else. Same handoff contacts.js uses for its call buttons: the
+   real phrase objects stay in an in-memory array (a saved phrase's text
+   could contain quotes/HTML-sensitive characters too awkward to round-trip
+   through a data- attribute), each row just carries an index into it, and
+   a delegated click handler resolves the real phrase and writes it to
+   sessionStorage right before the browser follows the link.
    ========================================================================== */
 (function () {
   'use strict';
@@ -76,11 +85,14 @@
     lg: '../assets/phrase-row-bg-lg.svg',
   };
 
+  var SHOW_TARGETS = [];
+
   function rowHtml(phrase) {
     var size = phrase.size || pickSize(phrase.en);
     var chevron = CHEVRON[size];
+    var index = SHOW_TARGETS.push(phrase) - 1;
     return (
-      '<button class="phraserow phraserow--' + size + '" type="button">' +
+      '<a class="phraserow phraserow--' + size + '" href="show-phrase.html" data-show-index="' + index + '">' +
         '<img class="phraserow__bg" src="' + BG_SRC[size] + '" alt="">' +
         '<span class="phraserow__label" style="--y:' + LABEL_Y[size] + 'px">' +
           '<span class="t-en">' + escapeHtml(phrase.en) + '</span>' +
@@ -89,7 +101,7 @@
         '<span class="chevron" style="--x:302px;--y:' + chevron.y + 'px;--s:' + chevron.s + 'px">' +
           '<img src="../assets/icon-chevron.svg" alt="">' +
         '</span>' +
-      '</button>'
+      '</a>'
     );
   }
 
@@ -106,4 +118,12 @@
 
   var list = document.getElementById('phraseList');
   list.innerHTML = SEED_PHRASES.map(rowHtml).join('') + saved.map(rowHtml).join('');
+
+  list.addEventListener('click', function (e) {
+    var link = e.target.closest('a[data-show-index]');
+    if (!link) return;
+    var phrase = SHOW_TARGETS[Number(link.dataset.showIndex)];
+    if (!phrase) return;
+    try { sessionStorage.setItem('guitu.showPhrase', JSON.stringify({ en: phrase.en, cn: phrase.cn })); } catch (err) { /* best effort only */ }
+  });
 }());
