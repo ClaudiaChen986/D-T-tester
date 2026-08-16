@@ -108,16 +108,17 @@
 
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Duration&nbsp;</span><span class="t-cn">时长</span></p>
-        <div class="durationpill" aria-hidden="true">
-          <span class="durationpill__highlight"></span>
-          <span class="durationpill__select"></span>
-          <span class="durationpill__value">5</span>
-          <span class="durationpill__value">10</span>
-          <span class="durationpill__value">15</span>
-          <span class="durationpill__value">30</span>
-          <span class="durationpill__value durationpill__value--selected">1h</span>
-          <span class="durationpill__value">2h</span>
-          <span class="durationpill__value">3h</span>
+        <div class="durationpill">
+          <span class="durationpill__highlight" aria-hidden="true"></span>
+          <input class="durationpill__input" type="range" id="durationInput" name="duration"
+                 min="0" max="6" step="1" value="4" aria-label="Duration 时长">
+          <span class="durationpill__value" data-index="0">5</span>
+          <span class="durationpill__value" data-index="1">10</span>
+          <span class="durationpill__value" data-index="2">15</span>
+          <span class="durationpill__value" data-index="3">30</span>
+          <span class="durationpill__value" data-index="4">1h</span>
+          <span class="durationpill__value" data-index="5">2h</span>
+          <span class="durationpill__value" data-index="6">3h</span>
         </div>
       </div>
 

@@ -18,10 +18,13 @@
        just figures out which row ended up nearest the fixed selection
        band and treats that as the picked value (also updated live while
        dragging, and tapping any row scrolls it to centre directly).
-       Duration is still plain, non-interactive markup matching Figma's
-       mock exactly (its own literal sample value, 1h) — real
-       interactivity for it is a later pass, per instruction. Save uses
-       a fixed value for it meanwhile (not read from the static markup).
+     · Duration is a real drag-left-right control too now: a native
+       <input type="range"> whose thumb is styled to *be* Figma's own
+       darker-teal "1h" capsule (49×42, radius 21), sitting under the
+       seven value labels (which sit visually on top but let clicks/
+       drags pass through to the input beneath via pointer-events:none).
+       Every `input` event repaints which label is white/bold — live
+       while dragging, not just on release.
      · Save doesn't write the event yet — it's only step 1 of the flow.
        It hands the title/icon/day/start/duration to
        add-event-continue.html (node 19:1547, Repeat + optional sub-task)
@@ -247,11 +250,23 @@
     return hour24 * 60 + minute;
   }
 
-  /* ------------------------------------------------------------------ save
-     Duration is still a fixed value matching what the static mockup
-     displays (1h) — not read from the page, since it's not a real
-     control yet. */
-  var FIXED_DURATION = 60;     // 1h
+  /* -------------------------------------------------------------- duration */
+  var DURATIONS = [5, 10, 15, 30, 60, 120, 180];
+  var durationInput = document.getElementById('durationInput');
+  var durationValues = document.querySelectorAll('.durationpill__value');
+
+  function paintDuration() {
+    var index = parseInt(durationInput.value, 10);
+    durationValues.forEach(function (v) {
+      v.classList.toggle('is-selected', parseInt(v.dataset.index, 10) === index);
+    });
+  }
+  paintDuration();
+  durationInput.addEventListener('input', paintDuration);
+
+  function selectedDuration() {
+    return DURATIONS[parseInt(durationInput.value, 10)];
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -276,7 +291,7 @@
       date: dateInput.value,
       start: startMinutes,
       time: startMinutes,
-      duration: FIXED_DURATION,
+      duration: selectedDuration(),
     };
 
     try {

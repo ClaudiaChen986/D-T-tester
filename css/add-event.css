@@ -309,12 +309,20 @@
 .wheelcol__item.is-selected { font-weight: 700; }
 
 /* ----------------------------------------------------------------- duration
-   Static reproduction of Figma's own two-layer highlight (19:1514/28/8):
-   a white pill, a lighter-teal capsule under the "common" values
-   (5/10/15/30/1h), and a darker-teal capsule nested at its right end
-   marking "1h" as the current selection — 2h/3h sit outside both, plain
-   on the white pill. Exact fill colours/shapes lifted from Figma's own
-   exported paths (#56A8B0 / #37848C). */
+   Real drag-left-right control now. The lighter-teal capsule
+   (.durationpill__highlight, Figma's own #56A8B0 shape marking the
+   "common" values 5/10/15/30/1h) stays put, static and decorative,
+   exactly where Figma has it. The darker-teal capsule
+   (Figma's #37848C "1h" highlight) is no longer a fixed shape — it's
+   now the actual draggable thumb of a native <input type="range">
+   (min 0-6, one stop per value), sized/shaped to match that same
+   capsule (49×42, radius 21) via ::-webkit-slider-thumb/::-moz-range-thumb,
+   so dragging it *is* dragging that shape. The seven value labels sit
+   visually on top (`z-index`, `pointer-events: none` so drags/clicks
+   pass straight through to the range input beneath — including clicking
+   a number directly, which native <input type="range"> already treats
+   as "jump the thumb here"), and js/add-event.js toggles which one is
+   white/bold vs. black on every `input` event, live while dragging. */
 .durationpill {
   position: relative;
   display: flex;
@@ -335,26 +343,58 @@
   height: 42px;
   border-radius: 21px;
   background: #56a8b0;
+  pointer-events: none;
 }
-.durationpill__select {
+.durationpill__input {
+  -webkit-appearance: none;
+  appearance: none;
   position: absolute;
-  left: 172px;
-  top: 4px;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+.durationpill__input::-webkit-slider-runnable-track { -webkit-appearance: none; background: transparent; height: 50px; }
+.durationpill__input::-moz-range-track { background: transparent; height: 50px; border: 0; }
+.durationpill__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
   width: 49px;
   height: 42px;
   border-radius: 21px;
   background: #37848c;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+  cursor: grab;
 }
+.durationpill__input::-moz-range-thumb {
+  width: 49px;
+  height: 42px;
+  border: 0;
+  border-radius: 21px;
+  background: #37848c;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
+  cursor: grab;
+}
+.durationpill__input:active::-webkit-slider-thumb,
+.durationpill__input:active::-moz-range-thumb { cursor: grabbing; }
+.durationpill__input:focus-visible::-webkit-slider-thumb { outline: 2px solid #154c52; outline-offset: 2px; }
+
 .durationpill__value {
   position: relative;
+  z-index: 2;
   flex: 1;
   text-align: center;
   font-family: var(--font-en);
   font-size: 20px;
   font-weight: 600;
   color: #000;
+  pointer-events: none;
+  transition: color .1s linear;
 }
-.durationpill__value--selected { color: #fff; font-weight: 700; }
+.durationpill__value.is-selected { color: #fff; font-weight: 700; }
 
 .save {
   display: block;
