@@ -56,12 +56,12 @@ pages/
                               something
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
-                              "plan tomorrow" button) leads here; a
-                              literal static mockup of Figma's design right
-                              now (icon circle/Date/Time/Duration are all
-                              non-interactive, matching the mock's own
-                              sample values — only the title field is
-                              real). Step 1 of 2 — Save hands off to
+                              "plan tomorrow" button) leads here; icon
+                              picker + title are real, Date/Time/Duration
+                              are still a literal static mockup of
+                              Figma's design (non-interactive, matching
+                              the mock's own sample values). Step 1 of 2
+                              — Save hands off to
                               add-event-continue.html rather than writing
                               the event itself
   add-event-continue.html    "Adding event (continue)" (node 19:1547, "add
@@ -113,10 +113,10 @@ js/
   calendar.js                  calendar.html: renders the 3-day overview
                                 timeline plus today's own detail timeline
                                 from localStorage, tick-box save
-  add-event.js                 add-event.html: title validation only
-                                (icon/date/time/duration are static for
-                                now); Save hands off a fixed-value draft,
-                                doesn't write the event
+  add-event.js                 add-event.html: icon picker, title
+                                validation (date/time/duration are still
+                                static); Save hands off a draft, doesn't
+                                write the event
   add-event-continue.js        add-event-continue.html: fills the summary
                                 from the handed-off draft, Repeat chips,
                                 sub-task toggle, and the real save
@@ -583,20 +583,37 @@ and, like those other two pages, is a real scrolling page rather than a
 fixed stage: even in its current form there's more content here than one
 screen reliably holds.
 
-**This page is currently a literal static mockup of Figma's design,
-not a live form** — the icon circle, Date, Time, and Duration are all
-non-interactive markup reproducing the mock exactly, including its own
-literal sample values (Jun 5 2023, 8:00 pm, 1h). An earlier pass had
-turned these into real controls (a click-to-pick Material Symbols icon
-strip, a native date input, a drag-slider for Duration, no Time field at
-all) — all deliberate, explicitly requested changes at the time — but
-matching Figma's actual mock pixel-for-pixel meant reverting to what it
-literally shows, with real interactivity for these fields coming back in
-a later pass once their intended behaviour ("animation") is specified.
-Concretely, right now:
+**Date, Time, and Duration are a literal static mockup of Figma's
+design** — non-interactive markup reproducing the mock exactly, including
+its own literal sample values (Jun 5 2023, 8:00 pm, 1h) — while the
+**icon circle and title field are real again**. The full history: an
+earlier pass turned all four into live controls (a click-to-pick Material
+Symbols icon strip, a native date input, a drag-slider for Duration, no
+Time field at all); matching Figma's actual mock pixel-for-pixel meant
+reverting all four to what it literally shows; then the icon picker was
+asked back explicitly, with a visible "tap me" affordance this time
+(Figma's own mock just shows a blank circle with no indication it's
+interactive at all). Date/Time/Duration are still waiting on their own
+"later pass" once their intended behaviour is specified. Concretely,
+right now:
 
-- The **icon circle** (`19:1506`) is a plain white circle, no picker, no
-  glyph — matches Figma exactly.
+- The **icon circle** (`19:1506`) is a real button again: tapping it
+  reveals a horizontal, scrollable strip of common Material Symbols (the
+  [fonts.google.com/icons](https://fonts.google.com/icons) library) —
+  walking, meals, socialising, home tasks, sleep, medication, shopping,
+  exercise, work, health, reading, celebrations — and picking one renders
+  that glyph inside the circle, which is also what shows up as the
+  event's icon back on `calendar.html`'s pills. At rest it's plain white
+  (matching Figma's own empty placeholder) with a faint hint glyph
+  (`add_photo_alternate`, ~35% opacity) marking it as tappable — Figma's
+  own mock has no such hint, since its circle isn't meant to be
+  interactive at all.
+- **Title** stays real input, unchanged — matching what Figma's own mock
+  actually is there too (a text field shown in its placeholder/empty
+  state, the same convention every other text field in this app
+  follows). Its placeholder is a custom two-line overlay rather than the
+  native `placeholder` attribute — see the "two-line, two-font
+  placeholder" note further down.
 - **Date** (`19:1531`) is a teal pill with a calendar-badge icon and the
   literal text "Jun 5 （6月5日）, 2023" — Figma's own "Date Picker -
   Collapsed" component's sample value, not a real date field.
@@ -611,18 +628,27 @@ Concretely, right now:
   (`#37848C`) nested at its right end marking "1h" as selected, both
   colours read directly off Figma's exported paths — with 2h/3h sitting
   plain outside either capsule, exactly as the mock shows.
-- Only the **title field** stays real input — that matches what Figma's
-  own mock actually is there too (a text field shown in its
-  placeholder/empty state, the same convention every other text field in
-  this app follows), so there was nothing to revert.
+
+The title field's **placeholder is a custom two-line overlay**
+(`.titleinput__placeholder`), not the input's native `placeholder`
+attribute — Figma's own placeholder (`56:747`) is two lines in two
+different fonts/sizes ("Enter text here" 18px Inria Serif / "在此输入文本"
+16px Noto Serif SC), which a native `placeholder="…"` string can only
+ever render as one line in one font. The overlay sits behind the real
+input (`z-index`) and `js/add-event.js` toggles its `hidden` attribute on
+every `input` event, so it disappears the moment there's real text and
+comes back if the field is cleared — matching Figma's two-line look
+while the field stays a genuine, typeable input underneath.
 
 Save still works end-to-end in the meantime: `js/add-event.js` uses fixed
-values matching what's on screen (8:00 pm start, 1h duration, a generic
-"event" icon) instead of reading them from the now-static markup, so the
-calendar → add-event → add-event-continue flow keeps working while these
-fields wait for their real behaviour. The `?day=` query param still picks
-which of the 3-day lanes the event lands in — that's plumbing, invisible
-on this screen, not something Figma's mock shows either way.
+values for Date/Time/Duration matching what's on screen (8:00 pm start,
+1h duration) instead of reading them from the still-static markup, but
+reads the real icon/title now that those are live again — so the
+calendar → add-event → add-event-continue flow keeps working while
+Date/Time/Duration wait for their own real behaviour. The `?day=` query
+param still picks which of the 3-day lanes the event lands in — that's
+plumbing, invisible on this screen, not something Figma's mock shows
+either way.
 
 This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add
 task （continue） - both", not covered by this static-mockup pass), is a

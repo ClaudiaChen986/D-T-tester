@@ -19,15 +19,15 @@
      button, which arrives with ?day=1 pre-selecting tomorrow). A real
      scrolling page, not a fixed stage.
 
-     Literal static mockup pass: the icon circle, Date, "Date and Time -
-     Wheels", and Duration are all rendered exactly as Figma's own mock
-     shows them (including its literal sample values — Jun 5 2023, 8:00
-     pm, 1h) rather than as live controls. Only the title field is real
-     input, matching Figma's own intent there (it's shown in its
-     placeholder/empty state, same as every other text field in this
-     app). Interactivity for the static pieces is coming in a later
-     pass, per instruction — see js/add-event.js for what Save does with
-     them meanwhile (fixed defaults, not read from these elements).
+     Date, "Date and Time - Wheels", and Duration are rendered exactly as
+     Figma's own mock shows them (including its literal sample values —
+     Jun 5 2023, 8:00 pm, 1h) rather than as live controls — interactivity
+     for those is a later pass, per instruction; see js/add-event.js for
+     what Save does with them meanwhile (fixed defaults, not read from
+     these elements). The round icon circle and the title field are both
+     real again, by request: tapping the circle reveals a horizontal
+     strip of Material Symbols (fonts.google.com/icons) to pick from, and
+     title is a genuine text input, same as it's always been.
      ================================================================ -->
 <div class="addeventpage">
 
@@ -60,7 +60,11 @@
 
     <div class="addevent__teal">
       <div class="addevent__row">
-        <div class="iconpicker" aria-hidden="true"></div>
+        <button class="iconpicker" id="iconPicker" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Choose an icon 选择图标">
+          <span class="iconpicker__display" id="iconDisplay">
+            <span class="material-symbols-outlined iconpicker__hint" aria-hidden="true">add_photo_alternate</span>
+          </span>
+        </button>
 
         <div class="titlewrap">
           <input class="titleinput" type="text" id="titleInput" name="title" autocomplete="off"
@@ -73,6 +77,8 @@
       </div>
 
       <div class="addevent__divider" aria-hidden="true"></div>
+
+      <div class="iconbar" id="iconBar" hidden role="listbox" aria-label="Event icon 日程图标"></div>
     </div>
 
     <div class="addevent__fields">

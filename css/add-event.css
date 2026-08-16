@@ -62,15 +62,51 @@
   gap: 7px;
 }
 
-/* Plain white, empty circle — matches Figma exactly (19:1506): an empty
-   placeholder, no icon and no picker behaviour. */
+/* White circle (19:1506 is an empty placeholder in Figma's own mock) —
+   now a real button again, by request: the faint glyph inside is this
+   app's own "tap to choose an icon" affordance so the circle reads as
+   clickable, not something Figma draws there. */
 .iconpicker {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 96px;
   height: 96px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: #fff;
+  cursor: pointer;
+  transition: transform .12s ease;
 }
+.iconpicker:active { transform: scale(.96); }
+.iconpicker__display { display: grid; place-items: center; }
+.iconpicker .material-symbols-outlined { font-size: 44px; color: #832118; }
+.iconpicker .iconpicker__hint { color: rgba(131, 33, 24, .35); }
+
+.iconbar {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 2px 4px;
+}
+.iconbar[hidden] { display: none; }
+.iconbar__btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, .18);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.iconbar__btn .material-symbols-outlined { font-size: 24px; }
+.iconbar__btn.is-selected { background: #edd8b4; border-color: #fff; }
+.iconbar__btn.is-selected .material-symbols-outlined { color: #832118; }
 
 /* Figma's placeholder (56:747) is two lines in two different fonts/sizes
    ("Enter text here" 18px Inria Serif, "在此输入文本" 16px Noto Serif SC) —
