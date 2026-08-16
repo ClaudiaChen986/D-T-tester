@@ -1,0 +1,175 @@
+/* ============================================================================
+   归途 GuiTu — "Adding event (continue)" (Figma node 19:1547,
+   "add task （continue） - both")
+   ----------------------------------------------------------------------------
+   Step 2 of add-event.html's flow: the title and icon picked on step 1 land
+   read-only in the round white shape + text next to it (Figma's own mockup
+   shows placeholder text there; here it's real, handed off via
+   sessionStorage — see js/add-event-continue.js). Same "real scrolling
+   page" reasoning as add-event.css: the Repeat grid + sub-task field are
+   more content than one screen reliably holds.
+   ========================================================================== */
+
+.addevent-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: #efefef;
+}
+
+.aecpage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #efefef;
+  font-family: var(--font-en);
+}
+
+/* ------------------------------------------------------------------ header */
+.aechead {
+  position: relative;
+  width: 390px;
+  height: 209.144px;
+  background: linear-gradient(to bottom, rgba(166, 49, 38, .8), var(--c-red));
+}
+.aechead .header__bg { position: absolute; inset: 0; width: 390px; height: 209.144px; }
+
+/* ------------------------------------------------------------------- teal */
+.aec__teal {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 26px 20px 24px;
+  background: #37848c;
+  border-radius: 30px 30px 0 0;
+  margin-top: -30px;
+}
+
+.aec__icon {
+  flex: none;
+  width: 96px;
+  height: 151px;
+  border-radius: 48px;
+  background: #edd8b4;
+  display: grid;
+  place-items: center;
+}
+.aec__icon .material-symbols-outlined { font-size: 48px; color: #832118; }
+
+.aec__summary { flex: 1; min-width: 0; padding-top: 8px; }
+.aec__title {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, .6);
+  color: #fff;
+  font-family: var(--font-en), var(--font-cn);
+  font-size: 18px;
+  overflow-wrap: break-word;
+}
+.aec__when {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.5;
+}
+.aec__when .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+
+/* ------------------------------------------------------------------ fields */
+.aec__fields { padding: 24px 0 40px; }
+
+.aec__card {
+  margin: 0 20px 20px;
+  background: #fff;
+  border-radius: 30px;
+  overflow: hidden;
+}
+.aec__card-label {
+  margin: 0;
+  padding: 20px 24px 16px;
+  font-size: 0;
+  line-height: normal;
+}
+.aec__card-label > span { font-weight: 700; color: #000; }
+.aec__card-label .t-en { font-family: var(--font-en); font-size: 22px; }
+.aec__card-label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
+
+.repeatgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.repeatchip {
+  padding: 12px 4px 16px;
+  border: 0;
+  border-top: 1px solid #e6e6e6;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+}
+.repeatchip > span { display: block; }
+.repeatchip .t-en { font-family: var(--font-en); font-size: 17px; color: #000; }
+.repeatchip .t-cn { font-family: var(--font-cn); font-size: 14px; color: #000; letter-spacing: .7px; margin-top: 2px; }
+.repeatchip.is-selected { background: var(--c-teal); border-radius: 30px; margin: 2px; }
+.repeatchip.is-selected .t-en,
+.repeatchip.is-selected .t-cn { color: #fff; }
+
+.subtaskrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  cursor: pointer;
+}
+.subtaskrow input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--c-teal);
+  cursor: pointer;
+}
+.subtaskrow span {
+  font-size: 0;
+  line-height: normal;
+}
+.subtaskrow .t-en { font-family: var(--font-en); font-size: 16px; color: #000; }
+.subtaskrow .t-cn { font-family: var(--font-cn); font-size: 14px; color: #000; letter-spacing: .7px; }
+
+.subtaskarea {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  border: 0;
+  border-top: 1px solid #e6e6e6;
+  background: #fff;
+  outline: none;
+  resize: vertical;
+  padding: 16px 24px;
+  color: #000;
+  font: 16px var(--font-en), var(--font-cn);
+  box-sizing: border-box;
+}
+.subtaskarea::placeholder { color: #979797; }
+.subtaskarea:disabled { color: #c2c2c2; background: #fafafa; }
+
+.save {
+  display: block;
+  width: 317px;
+  max-width: calc(100% - 40px);
+  height: 52px;
+  margin: 4px auto 0;
+  border: 0;
+  border-radius: 30px;
+  background: #154c52;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  color: #fff;
+  font-size: 0;
+  line-height: normal;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.save:active { transform: scale(.98); }
+.save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }

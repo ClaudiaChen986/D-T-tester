@@ -1,0 +1,182 @@
+/* ============================================================================
+   归途 GuiTu — "Adding event" (Figma node 19:1501, "add task - both")
+   ----------------------------------------------------------------------------
+   A real scrolling page rather than a fixed 390×844 stage: the icon picker's
+   selection bar adds a row of content on demand, so the page needs to be
+   able to grow and scroll instead of clipping it — same reasoning as
+   todays-events.css/journal.css elsewhere in this app.
+   ========================================================================== */
+
+.addevent-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: #efefef;
+}
+
+.addeventpage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #efefef;
+  font-family: var(--font-en);
+}
+
+/* ------------------------------------------------------------------ header */
+.addeventhead {
+  position: relative;
+  width: 390px;
+  height: 209.144px;
+  background: linear-gradient(to bottom, rgba(166, 49, 38, .8), var(--c-red));
+}
+.addeventhead .header__bg { position: absolute; inset: 0; width: 390px; height: 209.144px; }
+
+/* ------------------------------------------------------------------- teal */
+.addevent__teal {
+  position: relative;
+  padding: 26px 20px 24px;
+  background: #37848c;
+  border-radius: 30px 30px 0 0;
+  margin-top: -30px;
+}
+
+.iconpicker {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #edd8b4;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform .12s ease;
+}
+.iconpicker:active { transform: scale(.96); }
+.iconpicker__display { display: grid; place-items: center; }
+.iconpicker .material-symbols-outlined { font-size: 44px; color: #832118; }
+.iconpicker__placeholder { font-size: 13px; color: #832118; font-family: var(--font-en); font-weight: 700; text-align: center; line-height: 1.3; }
+
+.iconbar {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 14px;
+  margin: 0 0 4px;
+}
+.iconbar[hidden] { display: none; }
+.iconbar__btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, .18);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.iconbar__btn .material-symbols-outlined { font-size: 24px; }
+.iconbar__btn.is-selected { background: #edd8b4; border-color: #fff; }
+.iconbar__btn.is-selected .material-symbols-outlined { color: #832118; }
+
+.titleinput {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .6);
+  background: transparent;
+  outline: none;
+  padding: 6px 2px;
+  color: #fff;
+  font: 18px var(--font-en), var(--font-cn);
+}
+.titleinput::placeholder { color: #ccc; }
+
+/* ------------------------------------------------------------------ fields */
+.addevent__fields { padding: 24px 37px 40px; }
+
+.fieldgroup { margin-bottom: 26px; }
+.fieldgroup__label {
+  margin: 0 0 12px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.fieldgroup__label > span { font-weight: 700; }
+.fieldgroup__label .t-en { font-family: var(--font-en); font-size: 22px; }
+.fieldgroup__label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
+
+.datepill,
+.timepill {
+  width: 100%;
+  height: 50px;
+  border: 0;
+  border-radius: 30px;
+  background: var(--c-teal);
+  color: #fff;
+  font: 18px var(--font-en);
+  padding: 0 20px;
+  outline: none;
+  box-sizing: border-box;
+}
+.datepill::-webkit-calendar-picker-indicator,
+.timepill::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.durationrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.durationchip {
+  border: 0;
+  border-radius: 21px;
+  height: 42px;
+  padding: 0 16px;
+  background: #efefef;
+  border: 1px solid #56a8b0;
+  color: #000;
+  font-family: var(--font-en);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.durationchip.is-selected { background: var(--c-teal); color: #fff; border-color: var(--c-teal); }
+
+.save {
+  display: block;
+  width: 100%;
+  height: 52px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 30px;
+  background: #154c52;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  color: #fff;
+  font-size: 0;
+  line-height: normal;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.save:active { transform: scale(.98); }
+.save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }
+
+.formstatus {
+  margin: 0 0 16px;
+  text-align: center;
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 700;
+  color: #b44439;
+  min-height: 18px;
+}

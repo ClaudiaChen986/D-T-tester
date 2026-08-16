@@ -28,8 +28,7 @@ pages/
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
   other.html               "Other" menu (node 142:824) — Home's Other tile
-                            leads here; My Calendar/My Journal have no
-                            destination screen yet
+                            leads here
   todays-events.html       "What's on today?" (node 7:1322, "Suggestion -
                             homepage") — real scrolling page, like
                             contacts.html; six seniors-resource cards and a
@@ -47,6 +46,26 @@ pages/
   add-journal.html          "Adding journal" (node 19:1534) — journal.html's
                              Add button leads here; title + body form, Save
                              writes a new entry and returns to journal.html
+  calendar.html              "My Calendar" (node 56:218, "my calendar -
+                              both") — Other's My Calendar tile leads here;
+                              real scrolling page, a 3-day / 0:00-24:00
+                              timeline plus a scrollable "today's events"
+                              list, both empty until add-event.html adds
+                              something
+  add-event.html             "Adding event" (node 19:1501, "add task -
+                              both") — calendar.html's Add button (or its
+                              "plan tomorrow" button) leads here; icon
+                              picker + title + date/time/duration form.
+                              Step 1 of 2 — Save hands off to
+                              add-event-continue.html rather than writing
+                              the event itself
+  add-event-continue.html    "Adding event (continue)" (node 19:1547, "add
+                              task （continue） - both") — add-event.html's
+                              Save leads here; step 1's title/icon/date/
+                              time land read-only in the round shape and
+                              text next to it, plus Repeat and an optional
+                              sub-task. This Save is what actually writes
+                              the event and returns to calendar.html
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -65,6 +84,9 @@ css/
   event-location.css         event-location.html's own layout
   journal.css                journal.html's own layout
   add-journal.css            add-journal.html's own layout
+  calendar.css                calendar.html's own layout
+  add-event.css                add-event.html's own layout
+  add-event-continue.css       add-event-continue.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -83,6 +105,14 @@ js/
   journal.js                 journal.html: seeds + saved-entry rendering,
                               CJK/Latin script-run splitting per entry
   add-journal.js              add-journal.html: validation, save, handoff
+  calendar.js                  calendar.html: renders the timeline + today's
+                                events list from localStorage, tick-box save
+  add-event.js                 add-event.html: icon picker, date/time/
+                                duration defaults, validation; Save hands
+                                off a draft, doesn't write the event
+  add-event-continue.js        add-event-continue.html: fills the summary
+                                from the handed-off draft, Repeat chips,
+                                sub-task toggle, and the real save
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -121,10 +151,9 @@ file under `css/`.
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
 - Home's *Other* tile → `other.html`. Its *Today's new events* card →
-  `todays-events.html`; My Calendar/My Journal still have no destination
-  screen, so — same as Home's still-unbuilt Translation/Navigation tiles —
-  they're inert `<button>`s. Other's own return arrow and "Back to
-  homepage" bar both go to `home.html`.
+  `todays-events.html`; same as Home's still-unbuilt Translation/Navigation
+  tiles, nothing else on this menu is inert anymore. Other's own return
+  arrow and "Back to homepage" bar both go to `home.html`.
 - `todays-events.html`'s sticky **More** button opens
   <https://www.krg.nsw.gov.au/Community/Seniors> in a new tab — a real
   external link, not a placeholder. Its return arrow goes back to
@@ -147,6 +176,18 @@ file under `css/`.
   of every other entry. `add-journal.html`'s return arrow (cancel) goes back
   to `journal.html`; `journal.html`'s own return arrow and "Back to
   homepage" bar go to `other.html` and `home.html` respectively.
+- Other's *My Calendar* tile → `calendar.html`. Its **Add** pill and the
+  today panel's **plan tomorrow** button both → `add-event.html` (the
+  latter with `?day=1`, pre-selecting tomorrow's date). That page's Save
+  validates step 1 (title/icon/date/time/duration) and hands off to
+  `add-event-continue.html` (step 2: Repeat + optional sub-task) rather
+  than writing anything yet; *that* page's own Save is what writes the
+  finished event to `localStorage` and returns to `calendar.html`, where
+  it now appears on the timeline and, if it's today's, in the today panel
+  too. `add-event.html`'s return arrow (cancel) goes back to
+  `calendar.html`; `add-event-continue.html`'s return arrow goes back to
+  `add-event.html`; `calendar.html`'s own return arrow goes to
+  `other.html`, and its nav row's home-logo link goes to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -277,8 +318,8 @@ assets that would have come back identical anyway.
 `other.html` (node 142:824) is structurally the same menu Translation's
 Figma node uses — same scalloped card shape, same round badge artwork, same
 chevron and bottom-bar geometry — just with three different cards (Today's
-new events, My Calendar, My Journal; the first and third lead somewhere,
-see below — My Calendar has no destination screen yet). Header, return
+new events, My Calendar, My Journal — all three now lead somewhere, see
+below). Header, return
 button, background texture, and
 bottom bar are all pixel-identical assets to what every other return-button
 page already ships (confirmed by comparing exported bytes), so the only
@@ -421,3 +462,104 @@ add-contact.js already established for Name. Save falls back to handing
 the new entry to `journal.html` via a URL parameter if `localStorage`
 throws (the same file://-Firefox contingency add-contact.js already
 guards against), so Save never silently does nothing.
+
+## "My Calendar" — a 3-day timeline that starts empty
+
+`calendar.html` (node 56:218, "my calendar - both") is Other's *My
+Calendar* tile, and — like `todays-events.html`/`journal.html` — a real
+scrolling page: a 0:00–24:00 timeline across three day-columns plus a
+scrollable events list is genuine page-length content, not something a
+fixed 390×844 mock scaled as one unit can hold. Figma's own mockup ships
+the timeline pre-populated with sample events (a whole day planned out);
+this build deliberately does **not** seed any of that — a fresh visit
+shows only the hour axis and its guide line, three empty lanes underneath
+(`today`/`Tomorrow`/`2 Days`), and an empty today panel, since nothing has
+actually been scheduled yet. Events only appear once added through
+`add-event.html`, read back out of `localStorage`
+(`guitu.calendarEvents`) by `js/calendar.js`.
+
+Header, return button, and the "Add" pill's icon are all reused
+byte-for-byte from existing assets (`header.svg`, `return-button.png`,
+and — confirmed by comparing Figma's own crop percentages against
+`add-icon.png`'s existing crop in `journal.html` — the same add-icon
+sprite, just cropped identically), so nothing new needed exporting for
+this screen. The bottom nav (Calls / a home-logo / Profile) reuses the
+same three-pill arrangement Figma's own "Slide up card" component ships
+elsewhere in this file (see `calling.html`'s notes on that component)
+but, unlike `home.html`'s version, isn't draggable here — on a page this
+tall, a fixed 844px sheet that slides over the timeline doesn't apply;
+it's simply the page's own in-flow navigation row, same posture as every
+other page's bottom bar.
+
+**Each pill's colour is a live progress indicator**, not a fixed
+category colour: for *today's* lane only, `js/calendar.js` compares the
+event's start/end against the real clock — a pill entirely in the past
+renders fully teal, one entirely in the future stays the plain unfilled
+cream track, and one straddling *now* renders a soft gradient split at
+however far through it the clock has gotten. Tomorrow/2-days pills always
+render as plain track, since "how much has elapsed" isn't a meaningful
+question for a day that hasn't started. A dashed "now" line marks the
+live time on today's lane specifically, for the same reason. The today
+panel below mirrors this — each row's icon badge turns red while its
+event is the one currently in progress — and adds the one piece of
+real interactivity Figma's mock doesn't show any state for: a tickable
+checkbox per event (`role="checkbox"`, toggled on click), persisted back
+into the same stored event and rendered with a struck-through title once
+checked.
+
+`add-event.html` (node 19:1501, "add task - both") is reached from either
+of `calendar.html`'s two entry points — the header's **Add** pill (which
+defaults the date to today) and the today panel's **plan tomorrow**
+button (which arrives with `?day=1`, pre-selecting tomorrow) — and, like
+those other two pages, is a real scrolling page rather than a fixed
+stage: the icon-selection bar and the fields beneath it are more content
+than one screen reliably holds once the bar is open, so the page needs to
+be able to grow and scroll instead of clipping it.
+
+The round shape at the top of the teal band — Figma's placeholder circle
+— is a real clickable icon picker here: tapping it reveals a horizontal,
+scrollable strip of common Material Symbols (the
+[fonts.google.com/icons](https://fonts.google.com/icons) library, loaded
+as the `Material Symbols Outlined` webfont alongside the existing Inria
+Serif/Noto Serif SC fonts) — walking, meals, socialising, home tasks,
+sleep, medication, shopping, exercise, work, health, reading, and
+celebrations — and picking one both closes the strip and renders that
+glyph inside the circle, which is also what shows up as the event's icon
+back on `calendar.html`'s pills and list rows. Figma's own "Date and Time
+- Wheels" component (an iOS-style scroll picker, per its own linked Apple
+HIG docs) is approximated here with native `<input type="date">` /
+`<input type="time">` fields, styled to match the app's pill language
+rather than reproduced as a custom wheel widget — the same kind of
+native-control simplification this app already makes elsewhere. Duration
+keeps Figma's own preset-chip design (5/10/15/30 min, 1h/2h/3h) as plain
+selectable buttons.
+
+This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add
+task （continue） - both"), is a second screen, not this one finishing.
+Save here validates that a title, date, and time are all set, then hands
+everything off as a `sessionStorage` draft (`guitu.addEventDraft`) and
+moves on to `add-event-continue.html`, rather than writing anything to
+the real calendar yet — `sessionStorage`, not `localStorage`, for the
+same reason `js/app.js` uses it for `guitu.callTarget`: it's scoped to
+this one handoff, so abandoning the flow on step 2 (closing the tab,
+navigating away) doesn't leave a half-finished event sitting in
+`guitu.calendarEvents`.
+
+`add-event-continue.html` reads that draft back out on load — if it's
+missing (a direct visit, or a refresh after the draft was already
+cleared) it bounces straight back to `add-event.html` rather than
+rendering an empty summary. Figma's mock shows the round shape and the
+"Enter text here" line next to it as placeholder text; here they're
+filled in for real, from the draft: the icon picked on step 1 renders
+inside the (taller, pill-shaped) white shape, the title sits where the
+placeholder was, and the date/time render as formatted bilingual text
+(`Jun 5 （6月5日）, 2023` / `8:00 pm （下午）`) built from the picked
+values rather than Figma's own hardcoded sample. Repeat is a single-select
+grid of six chips (Figma's own set — No repetition/Daily/Weekly/Every
+fortnight/Monthly/Yearly), defaulting to "No repetition" same as the
+mock. The "add sub-task" checkbox gates its textarea's `disabled` state
+— per Figma's Material checkbox component, unticked by default, so the
+field starts inert until opted into. This page's own Save is what
+finally writes `{ title, icon, day, start, duration, done, repeat,
+subtask? }` to `guitu.calendarEvents`, clears the draft, and returns to
+`calendar.html`.
