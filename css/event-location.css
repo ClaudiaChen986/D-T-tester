@@ -1,0 +1,62 @@
+/* ============================================================================
+   归途 GuiTu — event location map
+   ----------------------------------------------------------------------------
+   No curved header.svg — same treatment as the `navigation` branch's own
+   "Go home"/"Navigation" route pages: plain `.screen` red background, a
+   return button, a centered title. Reached from senior-events.html's
+   Location buttons, which pass the destination as ?name=&address= — real
+   query-string params, not a fake/inert button, since the address text is
+   short enough to just go straight in the URL (no localStorage/
+   sessionStorage handoff needed the way a photo or a whole saved-contact
+   object would).
+   ========================================================================== */
+
+/* Dynamic event name (?name=) can run much longer than the header title box
+   was sized for elsewhere — widen it and drop the font size so it wraps
+   within its own box instead of overlapping the return button on the left. */
+.header__title {
+  left: 110px;
+  width: 256px;
+}
+.header__title .t-en { font-size: 22px; }
+.header__title .t-cn { font-size: 20px; }
+
+.eventloc-map {
+  position: absolute;
+  left: 0;
+  top: 131px;
+  width: 390px;
+  height: 700px;
+  border-radius: 30px 30px 0 0;
+  overflow: hidden;
+}
+.eventloc-map > iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* -------------------------------------------------------------- back bar */
+.eventlocbar {
+  position: absolute;
+  left: 0;
+  top: 710px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.eventlocbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.eventlocbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.eventlocbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.eventlocbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }

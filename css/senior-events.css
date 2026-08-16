@@ -1,0 +1,235 @@
+/* ============================================================================
+   归途 GuiTu — "Senior event" (Figma node 81:358, "iPhone 13 & 14 - 1")
+   ----------------------------------------------------------------------------
+   Reached from todays-events.html's "Seniors events" card. A real
+   (unbounded-height) scrolling page, same reasoning as contacts.css/
+   todays-events.css — but unlike those, laid out with the same pixel-
+   absolute-inside-a-fixed-height-panel scheme every fixed-screen page in
+   this app uses, since Figma positions every element in each event panel
+   at an exact offset rather than a flow. Both event cards and their
+   "When"/"Location" sub-cards are plain CSS rounded rectangles in Figma,
+   not the scalloped-ticket SVG shape used elsewhere — so no new
+   background asset was needed for either, just the two event photos.
+   Header, return button, and bottom bar are the same pixel-identical
+   assets every other page ships.
+
+   The "When" dates are real, current data — Ku-ring-gai Council's own
+   Seniors events listing (fetched at implementation time; see README) —
+   not Figma's placeholder sample dates, which had already passed by the
+   time this was built. Since this is a static prototype with nowhere to
+   run a live re-fetch (the council site doesn't allow it cross-origin
+   anyway — a plain fetch() 403s; only a full browser gets past it), the
+   date is accurate as of when this was written, not continuously live.
+   ========================================================================== */
+
+.senior-events-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: var(--c-red);
+}
+
+.seniorpage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--c-red);
+  font-family: var(--font-en);
+}
+.seniorpage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../assets/bg-texture2.png') repeat;
+  opacity: .16;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ header */
+.seniorhead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 390px;
+  height: 209.144px;
+}
+/* "Senior event" is longer than .header__title's box was sized for —
+   same fix every longer title elsewhere in the app needs. */
+.seniorhead .header__title {
+  left: 85px;
+  width: 281px;
+}
+.seniorhead .header__title .t-en,
+.seniorhead .header__title .t-cn { white-space: nowrap; }
+
+.morebtn {
+  position: absolute;
+  left: 235px;
+  top: 153px;
+  width: 119px;
+  height: 56px;
+  border-radius: 30px;
+  background: var(--c-teal);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.morebtn:active { transform: scale(.96); }
+.morebtn__label {
+  position: absolute;
+  left: 16px;
+  top: 9px;
+  width: 64px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.morebtn__label > span { display: block; font-weight: 700; }
+.morebtn__label .t-en { font-size: 16px; }
+.morebtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+
+/* -------------------------------------------------------------------- list */
+.seniorlist {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 32px 0 32px;
+}
+
+.eventpanel {
+  position: relative;
+  width: 317px;
+  border-radius: 30px;
+  background: #edd8b4;
+}
+.eventpanel--nutrition { height: 789px; }
+.eventpanel--chairyoga { height: 731px; }
+
+.eventpanel__title {
+  position: absolute;
+  left: 17px;
+  top: var(--y);
+  width: 282px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.eventpanel__title > span { display: block; font-weight: 700; }
+.eventpanel__title .t-en { font-size: 24px; }
+.eventpanel__title .t-cn { font-size: 22px; letter-spacing: 1.1px; }
+
+.eventpanel__desc {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 282px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.eventpanel__desc > span { display: block; font-weight: 400; }
+.eventpanel__desc .t-en { font-size: 18px; }
+.eventpanel__desc .t-cn { font-size: 16px; letter-spacing: .8px; margin-top: 6px; }
+
+.eventpanel__photo {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 282px;
+  height: 141px;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+/* "When" / "Location" sub-cards — same rust-red rounded panel, black
+   centered text, matching Figma exactly (lower-contrast than the rest of
+   the app's palette, but that's the design as given). Identical internal
+   layout in both event panels, so one component handles both. */
+.eventdetail {
+  position: absolute;
+  left: 17px;
+  top: var(--y);
+  width: 282px;
+  height: 144px;
+  border-radius: 30px;
+  background: #b44439;
+}
+a.eventdetail {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+a.eventdetail:active { transform: scale(.98); }
+
+.eventdetail__label {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 100%;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.eventdetail__label > span { font-weight: 700; }
+.eventdetail__label .t-en { font-family: var(--font-en); font-size: 20px; }
+.eventdetail__label .sp   { font-size: 18px; }
+.eventdetail__label .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
+
+.eventdetail__body {
+  position: absolute;
+  left: 18px;
+  top: var(--y2);
+  width: 246px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.eventdetail__body > span { display: block; }
+.eventdetail__body .t-en { font-family: var(--font-en); font-size: 16px; font-weight: 400; }
+.eventdetail__body .t-cn { font-family: var(--font-cn); font-size: 14px; font-weight: 400; letter-spacing: .7px; margin-top: 2px; }
+.eventdetail__body .t-time { margin-top: 8px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry as contacts.html's own .backbar (position: relative,
+   in normal flow — this page scrolls like that one, not a fixed stage). */
+.eventsbar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 390px;
+  height: 134px;
+  margin: 6px 0 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.eventsbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.eventsbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.eventsbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.eventsbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morebtn,
+  a.eventdetail { transition: none; }
+}

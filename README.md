@@ -34,6 +34,12 @@ pages/
                             homepage") — real scrolling page, like
                             contacts.html; six seniors-resource cards and a
                             "More" button out to a real external site
+  senior-events.html       "Senior event" (node 81:358) — todays-events.html's
+                            Seniors events card leads here; real scrolling
+                            page, two event cards with live-sourced dates
+  event-location.html      Routed Google Maps view for a senior event's
+                            venue — reads ?name=&address= off the link that
+                            sent it here
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -48,6 +54,8 @@ css/
   add-contact.css           add-contact.html's own layout
   other.css                 other.html's own layout
   todays-events.css          todays-events.html's own layout
+  senior-events.css          senior-events.html's own layout
+  event-location.css         event-location.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -61,6 +69,8 @@ js/
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
   other.js                  other.html: viewport fit only
+  event-location.js         event-location.html: viewport fit, reads
+                             ?name=&address=, live routed Google Maps embed
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -106,7 +116,19 @@ file under `css/`.
 - `todays-events.html`'s sticky **More** button opens
   <https://www.krg.nsw.gov.au/Community/Seniors> in a new tab — a real
   external link, not a placeholder. Its return arrow goes back to
-  `other.html`; its "Back to homepage" bar goes to `home.html`.
+  `other.html`; its "Back to homepage" bar goes to `home.html`. Its
+  **Seniors events** card → `senior-events.html`.
+- `senior-events.html`'s own sticky **More** button opens the more specific
+  <https://www.krg.nsw.gov.au/Community/Seniors/Seniors-events> listing page
+  (distinct from `todays-events.html`'s More, which points one level up).
+  Each event's **Location** sub-card → `event-location.html`, carrying the
+  venue as `?name=&address=` on the link. Its return arrow goes back to
+  `todays-events.html`; its "Back to homepage" bar goes to `home.html`.
+- `event-location.html` shows a live routed Google Maps embed to whatever
+  venue it was sent (falling back to a destination-only pin if geolocation
+  is denied/unavailable — same posture as every map on this project). Its
+  return arrow goes back to `senior-events.html`; its "Back to homepage" bar
+  goes to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -279,6 +301,54 @@ header pattern as `phrase-library.html`'s Add) is a real link to
 <https://www.krg.nsw.gov.au/Community/Seniors> (`target="_blank"
 rel="noopener noreferrer"`) — the Ku-ring-gai Council's actual seniors
 page, not a placeholder, since a link needs nothing this prototype can't
-already do. None of the six cards have their own destination screens yet,
-so they stay inert `<button>`s, same posture as every other
-not-yet-designed destination in the app.
+already do. Only the **Seniors events** card has a destination screen yet
+(`senior-events.html`, below); the other five stay inert `<button>`s, same
+posture as every other not-yet-designed destination in the app.
+
+## "Senior event" — real dates pulled from the council's own events page
+
+`senior-events.html` (node 81:358) is `todays-events.html`'s *Seniors
+events* card, and — like every other multi-item list in this app — a real
+scrolling page rather than a fixed 390×844 mock. Figma's own two event
+cards (Nutrition and Health workshop, Chair yoga) turned out to be plain
+CSS rounded rectangles, not the scalloped-ticket SVG shape every other
+card list in this app uses (confirmed in the returned JSX: `bg-[#edd8b4]
+... rounded-[30px]` on a bare `<div>`, no `<img>`) — a first for this
+project, so `senior-events.css` positions everything with plain
+`border-radius`/background-color instead of a card-background asset.
+Photos, header, return button, and bottom bar are the only image assets
+this page needs, and all but the two event photos already existed
+byte-for-byte elsewhere in the app.
+
+The "When" sub-card's date and time are **not** Figma's placeholder
+sample text — they're the real next-occurrence date for each event, read
+directly off the council's live events page,
+<https://www.krg.nsw.gov.au/Community/Seniors/Seniors-events> (plus each
+event's own detail page for the exact time, which isn't shown on the
+listing itself). That site returns HTTP 403 to plain HTTP clients
+(`curl`, this project's usual `WebFetch`) — bot-detection that a real
+browser clears — so fetching it took a headless browser rather than a
+simple request. This is necessarily a **snapshot taken at implementation
+time**, not a live feed: a static, no-build prototype with no server has
+nowhere to run a fetch against a site with no CORS headers, so the dates
+will drift out of date the same way any hand-typed copy would. Treat them
+as "accurate as of when this page was built," not as continuously
+current.
+
+Each event's **Location** sub-card is a real link to `event-location.html`,
+carrying the venue's name and address as `?name=&address=` query-string
+params rather than through `localStorage`/`sessionStorage` — the payload
+is short, one-shot text with nothing to persist across visits, unlike a
+saved contact or profile photo, so the simplest handoff that works is a
+plain URL. `event-location.html` reuses the same routed-map pattern this
+prototype already established elsewhere (destination-only pin loads
+immediately; upgraded to full directions if geolocation succeeds within
+8s) via the same keyless `maps.google.com/maps?...&output=embed` endpoint
+— no API key, no billing. Its title bar switches from this app's usual
+*centered* title (`.header-title-centered`, sized to short, known-length
+titles like "Add phrase") to the *right-aligned* `.header__title` instead,
+widened and set smaller than its default — a centered box sized to
+content (`width: max-content`) works for short fixed strings, but an
+event name is arbitrary, caller-supplied text that can run long enough to
+span the whole screen and sit on top of the return button; a bounded,
+right-aligned box wraps within itself instead of growing into it.
