@@ -1,0 +1,153 @@
+/* ============================================================================
+   归途 GuiTu — "Maps" (Navigation home) — Figma node 7:1284
+   ----------------------------------------------------------------------------
+   Header, return button, background texture, and the slide-up card's chrome
+   (background, panel, handle, medallion, Calls/Profile pills, and even the
+   contact-row background shape) are all pixel-identical assets to what
+   home.html already uses (confirmed by comparing exported bytes) — this
+   screen reuses the exact same "Slide up card" component/animation Figma
+   itself reuses, so js/navigation.js's drag logic is the same one from
+   js/app.js, just without the dynamic contact list. Only the map photo, the
+   two new sheet rows (Go home / Set destination), and the share-location
+   button are new.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- map */
+.navmap {
+  position: absolute;
+  left: -3px;
+  top: 2px;
+  width: 395px;
+  height: 821px;
+  overflow: hidden;
+}
+.navmap > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --------------------------------------------------------- share location
+   Same raised/idle → pressed/active convention calling.css's .callbtn
+   already uses (cream #fbecd1 + drop shadow idle, #d42628 + inset shadow
+   active) and the exact same location-pin glyph (icon-call-location-off/on
+   .svg, already in assets/ for the in-call Location toggle) — reused
+   outright rather than re-exporting Figma's two button variants as images. */
+.navshare {
+  position: absolute;
+  left: 263px;
+  top: 597px;
+  width: 111px;
+  height: 151px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(217, 217, 217, .8);
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.navshare:active { transform: scale(.97); }
+
+.navshare__icon {
+  position: absolute;
+  left: 16px;
+  top: 10px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #fbecd1;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, .25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease, box-shadow .15s ease;
+}
+.navshare.is-active .navshare__icon {
+  background: #d42628;
+  box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
+}
+.navshare__glyph { width: 34px; height: 42px; object-fit: contain; }
+
+/* pulsing "live sharing" ring — Figma's two button variants are static, no
+   authored motion (confirmed via get_motion_context), so this is the one
+   piece of original motion design here: an outward-fading ring that only
+   runs while sharing is on, echoing the app's other "something is live"
+   cue (home's listening soundwave) without inventing a new visual language. */
+.navshare__icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(212, 38, 40, .55);
+  opacity: 0;
+  pointer-events: none;
+}
+.navshare.is-active .navshare__icon::after {
+  animation: navshare-pulse 1.6s cubic-bezier(.2, .7, .3, 1) infinite;
+}
+@keyframes navshare-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(212, 38, 40, .55); opacity: 1; }
+  100% { box-shadow: 0 0 0 22px rgba(212, 38, 40, 0); opacity: 0; }
+}
+
+.navshare__label {
+  position: absolute;
+  left: 13px;
+  top: 98px;
+  width: 85px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.navshare__label > span { display: block; font-weight: 400; }
+.navshare__label .t-en { font-size: 16px; }
+.navshare__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+
+/* ------------------------------------------------------- sheet: nav rows
+   Reuses .row/.row__bg from styles.css (same 312×122 anchor, same
+   contact-row.svg background — confirmed byte-identical to Figma's export
+   for these rows) as a button instead of a div, since "Go home"/"Set
+   destination" don't have a per-row call button the way home's contact
+   rows do. */
+.sheet .row {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.sheet .row:active { transform: scale(.98); }
+
+.navrow__label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 169px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.navrow__label > span { display: block; font-weight: 400; }
+.navrow__label .t-en { font-size: 24px; }
+.navrow__label .t-cn { font-size: 22px; }
+/* "Set destination" rows read as a not-yet-set placeholder, same muted
+   grey Figma gives them (vs. black for the live "Go home" action). */
+.navrow__label--muted,
+.navrow__label--muted .t-en,
+.navrow__label--muted .t-cn { color: #646464; }
+
+.navrow__icon { pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .navshare,
+  .sheet .row { transition: none; }
+  .navshare.is-active .navshare__icon::after { animation: none; }
+}

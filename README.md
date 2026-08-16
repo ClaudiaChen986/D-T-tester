@@ -27,6 +27,9 @@ pages/
                             to profile.html
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
+  navigation.html          "Maps" — Navigation's home (node 7:1284) — Home's
+                            Navigation tile leads here; Go home/Set destination
+                            have no destination screen yet
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -39,6 +42,7 @@ css/
   edit.css                  edit-contacts.html's own layout
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
+  navigation.css             navigation.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -51,6 +55,8 @@ js/
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
+  navigation.js              navigation.html: viewport fit, share-location
+                              toggle, slide-up card drag (same as app.js's)
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -88,6 +94,10 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
+- Home's *Navigation* tile → `navigation.html`. Its "Go home" row and both
+  "Set destination" rows have no destination screen yet, so — same as
+  Home's still-unbuilt Translation/Other tiles — they're inert `<button>`s;
+  its return arrow goes to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -212,3 +222,39 @@ export for Location showed they're the exact same path data, just
 recolored, so the other two buttons' "on" states were derived the same way
 (swap `#37848C` for `white`) instead of two more round-trips to fetch
 assets that would have come back identical anyway.
+
+## "Maps" — Navigation's home, and the first non-contacts slide-up card
+
+`navigation.html` (node 7:1284) reuses the exact same "Slide up card"
+component `home.html` and `calling.html` already reuse for their own
+bottom panels (confirmed via `get_metadata` — same handle, same base
+frame, same 390×685 geometry), so `js/navigation.js`'s drag logic is
+`js/app.js`'s sheet section carried over verbatim; only the dynamic
+contact-row rendering is gone, since this card's three rows ("Go home",
+two "Set destination" rows — no destination screen exists yet, so they're
+inert like Home's still-unbuilt tiles) are static markup instead. Header,
+return button, background texture, and every piece of the card's own chrome
+(background, panel, handle, medallion, Calls/Profile pills, even the
+contact-row background shape the new rows sit on) are pixel-identical
+assets to what `home.html` already ships (confirmed by comparing exported
+bytes) — the only genuinely new asset is the map screenshot
+(`navigation-map.png`) and the small medallion icon on the two "Set
+destination" rows (`navigation-destination-icon.png`, a different art
+iteration of the same knot logo used elsewhere, not a crop of the existing
+sprite — confirmed those don't match byte-for-byte).
+
+The **share-location button** reuses Figma's two authored states (idle:
+cream circle, drop shadow; active: red circle, inset shadow) but not as
+images — that's the exact same visual convention `calling.css`'s
+Speaker/Mute/Location `.callbtn` toggle already uses, cream `#fbecd1` and
+red `#d42628` included, so it's built the same way (CSS background + box-
+shadow) instead of re-exporting Figma's two button variants as PNGs, and
+the pin glyph itself reuses `icon-call-location-off.svg`/`-on.svg` already
+in `assets/` for that same in-call Location toggle. Figma's component has
+no authored motion between the two states (`get_motion_context` came back
+empty), so the one piece of original motion design here is what happens
+*while* sharing is on: a ring pulses outward from the button and fades,
+signaling a live share the same way Home's listening soundwave signals a
+live mic — `js/navigation.js` just toggles one `.is-active` class; the
+animation itself is a plain CSS `@keyframes` loop, off by default and
+skipped under `prefers-reduced-motion`.
