@@ -1,0 +1,51 @@
+/* ============================================================================
+   归途 GuiTu — "Navigation" route to a saved destination (Figma node 120:363)
+   ----------------------------------------------------------------------------
+   Same template as go-home.css's page — no curved header.svg (Figma's own
+   node skips it here too), plain red screen background, return button,
+   centered title. Kept as its own file/page rather than parameterizing
+   go-home.html, matching this app's own convention of small per-page
+   duplication over cross-page coupling (see profile.css's .profilebar vs.
+   contacts.css's .backbar, translation.css's .transbar, etc. — all the
+   same shape, each defined on its own page).
+   ========================================================================== */
+
+.navdest-map {
+  position: absolute;
+  left: 0;
+  top: 131px;
+  width: 390px;
+  height: 700px;
+  border-radius: 30px 30px 0 0;
+  overflow: hidden;
+}
+.navdest-map > iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* -------------------------------------------------------------- back bar */
+.navdestbar {
+  position: absolute;
+  left: 0;
+  top: 710px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.navdestbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.navdestbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.navdestbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.navdestbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }

@@ -104,9 +104,12 @@
       </span>
     </a>
 
-    <button class="row" style="--y:343px" type="button">
+    <!-- Unset: "Set destination" placeholder → add-destination.html.
+         Set (js/navigation.js, guitu.savedDestination): shows the saved
+         name and → navigate-destination.html instead. -->
+    <a class="row" id="destRow" style="--y:343px" href="add-destination.html">
       <img class="row__bg" src="../assets/contact-row.svg" alt="">
-      <span class="navrow__label navrow__label--muted" style="--x:28px;--y:29px">
+      <span class="navrow__label navrow__label--muted" id="destRowLabel" style="--x:28px;--y:29px">
         <span class="t-en">Set destination</span>
         <span class="t-cn">设置目的地</span>
       </span>
@@ -114,7 +117,7 @@
         <img src="../assets/navigation-destination-icon.png" alt=""
              style="--iw:304.967px;--ih:211.926px;--ix:-121.986px;--iy:-22.354px">
       </span>
-    </button>
+    </a>
 
     <button class="row" style="--y:492px" type="button">
       <img class="row__bg" src="../assets/contact-row.svg" alt="">

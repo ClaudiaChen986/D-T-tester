@@ -41,6 +41,60 @@
     shareIcon.src = active ? '../assets/icon-call-location-on.svg' : '../assets/icon-call-location-off.svg';
   });
 
+  /* ------------------------------------------------- saved destination row
+     Row 2 of the sheet ("Set destination") is a placeholder until
+     add-destination.html saves one — then it shows the saved name (free
+     text, so its font is picked the same way contacts.js's
+     nameFontClass does, not hardcoded to one language) and points at
+     navigate-destination.html instead of the add form. Row 3 stays the
+     generic, always-inert "Set destination" placeholder — only one row
+     is wired to a saved-destination slot right now. Same file://
+     localStorage-disabled fallback (?newDest=) as contacts.js/
+     phrase-library.js use for their own saved data. */
+  var DEST_KEY = 'guitu.savedDestination';
+  var destRow = document.getElementById('destRow');
+  var destRowLabel = document.getElementById('destRowLabel');
+  var CJK_RE = /[㐀-䶿一-鿿豈-﫿]/;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function loadDestination() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(DEST_KEY));
+      return raw && raw.address ? raw : null;
+    } catch (e) { return null; }
+  }
+
+  function takePendingDestFromUrl() {
+    var raw = new URLSearchParams(window.location.search).get('newDest');
+    if (!raw) return null;
+    try {
+      var dest = JSON.parse(raw);
+      return dest && dest.address ? dest : null;
+    } catch (e) { return null; }
+  }
+
+  var pendingDest = takePendingDestFromUrl();
+  if (pendingDest) {
+    try { localStorage.setItem(DEST_KEY, JSON.stringify(pendingDest)); } catch (e) { /* still render it below either way */ }
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }
+
+  var savedDestination = pendingDest || loadDestination();
+  if (savedDestination) {
+    destRow.href = 'navigate-destination.html';
+    destRowLabel.classList.remove('navrow__label--muted');
+    destRowLabel.innerHTML =
+      '<span class="' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +
+      escapeHtml(savedDestination.name) + '</span>';
+  }
+
   /* ------------------------------------------------------- slide-up card */
   function setSheet(expanded) {
     sheet.dataset.state = expanded ? 'expanded' : 'collapsed';
