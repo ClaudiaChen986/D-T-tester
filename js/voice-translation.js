@@ -17,14 +17,20 @@
    always target the top slot, matching Figma (the keyboard button doesn't
    move to the bottom card in the swapped node either).
 
-   In keeping with "the interaction is real, the backend isn't" (there's
-   no translation backend here to fake, so nothing pretends to translate):
-   the two boxes are plain, real textareas, and where the browser supports
-   live speech recognition (webkitSpeechRecognition — Chrome/Edge, not
-   universal) holding the mic transcribes real speech into the top box,
-   in whichever language currently sits there, while the soundwave plays —
-   same graceful no-op-if-unsupported posture as daily-english.js's speech
-   synthesis.
+   Translation is real too, via MyMemory's free, keyless translation API
+   (no account/API key needed, same reasoning as the keyless Google Maps
+   embed on the Navigation screen) — typing or speaking into either box
+   translates into the other, debounced so it fires after a pause rather
+   than on every keystroke/interim speech result. Where the browser
+   supports live speech recognition (webkitSpeechRecognition — Chrome/
+   Edge, not universal) holding the mic also transcribes real speech into
+   the top box while the soundwave plays; unsupported browsers still get
+   the full press-and-hold animation and can still type. MyMemory's
+   anonymous tier is rate-limited (a few thousand words/day per IP) and
+   can be slow or briefly unavailable — a translation that fails to load
+   just leaves the existing text in place rather than erroring visibly,
+   since this is a nicety layered on a click-through prototype, not
+   something the rest of the page depends on.
    ========================================================================== */
 (function () {
   'use strict';
@@ -62,6 +68,7 @@
       style: 'transfield--light',
       ariaLabel: 'English text 英语',
       recognition: 'en-US',
+      translate: 'en',
     },
     cn: {
       label: '<span class="t-en">Chinese</span><span class="t-cn"> 中文：</span>',
@@ -69,6 +76,7 @@
       style: 'transfield--solid',
       ariaLabel: 'Chinese text 中文',
       recognition: 'zh-CN',
+      translate: 'zh-CN',
     },
   };
   function otherLang(key) { return key === 'en' ? 'cn' : 'en'; }
@@ -96,12 +104,59 @@
   });
 
   document.getElementById('swapBtn').addEventListener('click', function () {
+    // Any translation still in flight was scheduled for the pre-swap
+    // language pairing — let it land on the wrong box after the swap
+    // and it'd overwrite whatever's there with a stale result.
+    clearTimeout(timers.top);
+    clearTimeout(timers.bottom);
     var oldTopText = topWell.value;
     var oldBottomText = bottomWell.value;
     topLang = otherLang(topLang);
     topWell.value = oldBottomText;
     bottomWell.value = oldTopText;
     render();
+  });
+
+  /* -------------------------------------------------------------- translate
+     MyMemory's free translation endpoint (https://mymemory.translated.net) —
+     no API key. Each source well gets its own debounce timer and request
+     sequence number so a fast typist (or a stream of interim speech
+     results) doesn't fire one request per keystroke, and a slow response
+     that's since been superseded by a newer one can't clobber the target
+     box with stale text. */
+  var TRANSLATE_DEBOUNCE_MS = 600;
+  var timers = { top: null, bottom: null };
+  var seqs   = { top: 0, bottom: 0 };
+
+  function translateText(text, fromCode, toCode) {
+    if (!text.trim()) return Promise.resolve('');
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) +
+              '&langpair=' + fromCode + '|' + toCode;
+    return fetch(url)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        return (data && data.responseData && data.responseData.translatedText) || '';
+      });
+  }
+
+  function scheduleTranslate(key, sourceWell, sourceLang, targetWell, targetLang) {
+    clearTimeout(timers[key]);
+    timers[key] = setTimeout(function () {
+      var seq = ++seqs[key];
+      translateText(sourceWell.value, LANG[sourceLang].translate, LANG[targetLang].translate)
+        .then(function (translated) {
+          if (seq !== seqs[key]) return; // a newer request already superseded this one
+          targetWell.value = translated;
+        })
+        .catch(function () { /* offline or the endpoint hiccuped — leave existing text as-is */ });
+    }, TRANSLATE_DEBOUNCE_MS);
+  }
+
+  topWell.addEventListener('input', function () {
+    scheduleTranslate('top', topWell, topLang, bottomWell, otherLang(topLang));
+  });
+  bottomWell.addEventListener('input', function () {
+    scheduleTranslate('bottom', bottomWell, otherLang(topLang), topWell, topLang);
   });
 
   /* ------------------------------------------------------- press-to-speak
@@ -116,6 +171,7 @@
       var text = '';
       for (var i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
       topWell.value = text.trim();
+      scheduleTranslate('top', topWell, topLang, bottomWell, otherLang(topLang));
     };
     recognizer.onerror = function () { /* mic denied, no network, etc. — the overlay/animation still ran */ };
   }

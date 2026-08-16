@@ -33,9 +33,9 @@ pages/
                             card with real, spoken pronunciation
   voice-translation.html   "Voice translation" (node 7:886; listening
                             257:444; swapped 255:1584; swapped+listening
-                            257:489) — real text fields, a direction-swap
-                            button, and home.html's press-and-hold
-                            listening overlay
+                            257:489) — real (MyMemory API) translation as
+                            you type or speak, a direction-swap button, and
+                            home.html's press-and-hold listening overlay
   phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
                             page, like contacts.html; sixteen seed phrases +
                             anything saved from add-phrase.html
@@ -75,8 +75,9 @@ js/
   daily-english.js          daily-english.html: viewport fit, speaks the word/
                              sentence aloud via the Web Speech API
   voice-translation.js      voice-translation.html: viewport fit, press-to-speak
-                             listening overlay, swap fields, live speech-to-text
-                             where the browser supports it
+                             listening overlay, direction swap, real MyMemory-API
+                             translation, speech-to-text where the browser
+                             supports it
   phrase-library.js         phrase-library.html: renders seed + saved phrases
   add-phrase.js             add-phrase.html: validation, save + handoff
 
@@ -313,16 +314,27 @@ was the one explicit ask here — "the animation of the soundwave is the
 same as the one on homepage" — and reusing the actual component instead
 of re-implementing it is what guarantees that.
 
-The English/Chinese boxes are real `<textarea>`s, not fake output panels
-that were only ever going to show placeholder text — there's no
-translation backend to call, so pretending one of them displays a live
-translation would be more dishonest than useful. Where the browser exposes
-live speech recognition (`webkitSpeechRecognition` — Chrome/Edge; not
-universal, same tier of support as the calendar/location APIs elsewhere in
-the platform), holding the mic also transcribes real speech into the top
-box, in whichever language currently sits there, while the soundwave
-plays; unsupported browsers still get the full press-and-hold animation,
-just not the transcription.
+The English/Chinese boxes are real `<textarea>`s, and the translation
+between them is real too — [MyMemory](https://mymemory.translated.net)'s
+free, keyless translation API, called from `js/voice-translation.js` and
+debounced (600ms) so it fires after a pause instead of on every
+keystroke. Typing into either box translates into the other; each source
+box gets its own debounce timer and request-sequence number, so a fast
+typist doesn't fire one request per keystroke and a slow response that's
+since been superseded can't clobber the target box with stale text. Where
+the browser exposes live speech recognition (`webkitSpeechRecognition` —
+Chrome/Edge; not universal, same tier of support as the calendar/location
+APIs elsewhere in the platform), holding the mic also transcribes real
+speech into the top box — and that transcription feeds the same
+translate-on-pause pipeline — while the soundwave plays; unsupported
+browsers still get the full press-and-hold animation and can still type.
+MyMemory's anonymous tier is rate-limited and occasionally slow to
+respond; a translation that fails just leaves the existing text in place
+rather than erroring visibly, since it's a nicety layered on top of a
+click-through prototype, not something the rest of the page depends on.
+Swapping direction cancels any translation still in flight — one scheduled
+for the pre-swap language pairing landing after the swap would overwrite
+whatever's now in that box with a stale, mismatched result.
 
 **Swap** (node 255:1584, listening: 257:489) turned out to be a direction
 toggle, not a text-exchange button: Figma's swapped node shows the top
