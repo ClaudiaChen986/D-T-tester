@@ -613,20 +613,24 @@ their intended behaviour is specified. Concretely, right now:
   follows). Its placeholder is a custom two-line overlay rather than the
   native `placeholder` attribute — see the "two-line, two-font
   placeholder" note further down.
-- **Date** is real again too, and now matches Figma's own render exactly
-  — a plain `#37848c` pill, a small dark-teal (`#154c52`) round badge
-  with the calendar glyph, and the date text sitting directly on the
-  pill (a version part-way through this pass had put the text in its own
-  nested lighter sub-pill, from a different reference image — reverted,
-  since that's not what `19:1501` itself shows). The badge is a real
-  `<button>` — the one unambiguous "choose a date" control — that calls
-  a hidden `<input type="date">`'s own `showPicker()` to open the
-  browser's native date-picker pop-up (falling back to `.focus()`/
-  `.click()` on browsers without `showPicker`); an earlier version
-  instead made the *entire* pill a fully transparent input overlay,
-  which is fussier to get reliably clickable across browsers and gave no
-  visible indication anything was there to tap. `change` re-renders the
-  visible text in the "Jun 5 （6月5日）, 2023" format rather than the
+- **Date** is real again too: a black rounded-square calendar badge plus
+  the date text in its own nested lighter pill
+  (`rgba(255,255,255,.16)` on the `#37848c` teal) — confirmed against a
+  reference screenshot as the correct look. (A flatter version without
+  the nested pill was tried in between, on the theory that Figma's own
+  render was plainer than that — a screenshot comparison showed that
+  reasoning was wrong; the nested-pill look is the one to keep.) The
+  badge is a real `<button>` calling a hidden `<input type="date">`'s
+  own `showPicker()` to open the browser's native date-picker pop-up
+  (falling back to `.focus()`/`.click()` where `showPicker` isn't
+  supported) — an earlier version instead made the *entire* pill a
+  fully transparent input overlay, fussier to get reliably clickable
+  everywhere and with no visible indication anything was there to tap.
+  The badge now also carries a small orange chevron badge in its
+  bottom-right corner (a literal "tap here" cue, `border` ring, and a
+  drop shadow lifting it off the pill) since a lone flat calendar icon
+  still read as decorative rather than interactive. `change` re-renders
+  the visible text in the "Jun 5 （6月5日）, 2023" format rather than the
   input's own locale-formatted display. Defaults to today (or the date
   `?day=` implies), and picking a different one now genuinely changes
   which of the 3-day lanes the saved event lands in.
@@ -660,6 +664,16 @@ under an *empty* `.formstatus` paragraph that still reserved its full
 line-height and margin even with nothing to say. `.formstatus` now
 collapses to zero height/margin while empty and only claims space once
 there's an actual validation message to show.
+
+Every `.fieldgroup__label` (Date/Time/Duration) had a bare space
+character between its `t-en` and `t-cn` spans — `<span
+class="t-en">Date</span> <span class="t-cn">日期</span>` — which
+inherited `font-size: 0` from the label's own `font-size: 0` reset
+(everywhere else in this app sizes text through the child spans, not the
+parent) since the space itself isn't inside either span, collapsing it
+to zero width and running the two words together ("Date日期"). Fixed the
+same way `Save&nbsp;`/`Add&nbsp;` already handle it elsewhere in this
+app: the space moved *inside* the sized `t-en` span as `&nbsp;`.
 
 Save still works end-to-end in the meantime: `js/add-event.js` uses fixed
 values for Date/Time/Duration matching what's on screen (8:00 pm start,
