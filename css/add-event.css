@@ -86,12 +86,14 @@
 }
 .titleinput::placeholder { color: #ccc; }
 
-/* the divider (19:1507) is Figma's own fixed-position line — sits at a
-   constant 108px below the teal band's top regardless of exactly where
-   the input's text baseline lands. */
+/* the divider (19:1507) is Figma's own fixed-position line under the
+   title *text* (left:133, i.e. past the icon's own 30-126px span, not
+   under the icon itself) — sits at a constant 108px below the teal
+   band's top regardless of exactly where the input's text baseline
+   lands. */
 .addevent__divider {
   position: absolute;
-  left: 30px;
+  left: 133px;
   top: 108px;
   width: 222px;
   height: 0;
