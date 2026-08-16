@@ -36,7 +36,9 @@
 }
 .aechead .header__bg { position: absolute; inset: 0; width: 390px; height: 209.144px; }
 
-/* ------------------------------------------------------------------- teal */
+/* ------------------------------------------------------------------- teal
+   Same header/teal overlap as add-event.css: the band starts 81px before
+   the 209.144px header ends. */
 .aec__teal {
   position: relative;
   display: flex;
@@ -45,7 +47,7 @@
   padding: 26px 20px 24px;
   background: #37848c;
   border-radius: 30px 30px 0 0;
-  margin-top: -30px;
+  margin-top: -81px;
 }
 
 .aec__icon {
@@ -53,7 +55,7 @@
   width: 96px;
   height: 151px;
   border-radius: 48px;
-  background: #edd8b4;
+  background: #fff;
   display: grid;
   place-items: center;
 }
@@ -111,8 +113,8 @@
   text-align: center;
 }
 .repeatchip > span { display: block; }
-.repeatchip .t-en { font-family: var(--font-en); font-size: 17px; color: #000; }
-.repeatchip .t-cn { font-family: var(--font-cn); font-size: 14px; color: #000; letter-spacing: .7px; margin-top: 2px; }
+.repeatchip .t-en { font-family: var(--font-en); font-size: 18px; color: #000; }
+.repeatchip .t-cn { font-family: var(--font-cn); font-size: 16px; color: #000; letter-spacing: .8px; margin-top: 2px; }
 .repeatchip.is-selected { background: var(--c-teal); border-radius: 30px; margin: 2px; }
 .repeatchip.is-selected .t-en,
 .repeatchip.is-selected .t-cn { color: #fff; }
@@ -122,17 +124,24 @@
   align-items: center;
   gap: 10px;
   padding: 16px 24px;
-  cursor: pointer;
 }
-.subtaskrow input[type="checkbox"] {
+.subtaskrow__tick {
   width: 22px;
   height: 22px;
-  accent-color: var(--c-teal);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1d1b20;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
-.subtaskrow span {
+.subtaskrow__tick .material-symbols-outlined { font-size: 22px; }
+.subtaskrow__tick[aria-checked="true"] { color: var(--c-teal); }
+.subtaskrow__label {
   font-size: 0;
   line-height: normal;
+  cursor: pointer;
 }
 .subtaskrow .t-en { font-family: var(--font-en); font-size: 16px; color: #000; }
 .subtaskrow .t-cn { font-family: var(--font-cn); font-size: 14px; color: #000; letter-spacing: .7px; }
@@ -171,5 +180,5 @@
   transition: transform .12s ease;
 }
 .save:active { transform: scale(.98); }
-.save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
-.save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }
+.save .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.save .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }

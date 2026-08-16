@@ -47,10 +47,12 @@ pages/
                              Add button leads here; title + body form, Save
                              writes a new entry and returns to journal.html
   calendar.html              "My Calendar" (node 56:218, "my calendar -
-                              both") — Other's My Calendar tile leads here;
-                              real scrolling page, a 3-day / 0:00-24:00
-                              timeline plus a scrollable "today's events"
-                              list, both empty until add-event.html adds
+                              both", plus node 56:546 "Slide up card" for
+                              the bottom panel) — Other's My Calendar tile
+                              leads here; real scrolling page, a 3-day /
+                              0:00-24:00 overview timeline plus a
+                              scrollable, more detailed timeline just for
+                              today, both empty until add-event.html adds
                               something
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
@@ -106,8 +108,9 @@ js/
   journal.js                 journal.html: seeds + saved-entry rendering,
                               CJK/Latin script-run splitting per entry
   add-journal.js              add-journal.html: validation, save, handoff
-  calendar.js                  calendar.html: renders the timeline + today's
-                                events list from localStorage, tick-box save
+  calendar.js                  calendar.html: renders the 3-day overview
+                                timeline plus today's own detail timeline
+                                from localStorage, tick-box save
   add-event.js                 add-event.html: icon picker, date default,
                                 duration slider, validation; Save hands
                                 off a draft, doesn't write the event
@@ -483,9 +486,27 @@ Header, return button, and the "Add" pill's icon are all reused
 byte-for-byte from existing assets (`header.svg`, `return-button.png`,
 and — confirmed by comparing Figma's own crop percentages against
 `add-icon.png`'s existing crop in `journal.html` — the same add-icon
-sprite, just cropped identically), so nothing new needed exporting for
-this screen. The bottom nav (Calls / a home-logo / Profile) reuses the
-same three-pill arrangement Figma's own "Slide up card" component ships
+sprite, just cropped identically). The 3-day overview's own geometry is
+lifted straight from Figma's numbers: an 83px axis column feeding three
+50px lanes at x=83/194/298 (356px total content width, 61px/54px gaps
+between lanes), and Figma's own 907px 0:00–24:00 axis span used as a
+uniform px/hour scale — Figma's hand-placed hour labels aren't quite
+evenly spaced, and a real implementation needs one that is. Those axis
+labels are set in `Inter` at font-weight 900 specifically (loaded
+alongside the app's usual Inria Serif/Noto Serif SC pair), matching
+Figma's own choice of a different font just for this one element.
+
+The bottom nav turned out to be a real exported asset, not a shape worth
+redrawing in CSS: `calendar-nav-bg.svg` is Figma's own scalloped
+background (390×128, with a circular notch carved out of its top-centre
+for the medallion logo to nest into — confirmed by reading the exported
+path data), and the Profile pill's glyph (`icon-profile-outline.svg`) and
+the small centre arrow (`icon-nav-arrow.svg`) are likewise the real
+exported vectors rather than a Material Symbols substitute. Calls still
+uses a Material "call" glyph, since Figma's own icon there is a Code
+Connect reference to a design-system "Phone" component with no
+exportable path behind it. This whole nav row reuses the same
+three-pill arrangement Figma's own "Slide up card" component ships
 elsewhere in this file (see `calling.html`'s notes on that component)
 but, unlike `home.html`'s version, isn't draggable here — on a page this
 tall, a fixed 844px sheet that slides over the timeline doesn't apply;
@@ -500,13 +521,31 @@ cream track, and one straddling *now* renders a soft gradient split at
 however far through it the clock has gotten. Tomorrow/2-days pills always
 render as plain track, since "how much has elapsed" isn't a meaningful
 question for a day that hasn't started. A dashed "now" line marks the
-live time on today's lane specifically, for the same reason. The today
-panel below mirrors this — each row's icon badge turns red while its
-event is the one currently in progress — and adds the one piece of
-real interactivity Figma's mock doesn't show any state for: a tickable
-checkbox per event (`role="checkbox"`, toggled on click), persisted back
-into the same stored event and rendered with a struck-through title once
-checked.
+live time on today's lane specifically, for the same reason. Populated
+pills use Figma's own exact shape too — a 50px-wide, 40px-radius stadium
+filling the whole lane column, in cream (`#edd8b4`) or teal
+(`#37848c`) — even though what's *inside* each pill (a Material Symbol
+the user picked on add-event.html) is this app's own feature, not
+Figma's fixed demo icon set.
+
+**The today panel turned out not to be a simple checklist.** Reading
+Figma's own "Slide up card" component (`56:546`/`56:729`) closely showed
+it's actually a *second*, more detailed timeline just for today — its
+own axis, the same coloured-pill language as the 3-day overview (just at
+a taller px/hour scale), thin 8px connector stems between events, event
+text beside each pill, and a small tick-box square beside *that* — not a
+stack of list rows, which is what an earlier pass at this page had built
+instead. `js/calendar.js` now renders it that way: the displayed hour
+range is whatever covers today's events (rounded out to 3-hour
+boundaries, Figma's own label increment), each event gets a pill sized
+to its real duration and coloured by the same elapsed-fraction logic as
+the overview above, and the tick box — a plain teal square that gains a
+red Material "check" glyph once ticked, matching Figma's own two-tone
+checkbox rendering exactly rather than the inverted-white-box look an
+earlier version used — is the one piece of real interactivity Figma's
+mock doesn't show any state for: `role="checkbox"`, toggled on click,
+persisted back into the same stored event, with the row's text struck
+through once done.
 
 `add-event.html` (node 19:1501, "add task - both") is reached from either
 of `calendar.html`'s two entry points — the header's **Add** pill (which
@@ -517,19 +556,27 @@ stage: the icon-selection bar and the fields beneath it are more content
 than one screen reliably holds once the bar is open, so the page needs to
 be able to grow and scroll instead of clipping it.
 
-The round shape at the top of the teal band — Figma's placeholder circle
-— is a real clickable icon picker here: tapping it reveals a horizontal,
-scrollable strip of common Material Symbols (the
+The round shape at the top of the teal band is plain white in Figma
+(`19:1506`, `bg-white`) — an empty placeholder, no icon picked yet — and
+stays that colour here too; the faint "add a photo"-style glyph inside it
+is this app's own affordance for "tap to choose an icon," not something
+Figma draws there. Tapping it reveals a horizontal, scrollable strip of
+common Material Symbols (the
 [fonts.google.com/icons](https://fonts.google.com/icons) library, loaded
 as the `Material Symbols Outlined` webfont alongside the existing Inria
 Serif/Noto Serif SC fonts) — walking, meals, socialising, home tasks,
 sleep, medication, shopping, exercise, work, health, reading, and
 celebrations — and picking one both closes the strip and renders that
 glyph inside the circle, which is also what shows up as the event's icon
-back on `calendar.html`'s pills and list rows. Date keeps a plain
-`<input type="date">`, styled to match the app's pill language — the
-simplest approximation of Figma's own "Date Picker - Collapsed" component
-that still reads as one native control rather than a custom widget.
+back on `calendar.html`'s pills. The icon sits beside the title field
+(Figma places them side by side, not stacked), and the teal band itself
+starts 81px before the 209.144px header actually ends — Figma's own
+number for how far the band's rounded top corners overlap the header's
+curve, not the 30px approximation an earlier pass used. Date keeps a
+plain `<input type="date">`, styled to match the app's pill language —
+the simplest approximation of Figma's own "Date Picker - Collapsed"
+component that still reads as one native control rather than a custom
+widget.
 
 There's deliberately no Time field here (Figma's own "Date and Time -
 Wheels" component covers both on one screen) — the event's start just
@@ -567,9 +614,14 @@ placeholder was, and the date/time render as formatted bilingual text
 values rather than Figma's own hardcoded sample. Repeat is a single-select
 grid of six chips (Figma's own set — No repetition/Daily/Weekly/Every
 fortnight/Monthly/Yearly), defaulting to "No repetition" same as the
-mock. The "add sub-task" checkbox gates its textarea's `disabled` state
-— per Figma's Material checkbox component, unticked by default, so the
-field starts inert until opted into. This page's own Save is what
+mock. The "add sub-task" control is a `check_box_outline_blank` /
+`check_box` Material Symbol toggle rather than a native checkbox input —
+Figma's own component here (`19:1562`, Code Connect–mapped to a Material 3
+`CheckBoxOutlineBlank`) is that same icon pair, so matching it meant
+reaching for the same icon font already used for the event-icon picker
+rather than a plain HTML checkbox — and it gates the sub-task textarea's
+`disabled` state, unticked by default, so the field starts inert until
+opted into. This page's own Save is what
 finally writes `{ title, icon, day, start, duration, done, repeat,
 subtask? }` to `guitu.calendarEvents`, clears the draft, and returns to
 `calendar.html`.

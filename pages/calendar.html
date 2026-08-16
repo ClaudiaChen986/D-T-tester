@@ -6,7 +6,7 @@
 <title>归途 GuiTu — My Calendar 我的日历</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Inter:wght@900&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=swap">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/calendar.css">
@@ -58,7 +58,6 @@
 
   <div class="timeline">
     <div class="timeline__days">
-      <span></span>
       <span class="timeline__day"><span class="t-en">today</span><span class="t-cn">今天</span></span>
       <span class="timeline__day"><span class="t-en">Tomorrow</span><span class="t-cn">明天</span></span>
       <span class="timeline__day"><span class="t-en">2 Days</span><span class="t-cn">后天</span></span>
@@ -89,16 +88,22 @@
   </section>
 
   <nav class="calnav">
-    <a class="navpill" href="contacts.html">
+    <img class="calnav__bg" src="../assets/calendar-nav-bg.svg" alt="">
+
+    <a class="navpill navpill--calls" href="contacts.html">
       <span class="material-symbols-outlined">call</span>
       <span class="navpill__label"><span class="t-en">Calls</span><span class="t-cn">电话</span></span>
     </a>
+
+    <img class="navarrow" src="../assets/icon-nav-arrow.svg" alt="">
+
+    <a class="navpill navpill--profile" href="profile.html">
+      <img class="navpill__icon" src="../assets/icon-profile-outline.svg" alt="">
+      <span class="navpill__label"><span class="t-en">Profile</span><span class="t-cn">个人</span></span>
+    </a>
+
     <a class="navlogo" href="home.html" aria-label="Back to homepage 返回首页">
       <img src="../assets/logo-sprite.png" alt="">
-    </a>
-    <a class="navpill" href="profile.html">
-      <span class="material-symbols-outlined">person</span>
-      <span class="navpill__label"><span class="t-en">Profile</span><span class="t-cn">个人</span></span>
     </a>
   </nav>
 

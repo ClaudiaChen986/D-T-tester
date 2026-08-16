@@ -87,10 +87,14 @@
       </div>
 
       <div class="aec__card">
-        <label class="subtaskrow">
-          <input type="checkbox" id="subtaskToggle">
-          <span><span class="t-en">add sub-task&nbsp;</span><span class="t-cn">添加子任务</span></span>
-        </label>
+        <div class="subtaskrow">
+          <button class="subtaskrow__tick" id="subtaskToggle" type="button" role="checkbox" aria-checked="false" aria-label="Add a sub-task 添加子任务">
+            <span class="material-symbols-outlined">check_box_outline_blank</span>
+          </button>
+          <span class="subtaskrow__label" id="subtaskLabel">
+            <span class="t-en">add sub-task&nbsp;</span><span class="t-cn">添加子任务</span>
+          </span>
+        </div>
         <textarea class="subtaskarea" id="subtaskInput" disabled
                   placeholder="Enter text here 在此输入文本" aria-label="Sub-task 子任务"></textarea>
       </div>

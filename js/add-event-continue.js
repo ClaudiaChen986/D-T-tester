@@ -19,6 +19,7 @@
   var summaryWhen  = document.getElementById('summaryWhen');
   var repeatGrid   = document.getElementById('repeatGrid');
   var subtaskToggle = document.getElementById('subtaskToggle');
+  var subtaskLabel  = document.getElementById('subtaskLabel');
   var subtaskInput  = document.getElementById('subtaskInput');
   var form         = document.getElementById('continueForm');
 
@@ -64,10 +65,16 @@
   });
 
   /* -------------------------------------------------------------- subtask */
-  subtaskToggle.addEventListener('change', function () {
-    subtaskInput.disabled = !subtaskToggle.checked;
-    if (subtaskToggle.checked) subtaskInput.focus();
-  });
+  function toggleSubtask() {
+    var checked = subtaskToggle.getAttribute('aria-checked') !== 'true';
+    subtaskToggle.setAttribute('aria-checked', String(checked));
+    subtaskToggle.querySelector('.material-symbols-outlined').textContent =
+      checked ? 'check_box' : 'check_box_outline_blank';
+    subtaskInput.disabled = !checked;
+    if (checked) subtaskInput.focus();
+  }
+  subtaskToggle.addEventListener('click', toggleSubtask);
+  subtaskLabel.addEventListener('click', toggleSubtask);
 
   /* ------------------------------------------------------------------ save */
   function loadEvents() {
@@ -91,7 +98,7 @@
       done: false,
       repeat: selectedRepeat,
     };
-    if (subtaskToggle.checked && subtaskInput.value.trim()) {
+    if (subtaskToggle.getAttribute('aria-checked') === 'true' && subtaskInput.value.trim()) {
       event.subtask = subtaskInput.value.trim();
     }
     events.push(event);

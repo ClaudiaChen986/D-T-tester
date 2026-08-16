@@ -3,7 +3,7 @@
    ----------------------------------------------------------------------------
    A real (unbounded-height) scrolling page, same reasoning as
    todays-events.css: a 3-day, 0:00-24:00 timeline plus a scrollable "today's
-   events" list is genuine page-length content, not something a fixed
+   events" panel is genuine page-length content, not something a fixed
    390×844 mock scaled as one unit can hold.
 
    Default state ships empty — just the hour axis and its straight guide
@@ -12,6 +12,19 @@
    js/calendar.js, which also owns the "colour = how much of the event has
    already happened" logic: only today's lane compares against the live
    clock, so tomorrow/2-days pills always render as plain unfilled track.
+
+   Geometry below is lifted directly from Figma's own numbers (56:218 for
+   the 3-day overview, 56:546/56:729 "Slide up card" for the bottom panel):
+   an 83px axis column feeding three 50px lanes at x=83/194/298 (356px
+   total content width, 61px/54px gaps between lanes), and a 907px axis
+   span for 0:00-24:00 — used as a uniform px/hour scale here since Figma's
+   own hand-placed hour labels aren't quite evenly spaced and a real
+   implementation needs one that is. The bottom panel turned out to be a
+   *second*, more detailed vertical timeline for just today (its own axis,
+   coloured pills, connector stems) with each event's text and a tick box
+   beside it — not a plain list — so js/calendar.js renders it with the
+   same pill/axis logic as the 3-day overview, just at a taller px/hour
+   scale and with room for text.
    ========================================================================== */
 
 .calendar-body {
@@ -22,6 +35,8 @@
   --c-track: #edd8b4;
   --c-accent: #37848c;
   --c-badge: #56a8b0;
+  --c-check: #b44439;
+  --c-time-text: #cbf9fe;
 }
 
 .calpage {
@@ -82,22 +97,23 @@
   color: #000;
 }
 .addpill__label > span { display: block; font-weight: 700; }
-.addpill__label .t-en { font-size: 16px; }
-.addpill__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+.addpill__label .t-en { font-family: var(--font-en); font-size: 16px; }
+.addpill__label .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
 
-/* ---------------------------------------------------------------- timeline */
+/* ---------------------------------------------------------------- timeline
+   Grid columns: 83px axis, then lane/gap/lane/gap/lane (50/61/50/54/50),
+   totalling Figma's own 356px content width almost exactly. */
 .timeline {
   position: relative;
   z-index: 1;
   width: 356px;
-  margin: 12px auto 0;
+  margin: 20px auto 0;
 }
 
 .timeline__days {
   display: grid;
-  grid-template-columns: 54px repeat(3, 1fr);
-  column-gap: 12px;
-  margin-bottom: 8px;
+  grid-template-columns: 83px 50px 61px 50px 54px 50px;
+  margin-bottom: 4px;
 }
 .timeline__day {
   font-size: 0;
@@ -105,52 +121,55 @@
   text-align: center;
   color: #fff;
 }
+.timeline__day:nth-of-type(1) { grid-column: 2; }
+.timeline__day:nth-of-type(2) { grid-column: 4; }
+.timeline__day:nth-of-type(3) { grid-column: 6; }
 .timeline__day > span { display: block; font-weight: 700; }
-.timeline__day .t-en { font-family: var(--font-en); font-size: 18px; }
-.timeline__day .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+.timeline__day .t-en { font-family: var(--font-en); font-size: 20px; }
+.timeline__day .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
 
 .timeline__body {
   position: relative;
   display: grid;
-  grid-template-columns: 54px repeat(3, 1fr);
-  column-gap: 12px;
-  height: var(--tl-h, 864px);
+  grid-template-columns: 83px 50px 61px 50px 54px 50px;
+  height: var(--tl-h, 907px);
   padding-bottom: 24px;
 }
 
-/* hour axis: right-aligned labels + one straight guide line running the
-   whole 0:00-24:00 length — this, alone, is the "default empty" state. */
+/* hour axis: right-aligned Inter Black labels + one straight guide line
+   with a small arrowhead — this, alone, is the "default empty" state. */
 .timeline__axis {
   position: relative;
+  grid-column: 1;
   height: 100%;
 }
 .timeline__axis-line {
   position: absolute;
-  right: 0;
-  top: 6px;
+  right: 10px;
+  top: 10px;
   bottom: 0;
   width: 2px;
-  background: rgba(237, 216, 180, .5);
+  background: rgba(237, 216, 180, .55);
 }
 .timeline__axis-line::before {
   content: '';
   position: absolute;
   left: 50%;
-  top: -6px;
+  top: -7px;
   width: 0;
   height: 0;
   transform: translateX(-50%);
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 7px solid rgba(237, 216, 180, .7);
+  border-bottom: 8px solid rgba(237, 216, 180, .75);
 }
 .timeline__hour {
   position: absolute;
-  right: 12px;
+  right: 20px;
   transform: translateY(-50%);
-  font-family: var(--font-en);
+  font-family: 'Inter', var(--font-en);
   font-weight: 900;
-  font-size: 14px;
+  font-size: 16px;
   color: #fff;
   white-space: nowrap;
 }
@@ -159,6 +178,9 @@
   position: relative;
   height: 100%;
 }
+#lane0 { grid-column: 2; }
+#lane1 { grid-column: 4; }
+#lane2 { grid-column: 6; }
 
 /* today's lane gets a soft "now" line — the live reference every pill's
    colour split is measured against. */
@@ -181,19 +203,20 @@
   background: #fff;
 }
 
+/* event pill: Figma's own exact shape — a 50px-wide, 40px-radius stadium
+   filling the whole lane column. */
 .tlpill {
   position: absolute;
-  left: 50%;
-  width: 42px;
+  left: 0;
+  width: 50px;
   min-height: 34px;
-  transform: translateX(-50%);
-  border-radius: 21px;
+  border-radius: 40px;
   background: var(--c-track);
   overflow: hidden;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 6px;
+  padding-top: 8px;
 }
 .tlpill .material-symbols-outlined {
   font-size: 20px;
@@ -201,17 +224,21 @@
 }
 .tlpill--done .material-symbols-outlined { color: #fff; }
 
-/* ------------------------------------------------------------- today panel */
+/* ------------------------------------------------------------- today panel
+   Figma's "Slide up card" component (56:546/56:729): a teal panel pinned
+   below the 3-day overview holding a second, more detailed timeline for
+   just today — same pill/axis language, taller px/hour scale, event text
+   and a tick box beside each pill instead of just an icon. */
 .today-panel {
   position: relative;
   z-index: 1;
   margin-top: 28px;
-  padding: 20px 20px 8px;
-  background: var(--c-teal);
+  padding: 20px 20px 0;
+  background: var(--c-accent);
   border-radius: 30px 30px 0 0;
 }
 .today-panel__title {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 0;
   line-height: normal;
   color: #fff;
@@ -221,14 +248,12 @@
 .today-panel__title .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
 
 .today-panel__list {
-  max-height: 360px;
+  position: relative;
+  max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 4px 4px 16px;
+  padding: 6px 0 24px;
 }
 
 .today-panel__empty {
@@ -238,74 +263,104 @@
   color: rgba(255, 255, 255, .85);
 }
 
-.evrow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  background: rgba(0, 0, 0, .12);
-  border-radius: 18px;
-}
-.evrow__badge {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--c-badge);
+/* mini-timeline (mtl): axis(55px) | rail(50px pill) | text(1fr) | tick(30px) */
+.mtl {
+  position: relative;
   display: grid;
-  place-items: center;
+  grid-template-columns: 55px 50px 1fr 34px;
+  column-gap: 12px;
 }
-.evrow__badge .material-symbols-outlined { font-size: 22px; color: #fff; }
-.evrow--now .evrow__badge { background: #b44439; }
 
-.evrow__text { flex: 1; min-width: 0; }
-.evrow__title {
+.mtl__axis { position: relative; grid-column: 1; }
+.mtl__hour {
+  position: absolute;
+  right: 8px;
+  transform: translateY(-50%);
+  font-family: 'Inter', var(--font-en);
+  font-weight: 900;
+  font-size: 16px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.mtl__rail { position: relative; grid-column: 2; }
+.mtl__pill {
+  position: absolute;
+  left: 0;
+  width: 50px;
+  border-radius: 40px;
+  background: var(--c-track);
+}
+.mtl__pill .material-symbols-outlined {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: var(--c-red);
+}
+.mtl__pill--done .material-symbols-outlined { color: #fff; }
+.mtl__stem {
+  position: absolute;
+  left: 21px;
+  width: 8px;
+  background: var(--c-track);
+}
+
+.mtl__body { grid-column: 3; }
+.mtl__entry {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.mtl__time {
   margin: 0;
   font-family: var(--font-en);
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
+  font-size: 15px;
+  color: var(--c-time-text);
   overflow-wrap: break-word;
 }
-.evrow__time {
-  margin: 2px 0 0;
-  font-family: var(--font-en);
-  font-size: 14px;
-  color: #cbf9fe;
+.mtl__time .t-cn { font-family: var(--font-cn); font-size: 13px; letter-spacing: .65px; }
+.mtl__title {
+  margin: 3px 0 0;
+  font-size: 0;
+  line-height: normal;
+  overflow-wrap: break-word;
 }
+.mtl__title > span { display: block; font-weight: 700; color: #fff; }
+.mtl__title .t-en { font-family: var(--font-en); font-size: 17px; }
+.mtl__title .t-cn { font-family: var(--font-cn); font-size: 15px; letter-spacing: .75px; }
+.mtl__entry.is-done .mtl__time,
+.mtl__entry.is-done .mtl__title { opacity: .55; text-decoration: line-through; }
 
-.evrow__tick {
-  flex: none;
-  width: 26px;
-  height: 26px;
+.mtl__tickcol { position: relative; grid-column: 4; }
+.mtl__tick {
+  position: absolute;
+  left: 0;
+  width: 29px;
+  height: 29px;
   border-radius: 6px;
-  border: 2px solid #fff;
-  background: transparent;
+  border: 0;
+  background: var(--c-badge);
   cursor: pointer;
   display: grid;
   place-items: center;
   padding: 0;
 }
-.evrow__tick .material-symbols-outlined {
-  font-size: 18px;
-  color: #fff;
+.mtl__tick .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--c-check);
   visibility: hidden;
 }
-.evrow__tick[aria-checked="true"] { background: #fff; }
-.evrow__tick[aria-checked="true"] .material-symbols-outlined {
-  visibility: visible;
-  color: var(--c-teal);
-}
-.evrow.is-done .evrow__title,
-.evrow.is-done .evrow__time { opacity: .55; text-decoration: line-through; }
+.mtl__tick[aria-checked="true"] .material-symbols-outlined { visibility: visible; }
 
 .planbtn {
   display: block;
-  margin: 4px auto 20px;
-  width: 317px;
+  margin: 20px auto 20px;
+  width: 350px;
   max-width: 100%;
-  height: 52px;
-  border-radius: 30px;
+  height: 71px;
+  border-radius: 20px;
   background: #d97e4a;
   box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
   text-align: center;
@@ -316,39 +371,50 @@
 .planbtn:active { transform: scale(.98); }
 .planbtn__label {
   display: inline-block;
-  padding-top: 12px;
+  padding-top: 15px;
   font-size: 0;
   line-height: normal;
   color: #fff;
 }
 .planbtn__label > span { display: block; font-weight: 700; }
-.planbtn__label .t-en { font-family: var(--font-en); font-size: 18px; }
-.planbtn__label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+.planbtn__label .t-en { font-family: var(--font-en); font-size: 20px; }
+.planbtn__label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
 
-/* ------------------------------------------------------------------- nav */
+/* ------------------------------------------------------------------- nav
+   Figma's own scalloped nav background (a real exported asset, notched at
+   top-centre for the medallion to nest into) rather than a plain CSS bar. */
 .calnav {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 20px 28px;
-  background: var(--c-teal);
+  width: 390px;
+  height: 128px;
+}
+.calnav__bg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 128px;
 }
 .navpill {
+  position: absolute;
+  top: 66px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: 119px;
   height: 56px;
-  padding: 0 18px;
   border-radius: 30px;
-  background: #56a8b0;
+  background: var(--c-badge);
   text-decoration: none;
   cursor: pointer;
   transition: transform .12s ease;
 }
 .navpill:active { transform: scale(.96); }
-.navpill .material-symbols-outlined { font-size: 26px; color: #000; }
+.navpill--calls { left: 22px; }
+.navpill--profile { left: 253px; }
+.navpill .material-symbols-outlined { font-size: 24px; color: #000; }
+.navpill__icon { width: 24px; height: 27.4px; }
 .navpill__label {
   font-size: 0;
   line-height: normal;
@@ -358,11 +424,23 @@
 .navpill__label .t-en { font-family: var(--font-en); font-size: 18px; }
 .navpill__label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
 
+.navarrow {
+  position: absolute;
+  left: 50%;
+  top: 81px;
+  width: 19px;
+  height: 17.25px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
 .navlogo {
-  position: relative;
-  flex: none;
-  width: 78.179px;
-  height: 79.817px;
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 78px;
+  height: 80px;
+  transform: translateX(-50%);
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
