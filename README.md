@@ -613,19 +613,23 @@ their intended behaviour is specified. Concretely, right now:
   follows). Its placeholder is a custom two-line overlay rather than the
   native `placeholder` attribute — see the "two-line, two-font
   placeholder" note further down.
-- **Date** is real again too, restyled to a black calendar-badge icon
-  plus a nested lighter pill of white bold text (`rgba(255,255,255,.16)`
-  on the outer `#37848c` teal) — a rounder, more layered look than
-  Figma's own flatter "Date Picker - Collapsed" component, matched to a
-  reference screenshot given for this pass. It's a real
-  `<input type="date">` again, but positioned as a fully transparent
-  layer covering the *entire* styled pill (not shown as a native-styled
-  control itself) — so tapping anywhere on it, badge included, opens the
-  browser's own date-picker pop-up, and `change` re-renders the visible
-  text in the "Jun 5 （6月5日）, 2023" format rather than the input's own
-  locale-formatted display. Defaults to today (or the date `?day=`
-  implies), and picking a different one now genuinely changes which of
-  the 3-day lanes the saved event lands in.
+- **Date** is real again too, and now matches Figma's own render exactly
+  — a plain `#37848c` pill, a small dark-teal (`#154c52`) round badge
+  with the calendar glyph, and the date text sitting directly on the
+  pill (a version part-way through this pass had put the text in its own
+  nested lighter sub-pill, from a different reference image — reverted,
+  since that's not what `19:1501` itself shows). The badge is a real
+  `<button>` — the one unambiguous "choose a date" control — that calls
+  a hidden `<input type="date">`'s own `showPicker()` to open the
+  browser's native date-picker pop-up (falling back to `.focus()`/
+  `.click()` on browsers without `showPicker`); an earlier version
+  instead made the *entire* pill a fully transparent input overlay,
+  which is fussier to get reliably clickable across browsers and gave no
+  visible indication anything was there to tap. `change` re-renders the
+  visible text in the "Jun 5 （6月5日）, 2023" format rather than the
+  input's own locale-formatted display. Defaults to today (or the date
+  `?day=` implies), and picking a different one now genuinely changes
+  which of the 3-day lanes the saved event lands in.
 - **Time** (`19:1527`, "Date and Time - Wheels") is a frosted, blurred
   card with three static columns (hour/minute/AM-PM) and a pill-shaped
   selection band behind the middle row, reading "8:00 pm" — the
@@ -648,6 +652,14 @@ input (`z-index`) and `js/add-event.js` toggles its `hidden` attribute on
 every `input` event, so it disappears the moment there's real text and
 comes back if the field is cleared — matching Figma's two-line look
 while the field stays a genuine, typeable input underneath.
+
+The gap between the title field and Date used to look too big: `14px`
+of top padding on `.addevent__fields` (Figma's own number — the teal
+band ends at 269, Date's own label starts at 283) was getting stacked
+under an *empty* `.formstatus` paragraph that still reserved its full
+line-height and margin even with nothing to say. `.formstatus` now
+collapses to zero height/margin while empty and only claims space once
+there's an actual validation message to show.
 
 Save still works end-to-end in the meantime: `js/add-event.js` uses fixed
 values for Date/Time/Duration matching what's on screen (8:00 pm start,

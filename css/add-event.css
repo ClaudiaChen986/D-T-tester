@@ -157,8 +157,10 @@
   border-top: 1px solid rgba(255, 255, 255, .6);
 }
 
-/* ------------------------------------------------------------------ fields */
-.addevent__fields { background: #efefef; padding: 24px 37px 40px; }
+/* ------------------------------------------------------------------ fields
+   14px top padding matches Figma's own gap here (teal band ends at 269,
+   the Date label starts at 283). */
+.addevent__fields { background: #efefef; padding: 14px 37px 40px; }
 
 .fieldgroup { margin-bottom: 21px; }
 .fieldgroup__label {
@@ -172,64 +174,61 @@
 .fieldgroup__label .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
 
 /* --------------------------------------------------------------------- date
-   Static: Figma's own "Date Picker - Collapsed" component renders custom
-   bilingual text ("Jun 5 （6月5日）, 2023") plus a calendar-icon component —
-   neither is something a native <input type="date"> can be styled to
-   show, so this is a plain div with the literal sample text for now. */
-/* Now a real control: a transparent native <input type="date"> covers
-   the whole pill (.datepill__input), so tapping anywhere on it — the
-   badge or the text — opens the browser's own date-picker popup. Its
-   `change` updates .datepill__text (js/add-event.js), formatted in
-   Figma's own style ("Jun 5 （6月5日）, 2023") rather than showing the
-   native input's own locale format, which native styling can't reach
-   into a nested badge/text layout to override anyway. */
+   Matches Figma's own render exactly: a plain #37848c pill, a small dark
+   round badge with the calendar glyph, and the date text sitting
+   straight on the pill — no nested sub-pill behind the text (an earlier
+   pass added one from a different reference image; this reverts to what
+   19:1501 actually shows).
+
+   The badge (.datepill__badge) is a real <button> — the visible,
+   unambiguous "choose a date" control — that calls the hidden
+   <input type="date">'s own showPicker() to open the browser's native
+   date-picker pop-up. That input stays genuinely off-screen (not just
+   opacity:0 sitting on top of everything, which is fussier to get
+   reliably clickable across browsers) since it's driven entirely by the
+   button now; `change` on it updates .datepill__text (js/add-event.js),
+   formatted in Figma's own style ("Jun 5 （6月5日）, 2023") rather than
+   the input's own locale format. */
 .datepill {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
   height: 50px;
   border-radius: 30px;
   background: var(--c-teal);
-  padding: 4px;
+  padding: 0 18px;
   box-sizing: border-box;
-  cursor: pointer;
 }
 .datepill__badge {
   flex: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: #1a1a1a;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #154c52;
   display: grid;
   place-items: center;
+  cursor: pointer;
+  transition: transform .12s ease;
 }
-.datepill__badge .material-symbols-outlined { font-size: 22px; color: #fff; }
+.datepill__badge:active { transform: scale(.92); }
+.datepill__badge .material-symbols-outlined { font-size: 18px; color: #fff; }
 .datepill__text {
-  flex: 1;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  border-radius: 21px;
-  background: rgba(255, 255, 255, .16);
-  color: #fff;
   font: 18px var(--font-en), var(--font-cn);
   font-weight: 700;
+  color: #fff;
   overflow: hidden;
   white-space: nowrap;
 }
 .datepill__input {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
+  width: 1px;
+  height: 1px;
   opacity: 0;
-  cursor: pointer;
+  pointer-events: none;
 }
 
 /* --------------------------------------------------- time (wheel picker)
@@ -356,12 +355,17 @@
 .save .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
 .save .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
 
+/* No reserved height/margin while empty — it was always taking up ~34px
+   above Date even with nothing to say, which read as too big a gap
+   under the title field. Only claims space once there's an actual
+   message to show. */
 .formstatus {
-  margin: 0 0 16px;
+  margin: 0;
   text-align: center;
   font-family: var(--font-en);
   font-size: 15px;
   font-weight: 700;
   color: #b44439;
-  min-height: 18px;
 }
+.formstatus:not(:empty) { margin-bottom: 16px; }
+.formstatus:empty { font-size: 0; }

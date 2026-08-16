@@ -88,9 +88,11 @@
       <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Date</span> <span class="t-cn">日期</span></p>
         <div class="datepill">
-          <span class="datepill__badge"><span class="material-symbols-outlined">calendar_month</span></span>
+          <button class="datepill__badge" id="dateButton" type="button" aria-label="Choose date 选择日期">
+            <span class="material-symbols-outlined">calendar_month</span>
+          </button>
           <span class="datepill__text" id="dateText"></span>
-          <input class="datepill__input" type="date" id="dateInput" name="date" aria-label="Date 日期">
+          <input class="datepill__input" type="date" id="dateInput" name="date" aria-hidden="true" tabindex="-1">
         </div>
       </div>
 

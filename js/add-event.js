@@ -4,11 +4,13 @@
        horizontal, scrollable strip of common Material Symbols
        (fonts.google.com/icons) — pick one, it lands in the circle
      · title stays real input, same as it's always been
-     · Date is real again too: a transparent native <input type="date">
-       covers the whole styled pill, so tapping it anywhere opens the
-       browser's own date-picker pop-up; its `change` re-renders the
-       visible text in Figma's own style ("Jun 5 （6月5日）, 2023")
-       instead of the input's native locale format
+     · Date is real again too: the small round badge is a real button
+       that calls a hidden native <input type="date">'s showPicker() to
+       open the browser's own date-picker pop-up (falling back to
+       .focus()/.click() on browsers without showPicker); its `change`
+       re-renders the visible text in Figma's own style
+       ("Jun 5 （6月5日）, 2023") instead of the input's native locale
+       format
      · "Date and Time - Wheels" and Duration are still plain,
        non-interactive markup matching Figma's mock exactly (its own
        literal sample values — 8:00 pm, 1h) — real interactivity for
@@ -35,6 +37,7 @@
   var iconBar          = document.getElementById('iconBar');
   var titleInput       = document.getElementById('titleInput');
   var titlePlaceholder = document.getElementById('titlePlaceholder');
+  var dateButton       = document.getElementById('dateButton');
   var dateInput        = document.getElementById('dateInput');
   var dateText         = document.getElementById('dateText');
   var status           = document.getElementById('formStatus');
@@ -110,6 +113,14 @@
   }
   updateDateText();
   dateInput.addEventListener('change', updateDateText);
+
+  dateButton.addEventListener('click', function () {
+    if (typeof dateInput.showPicker === 'function') {
+      try { dateInput.showPicker(); return; } catch (err) { /* fall through */ }
+    }
+    dateInput.focus();
+    dateInput.click();
+  });
 
   function dayOffset(dateValue) {
     var picked = new Date(dateValue + 'T00:00:00');
