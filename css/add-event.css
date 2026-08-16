@@ -14,13 +14,18 @@
   background: #efefef;
 }
 
+/* Figma's own full-page background (19:1504) is this same gradient behind
+   everything, not just behind the header — the teal band and the grey
+   fields area both fully cover it in practice, but painting it here too
+   means there's no colour seam anywhere the layers meet at a rounded
+   corner. */
 .addeventpage {
   position: relative;
   width: 390px;
   max-width: 100%;
   margin: 0 auto;
   min-height: 100vh;
-  background: #efefef;
+  background: linear-gradient(to left, rgba(166, 49, 38, .8), var(--c-red));
   font-family: var(--font-en);
 }
 
@@ -29,9 +34,7 @@
   position: relative;
   width: 390px;
   height: 209.144px;
-  background: linear-gradient(to bottom, rgba(166, 49, 38, .8), var(--c-red));
 }
-.addeventhead .header__bg { position: absolute; inset: 0; width: 390px; height: 209.144px; }
 
 /* ------------------------------------------------------------------- teal
    Figma's teal band (128-269 in its own 0-844 canvas) starts 81px before
@@ -39,7 +42,7 @@
    curve peeking out from under the band's rounded top corners. */
 .addevent__teal {
   position: relative;
-  padding: 26px 20px 20px;
+  padding: 26px 21px 20px 30px;
   background: #37848c;
   border-radius: 30px 30px 0 0;
   margin-top: -81px;
@@ -47,14 +50,16 @@
 
 .addevent__row {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 7px;
 }
 
-/* the round shape is plain white in Figma (an empty placeholder — no icon
-   picked yet), same as add-event-continue's larger version of it; the
-   small "add a photo"-style glyph here is this app's own affordance for
-   "tap to choose an icon", not something Figma draws inside the circle. */
+/* Plain white, empty circle — matches Figma exactly (19:1506, an empty
+   placeholder, no icon picked yet and no hint glyph drawn inside it).
+   Nothing in the idle state signals it's tappable beyond cursor:pointer
+   on hover — a deliberate fidelity-over-affordance trade-off; see the
+   chat note on this page for the alternative (a faint hint glyph) if
+   that's ever preferred over matching the mock exactly. */
 .iconpicker {
   flex: none;
   display: grid;
@@ -71,7 +76,6 @@
 .iconpicker:active { transform: scale(.96); }
 .iconpicker__display { display: grid; place-items: center; }
 .iconpicker .material-symbols-outlined { font-size: 44px; color: #832118; }
-.iconpicker .iconpicker__placeholder { color: rgba(131, 33, 24, .35); }
 
 .iconbar {
   display: flex;
@@ -101,18 +105,31 @@
   display: block;
   flex: 1;
   min-width: 0;
+  margin-top: 30px;
   border: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, .6);
   background: transparent;
   outline: none;
-  padding: 6px 2px;
+  padding: 0 2px 6px;
   color: #fff;
   font: 18px var(--font-en), var(--font-cn);
 }
 .titleinput::placeholder { color: #ccc; }
 
+/* the divider (19:1507) is Figma's own fixed-position line, not the
+   input's own underline — it sits at a constant 108px below the teal
+   band's top regardless of exactly where the input's text baseline
+   lands, so it's drawn separately rather than as a border on the input. */
+.addevent__divider {
+  position: absolute;
+  left: 30px;
+  top: 108px;
+  width: 222px;
+  height: 0;
+  border-top: 1px solid rgba(255, 255, 255, .6);
+}
+
 /* ------------------------------------------------------------------ fields */
-.addevent__fields { padding: 24px 37px 40px; }
+.addevent__fields { background: #efefef; padding: 24px 37px 40px; }
 
 .fieldgroup { margin-bottom: 26px; }
 .fieldgroup__label {
