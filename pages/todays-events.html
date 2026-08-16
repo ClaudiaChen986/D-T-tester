@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — What's on today? 今日信息</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/todays-events.css">
+</head>
+<body class="events-body">
+
+<!-- ================================================================
+     Suggestion - homepage  ·  Figma node 7:1322
+     A real (unbounded-height) scrolling page, like contacts.html.
+     ================================================================ -->
+<div class="eventspage">
+
+  <header class="eventshead">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="other.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="Back to Other 返回其他">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header__title">
+      <span class="t-en">What&#8217;s on today?</span>
+      <span class="t-cn">今日信息</span>
+    </h1>
+
+    <a class="morebtn" href="https://www.krg.nsw.gov.au/Community/Seniors" target="_blank" rel="noopener noreferrer"
+       aria-label="More seniors resources on the Ku-ring-gai Council website 了解更多老年人资源（跳转至库灵盖市议会网站）">
+      <span class="morebtn__label">
+        <span class="t-en">More</span>
+        <span class="t-cn">了解更多</span>
+      </span>
+      <span class="chevron" style="--x:116px;--y:10px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </a>
+  </header>
+
+  <div class="eventslist">
+
+    <button class="eventcard eventcard--lg" type="button">
+      <img class="eventcard__bg" src="../assets/today-card-bg-lg.svg" alt="">
+      <span class="eventcard__label" style="--y:21px">
+        <span class="t-en">Seniors events</span>
+        <span class="t-cn">老年人活动</span>
+      </span>
+      <span class="eventcard__desc" style="--y:82px">
+        <span class="t-en">Join us on an outing, in a webinar or in one of the weekly exercise classes.</span>
+        <span class="t-cn">欢迎您参加我们的郊游、网络研讨会或每周的健身课程。</span>
+      </span>
+      <span class="chevron" style="--x:307px;--y:87px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+    <button class="eventcard eventcard--sm" type="button">
+      <img class="eventcard__bg" src="../assets/other-card-bg.svg" alt="">
+      <span class="eventcard__label" style="--y:24px">
+        <span class="t-en">Seniors exercise classes</span>
+        <span class="t-cn">老年人健身课程</span>
+      </span>
+      <span class="chevron" style="--x:300px;--y:50px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+    <button class="eventcard eventcard--sm" type="button">
+      <img class="eventcard__bg" src="../assets/other-card-bg.svg" alt="">
+      <span class="eventcard__label" style="--y:36px">
+        <span class="t-en">Seniors services</span>
+        <span class="t-cn">老年人服务</span>
+      </span>
+      <span class="chevron" style="--x:300px;--y:50px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+    <button class="eventcard eventcard--sm" type="button">
+      <img class="eventcard__bg" src="../assets/other-card-bg.svg" alt="">
+      <span class="eventcard__label" style="--y:22px">
+        <span class="t-en">Seniors community activities</span>
+        <span class="t-cn">老年人社区活动</span>
+      </span>
+      <span class="chevron" style="--x:300px;--y:50px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+    <button class="eventcard eventcard--sm" type="button">
+      <img class="eventcard__bg" src="../assets/other-card-bg.svg" alt="">
+      <span class="eventcard__label" style="--y:22px">
+        <span class="t-en">Past seniors event resources</span>
+        <span class="t-cn">历史老年人活动资源</span>
+      </span>
+      <span class="chevron" style="--x:300px;--y:50px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+    <button class="eventcard eventcard--sm" type="button">
+      <img class="eventcard__bg" src="../assets/other-card-bg.svg" alt="">
+      <span class="eventcard__label" style="--y:36px">
+        <span class="t-en">Seniors care</span>
+        <span class="t-cn">老年人护理</span>
+      </span>
+      <span class="chevron" style="--x:300px;--y:50px;--s:36px">
+        <img src="../assets/icon-chevron.svg" alt="">
+      </span>
+    </button>
+
+  </div>
+
+  <a class="eventsbar" href="home.html">
+    <img class="eventsbar__bg" src="../assets/bottomnav-bg.svg" alt="">
+    <span class="crop" style="--x:156px;--y:7px;--w:78.179px;--h:79.817px">
+      <img src="../assets/logo-sprite.png" alt=""
+           style="--iw:292.75px;--ih:203.45px;--ix:-110.95px;--iy:-107.65px">
+    </span>
+    <span class="eventsbar__text">
+      <span class="t-en">Back to homepage&nbsp;</span><span class="t-cn">返回首页</span>
+    </span>
+  </a>
+
+</div>
+
+</body>
+</html>

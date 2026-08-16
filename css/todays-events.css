@@ -1,0 +1,178 @@
+/* ============================================================================
+   归途 GuiTu — "What's on today?" (Figma node 7:1322, "Suggestion - homepage")
+   ----------------------------------------------------------------------------
+   A real (unbounded-height) scrolling page, same reasoning as contacts.css
+   and phrase-library.css: six seniors-resource cards is genuine page-length
+   content, not something a fixed 390×844 mock scaled as one unit can hold.
+   Header, return button, bottom bar, and the regular-height card shape are
+   all pixel-identical assets/geometry to what other pages already ship
+   (the card background in particular is byte-identical to
+   `other-card-bg.svg`, confirmed by comparing exported path data) — only
+   the taller first-card variant (`today-card-bg-lg.svg`, for the one card
+   with a description line under its title) is genuinely new.
+
+   The header's persistent **More** button (matching phrase-library.html's
+   sticky Add button) is a real external link — to the NSW Ku-ring-gai
+   Council's Seniors page — not a placeholder, since a link needs nothing
+   this prototype can't already do.
+   ========================================================================== */
+
+.events-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: var(--c-red);
+}
+
+.eventspage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--c-red);
+  font-family: var(--font-en);
+}
+.eventspage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../assets/bg-texture2.png') repeat;
+  opacity: .16;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ header */
+.eventshead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 390px;
+  height: 209.144px;
+}
+/* "What's on today?" is longer than .header__title's box was sized for —
+   same fix every longer title elsewhere in the app needs (contacts.css,
+   translation.css's siblings, etc.). */
+.eventshead .header__title {
+  left: 75px;
+  width: 291px;
+}
+.eventshead .header__title .t-en,
+.eventshead .header__title .t-cn { white-space: nowrap; }
+
+.morebtn {
+  position: absolute;
+  left: 235px;
+  top: 153px;
+  width: 119px;
+  height: 56px;
+  border-radius: 30px;
+  background: var(--c-teal);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.morebtn:active { transform: scale(.96); }
+.morebtn__label {
+  position: absolute;
+  left: 16px;
+  top: 9px;
+  width: 64px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.morebtn__label > span { display: block; font-weight: 700; }
+.morebtn__label .t-en { font-size: 16px; }
+.morebtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+
+/* -------------------------------------------------------------------- list */
+.eventslist {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 23px 0 32px;
+}
+
+.eventcard {
+  position: relative;
+  display: block;
+  width: 317px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.eventcard:active { transform: scale(.98); }
+.eventcard--sm { height: 135px; }
+.eventcard--lg { height: 209px; }
+
+.eventcard__bg { position: absolute; left: -4px; top: 0; width: 325px; }
+.eventcard--sm .eventcard__bg { height: 149px; }
+.eventcard--lg .eventcard__bg { height: 223px; }
+
+.eventcard__label {
+  position: absolute;
+  left: 18px;
+  top: var(--y);
+  width: 246px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.eventcard__label > span { display: block; font-weight: 700; }
+.eventcard__label .t-en { font-size: 24px; }
+.eventcard__label .t-cn { font-size: 22px; letter-spacing: 1.1px; }
+
+.eventcard__desc {
+  position: absolute;
+  left: 18px;
+  top: var(--y);
+  width: 246px;
+  font-size: 0;
+  line-height: normal;
+  color: #5e4415;
+}
+.eventcard__desc > span { display: block; font-weight: 400; }
+.eventcard__desc .t-en { font-size: 18px; }
+.eventcard__desc .t-cn { font-size: 16px; letter-spacing: .9px; margin-top: 4px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry as contacts.html's own .backbar (position: relative,
+   in normal flow — this page scrolls like that one, not a fixed stage). */
+.eventsbar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 390px;
+  height: 134px;
+  margin: 6px 0 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.eventsbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.eventsbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.eventsbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.eventsbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morebtn,
+  .eventcard { transition: none; }
+}

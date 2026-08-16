@@ -28,8 +28,12 @@ pages/
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
   other.html               "Other" menu (node 142:824) — Home's Other tile
-                            leads here; the three cards have no destination
-                            screen yet
+                            leads here; My Calendar/My Journal have no
+                            destination screen yet
+  todays-events.html       "What's on today?" (node 7:1322, "Suggestion -
+                            homepage") — real scrolling page, like
+                            contacts.html; six seniors-resource cards and a
+                            "More" button out to a real external site
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -43,6 +47,7 @@ css/
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
   other.css                 other.html's own layout
+  todays-events.css          todays-events.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -93,11 +98,15 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
-- Home's *Other* tile → `other.html`. Its three cards (Today's new events,
-  My Calendar, My Journal) have no destination screen yet, so — same as
-  Home's still-unbuilt Translation/Navigation tiles — they're inert
-  `<button>`s; its return arrow and "Back to homepage" bar both go to
-  `home.html`.
+- Home's *Other* tile → `other.html`. Its *Today's new events* card →
+  `todays-events.html`; My Calendar/My Journal still have no destination
+  screen, so — same as Home's still-unbuilt Translation/Navigation tiles —
+  they're inert `<button>`s. Other's own return arrow and "Back to
+  homepage" bar both go to `home.html`.
+- `todays-events.html`'s sticky **More** button opens
+  <https://www.krg.nsw.gov.au/Community/Seniors> in a new tab — a real
+  external link, not a placeholder. Its return arrow goes back to
+  `other.html`; its "Back to homepage" bar goes to `home.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -228,8 +237,8 @@ assets that would have come back identical anyway.
 `other.html` (node 142:824) is structurally the same menu Translation's
 Figma node uses — same scalloped card shape, same round badge artwork, same
 chevron and bottom-bar geometry — just with three different cards (Today's
-new events, My Calendar, My Journal) and none of them wired to a
-destination screen yet. Header, return button, background texture, and
+new events, My Calendar, My Journal; only the first leads anywhere yet, see
+below). Header, return button, background texture, and
 bottom bar are all pixel-identical assets to what every other return-button
 page already ships (confirmed by comparing exported bytes), so the only
 genuinely new assets are the card background/badge (re-exported under this
@@ -247,3 +256,29 @@ your activity today! 来寻找你喜欢的活动吧!"), wider than
 `.header__welcome`'s default box — widened and forced to `nowrap` in
 `other.css` the same way `contacts.css` widens `.header__title` for its
 own longer title, rather than letting it wrap mid-phrase.
+
+## "What's on today?" — a real link out, to a real government site
+
+`todays-events.html` (node 7:1322, "Suggestion - homepage") is Other's
+*Today's new events* card, and — like `contacts.html`/`phrase-library.html`
+— a real scrolling page: six seniors-resource cards is genuine page-length
+content, not something a fixed 390×844 mock scaled as one unit can hold.
+Header, return button, bottom bar, and the regular-height card shape are
+all pixel-identical assets to what other pages already ship (the card
+background in particular is byte-identical to `other-card-bg.svg`,
+confirmed by comparing exported path data — not assumed just because it
+looks the same); the only genuinely new asset is the taller variant for
+the one card with a description line under its title
+(`today-card-bg-lg.svg`). Both language lines are bold here (`font-weight:
+700` on English *and* Chinese), unlike Translation/Other's cards where
+only English is — kept as Figma exports it rather than normalized to
+match a different page's convention.
+
+The header's sticky **More** button (same persistent-button-in-a-sticky-
+header pattern as `phrase-library.html`'s Add) is a real link to
+<https://www.krg.nsw.gov.au/Community/Seniors> (`target="_blank"
+rel="noopener noreferrer"`) — the Ku-ring-gai Council's actual seniors
+page, not a placeholder, since a link needs nothing this prototype can't
+already do. None of the six cards have their own destination screens yet,
+so they stay inert `<button>`s, same posture as every other
+not-yet-designed destination in the app.
