@@ -130,25 +130,20 @@
   cursor: pointer;
 }
 
-/* -------------------------------------------------------------- time slider
-   A drag-left-to-right pill in place of Figma's own iOS-style wheel picker
-   — same native-control simplification as Date, just a range input this
-   time. Track fill (teal up to the thumb, cream past it) is painted as a
-   plain CSS background on the input itself, with both pseudo-element track
-   variants forced transparent so that background shows through in every
-   browser; js/add-event.js recomputes the gradient's stop on every `input`
-   event so the fill tracks the thumb continuously while dragging, not just
-   on release. */
-.timeslider { position: relative; }
-.timeslider__value {
-  margin: 0 0 10px;
-  text-align: center;
-  font-family: var(--font-en);
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
-}
-.timeslider__input {
+/* ---------------------------------------------------------- duration slider
+   A drag-left-to-right pill snapping between Figma's own seven preset
+   stops (5/10/15/30 min, 1h/2h/3h) rather than separate chip buttons —
+   the native range input drives the drag physics and snapping, and a
+   decorative tick row on top renders the labels + which one is currently
+   selected. Track fill (teal up to the thumb, cream past it) is painted
+   as a plain CSS background on the input itself, with both pseudo-element
+   track variants forced transparent so that background shows through in
+   every browser; js/add-event.js recomputes the gradient's stop — and
+   which tick is highlighted — on every `input` event, so both track the
+   thumb continuously while dragging, not just on release. Tapping a tick
+   label directly also jumps the slider there. */
+.durationslider { position: relative; }
+.durationslider__input {
   -webkit-appearance: none;
   appearance: none;
   display: block;
@@ -160,17 +155,17 @@
   outline: none;
   cursor: pointer;
 }
-.timeslider__input::-webkit-slider-runnable-track {
+.durationslider__input::-webkit-slider-runnable-track {
   height: 50px;
   border-radius: 30px;
   background: transparent;
 }
-.timeslider__input::-moz-range-track {
+.durationslider__input::-moz-range-track {
   height: 50px;
   border-radius: 30px;
   background: transparent;
 }
-.timeslider__input::-webkit-slider-thumb {
+.durationslider__input::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 34px;
   height: 34px;
@@ -181,7 +176,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
   cursor: grab;
 }
-.timeslider__input::-moz-range-thumb {
+.durationslider__input::-moz-range-thumb {
   width: 34px;
   height: 34px;
   border: 3px solid #154c52;
@@ -190,38 +185,31 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, .35);
   cursor: grab;
 }
-.timeslider__input:active::-webkit-slider-thumb,
-.timeslider__input:active::-moz-range-thumb { cursor: grabbing; }
-.timeslider__input:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; }
+.durationslider__input:active::-webkit-slider-thumb,
+.durationslider__input:active::-moz-range-thumb { cursor: grabbing; }
+.durationslider__input:focus-visible { outline: 2px solid #154c52; outline-offset: 3px; }
 
-.timeslider__ends {
+.durationslider__ticks {
+  position: absolute;
+  inset: 0;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-top: 6px;
-  font-family: var(--font-en);
-  font-size: 13px;
-  color: rgba(0, 0, 0, .45);
+  padding: 0 14px;
+  pointer-events: none;
 }
-
-.durationrow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.durationchip {
-  border: 0;
-  border-radius: 21px;
-  height: 42px;
-  padding: 0 16px;
-  background: #efefef;
-  border: 1px solid #56a8b0;
-  color: #000;
-  font-family: var(--font-en);
-  font-size: 16px;
-  font-weight: 700;
+.durationslider__tick {
+  pointer-events: auto;
   cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .55);
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 700;
+  color: #000;
 }
-.durationchip.is-selected { background: var(--c-teal); color: #fff; border-color: var(--c-teal); }
+.durationslider__tick.is-selected { background: #154c52; color: #fff; }
 
 .save {
   display: block;

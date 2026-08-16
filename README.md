@@ -55,8 +55,9 @@ pages/
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
                               "plan tomorrow" button) leads here; icon
-                              picker + title + date/time/duration form.
-                              Step 1 of 2 — Save hands off to
+                              picker + title + date + a drag-slider
+                              Duration field (start defaults silently to
+                              "now"). Step 1 of 2 — Save hands off to
                               add-event-continue.html rather than writing
                               the event itself
   add-event-continue.html    "Adding event (continue)" (node 19:1547, "add
@@ -107,8 +108,8 @@ js/
   add-journal.js              add-journal.html: validation, save, handoff
   calendar.js                  calendar.html: renders the timeline + today's
                                 events list from localStorage, tick-box save
-  add-event.js                 add-event.html: icon picker, date/time/
-                                duration defaults, validation; Save hands
+  add-event.js                 add-event.html: icon picker, date default,
+                                duration slider, validation; Save hands
                                 off a draft, doesn't write the event
   add-event-continue.js        add-event-continue.html: fills the summary
                                 from the handed-off draft, Repeat chips,
@@ -179,7 +180,7 @@ file under `css/`.
 - Other's *My Calendar* tile → `calendar.html`. Its **Add** pill and the
   today panel's **plan tomorrow** button both → `add-event.html` (the
   latter with `?day=1`, pre-selecting tomorrow's date). That page's Save
-  validates step 1 (title/icon/date/time/duration) and hands off to
+  validates step 1 (title/icon/date/duration) and hands off to
   `add-event-continue.html` (step 2: Repeat + optional sub-task) rather
   than writing anything yet; *that* page's own Save is what writes the
   finished event to `localStorage` and returns to `calendar.html`, where
@@ -525,29 +526,33 @@ Serif/Noto Serif SC fonts) — walking, meals, socialising, home tasks,
 sleep, medication, shopping, exercise, work, health, reading, and
 celebrations — and picking one both closes the strip and renders that
 glyph inside the circle, which is also what shows up as the event's icon
-back on `calendar.html`'s pills and list rows. Figma's own "Date and Time
-- Wheels" component (an iOS-style scroll picker, per its own linked Apple
-HIG docs) is approximated here as two different native controls: Date
-keeps a plain `<input type="date">`, styled to match the app's pill
-language; Time is a drag-left-to-right `<input type="range">` (0:00-24:00
-in 5-minute steps) instead — closer to "slide to choose" than a native
-time field reads, without building a custom wheel widget. Its teal/cream
-fill and the live "8:00 pm" label above it both repaint on every `input`
-event (`js/add-event.js`), not just on release, so the picked time is
-visible continuously while dragging, the same way the label on Figma's
-own wheel tracks whatever's under the selection band. Duration keeps
-Figma's own preset-chip design (5/10/15/30 min, 1h/2h/3h) as plain
-selectable buttons.
+back on `calendar.html`'s pills and list rows. Date keeps a plain
+`<input type="date">`, styled to match the app's pill language — the
+simplest approximation of Figma's own "Date Picker - Collapsed" component
+that still reads as one native control rather than a custom widget.
+
+There's deliberately no Time field here (Figma's own "Date and Time -
+Wheels" component covers both on one screen) — the event's start just
+defaults silently to whatever moment Save is actually pressed, rounded to
+the nearest 5 minutes, the same value this page used to prefill a
+since-removed time picker with. **Duration**, in exchange, is a drag-
+left-to-right `<input type="range">` snapping between Figma's own seven
+preset stops (5/10/15/30 min, 1h/2h/3h) instead of separate chip buttons —
+a decorative tick row of those seven labels sits on top of the track,
+and both its teal/cream fill and which tick is highlighted repaint on
+every `input` event (`js/add-event.js`), not just on release, so the
+picked duration is visible continuously while dragging. Tapping a tick
+label directly also jumps the slider straight there.
 
 This is step 1 of 2 — Figma's own next node in the flow, `19:1547` ("add
 task （continue） - both"), is a second screen, not this one finishing.
-Save here validates that a title, date, and time are all set, then hands
-everything off as a `sessionStorage` draft (`guitu.addEventDraft`) and
-moves on to `add-event-continue.html`, rather than writing anything to
-the real calendar yet — `sessionStorage`, not `localStorage`, for the
-same reason `js/app.js` uses it for `guitu.callTarget`: it's scoped to
-this one handoff, so abandoning the flow on step 2 (closing the tab,
-navigating away) doesn't leave a half-finished event sitting in
+Save here validates that a title and date are set, then hands everything
+off as a `sessionStorage` draft (`guitu.addEventDraft`) and moves on to
+`add-event-continue.html`, rather than writing anything to the real
+calendar yet — `sessionStorage`, not `localStorage`, for the same reason
+`js/app.js` uses it for `guitu.callTarget`: it's scoped to this one
+handoff, so abandoning the flow on step 2 (closing the tab, navigating
+away) doesn't leave a half-finished event sitting in
 `guitu.calendarEvents`.
 
 `add-event-continue.html` reads that draft back out on load — if it's

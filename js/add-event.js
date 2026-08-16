@@ -2,13 +2,17 @@
    归途 GuiTu — Adding event behaviour (Figma node 19:1501)
      · the round icon-picker toggles a small selection bar of Material
        Symbols (fonts.google.com/icons) — pick one, it lands in the circle
-     · Time is a drag-left-to-right range slider (0:00-24:00 in 5-minute
-       steps) rather than Figma's own wheel picker — the live value label
-       and the teal/cream fill both update on every `input` event, so
-       dragging shows the picked time continuously instead of only on
-       release
+     · no Time field — the event's start defaults silently to right now
+       (rounded to the nearest 5 minutes), same value this page used to
+       prefill a now-removed time picker with
+     · Duration is a drag-left-to-right range slider snapping between
+       Figma's own seven preset stops (5/10/15/30 min, 1h/2h/3h) rather
+       than separate chip buttons; the fill and which tick is highlighted
+       both update on every `input` event, so dragging shows the picked
+       duration continuously instead of only on release. Tapping a tick
+       label directly also jumps the slider there.
      · Save doesn't write the event yet — it's only step 1 of the flow.
-       It hands the title/icon/date/time/duration to
+       It hands the title/icon/date/start/duration to
        add-event-continue.html (node 19:1547, Repeat + optional sub-task)
        as a sessionStorage draft; that page's own Save is what actually
        commits the event to localStorage. sessionStorage (not localStorage)
@@ -21,16 +25,15 @@
 
   var DRAFT_KEY = 'guitu.addEventDraft';
 
-  var form        = document.getElementById('eventForm');
-  var iconPicker  = document.getElementById('iconPicker');
-  var iconDisplay = document.getElementById('iconDisplay');
-  var iconBar     = document.getElementById('iconBar');
-  var titleInput  = document.getElementById('titleInput');
-  var dateInput   = document.getElementById('dateInput');
-  var timeInput   = document.getElementById('timeInput');
-  var timeValue   = document.getElementById('timeValue');
-  var durationRow = document.getElementById('durationRow');
-  var status      = document.getElementById('formStatus');
+  var form           = document.getElementById('eventForm');
+  var iconPicker     = document.getElementById('iconPicker');
+  var iconDisplay    = document.getElementById('iconDisplay');
+  var iconBar        = document.getElementById('iconBar');
+  var titleInput     = document.getElementById('titleInput');
+  var dateInput      = document.getElementById('dateInput');
+  var durationInput  = document.getElementById('durationInput');
+  var durationTicks  = document.getElementById('durationTicks');
+  var status         = document.getElementById('formStatus');
 
   var ICONS = [
     'directions_walk', 'restaurant', 'groups', 'home', 'bedtime',
@@ -39,7 +42,6 @@
   ];
 
   var selectedIcon = null;
-  var selectedMinutes = 60;
 
   /* ------------------------------------------------------------- icon bar */
   ICONS.forEach(function (name) {
@@ -68,16 +70,6 @@
   }
   iconPicker.addEventListener('click', function () { setIconBar(iconBar.hidden); });
 
-  /* ------------------------------------------------------------- duration */
-  durationRow.addEventListener('click', function (e) {
-    var chip = e.target.closest('.durationchip');
-    if (!chip) return;
-    selectedMinutes = parseInt(chip.dataset.minutes, 10);
-    durationRow.querySelectorAll('.durationchip').forEach(function (c) {
-      c.classList.toggle('is-selected', c === chip);
-    });
-  });
-
   /* --------------------------------------------------------- date default
      Plain query param, no persistence involved — "plan tomorrow" on
      calendar.html links here with ?day=1 to pre-select tomorrow's date;
@@ -93,28 +85,37 @@
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
   }
 
-  /* ----------------------------------------------------------- time slider */
-  function formatTime(minutes) {
-    var h = Math.floor(minutes / 60), m = minutes % 60;
-    var isPm = h >= 12;
-    var h12 = h % 12 === 0 ? 12 : h % 12;
-    return h12 + ':' + pad(m) + ' ' + (isPm ? 'pm' : 'am');
-  }
-
-  function updateTimeSlider() {
-    var minutes = parseInt(timeInput.value, 10);
-    var pct = (minutes / timeInput.max) * 100;
-    timeValue.textContent = formatTime(minutes);
-    timeInput.setAttribute('aria-valuetext', formatTime(minutes));
-    timeInput.style.background =
-      'linear-gradient(to right, #37848c ' + pct + '%, #edd8b4 ' + pct + '%)';
-  }
-
+  /* -------------------------------------------------------------- start
+     No Time field on this page — the event just starts "now". */
   var now = new Date();
   now.setMinutes(Math.round(now.getMinutes() / 5) * 5, 0, 0);
-  timeInput.value = String(now.getHours() * 60 + now.getMinutes());
-  updateTimeSlider();
-  timeInput.addEventListener('input', updateTimeSlider);
+  var startMinutes = now.getHours() * 60 + now.getMinutes();
+
+  /* ------------------------------------------------------- duration slider */
+  var DURATIONS = [5, 10, 15, 30, 60, 120, 180];
+  var selectedMinutes = DURATIONS[parseInt(durationInput.value, 10)];
+  var durationTickEls = durationTicks.querySelectorAll('.durationslider__tick');
+
+  function updateDurationSlider() {
+    var index = parseInt(durationInput.value, 10);
+    selectedMinutes = DURATIONS[index];
+    var pct = (index / (DURATIONS.length - 1)) * 100;
+    durationInput.style.background =
+      'linear-gradient(to right, #37848c ' + pct + '%, #edd8b4 ' + pct + '%)';
+    durationInput.setAttribute('aria-valuetext', selectedMinutes + ' minutes');
+    durationTickEls.forEach(function (tick) {
+      tick.classList.toggle('is-selected', parseInt(tick.dataset.index, 10) === index);
+    });
+  }
+  updateDurationSlider();
+  durationInput.addEventListener('input', updateDurationSlider);
+
+  durationTickEls.forEach(function (tick) {
+    tick.addEventListener('click', function () {
+      durationInput.value = tick.dataset.index;
+      updateDurationSlider();
+    });
+  });
 
   /* ------------------------------------------------------------------ save */
   function dayOffset(dateValue) {
@@ -139,8 +140,6 @@
       status.textContent = 'Please set a date 请设置日期';
       return;
     }
-
-    var startMinutes = parseInt(timeInput.value, 10);
 
     var draft = {
       title: title,

@@ -18,9 +18,12 @@
      Reached from calendar.html's Add button (or its "plan tomorrow"
      button, which arrives with ?day=1 pre-selecting tomorrow). A real
      scrolling page, not a fixed stage — the icon-selection bar and the
-     fields below it need room to grow past one screen. Step 1 of 2: Save
-     here hands off to add-event-continue.html (node 19:1547) rather than
-     writing the event itself — see js/add-event.js.
+     fields below it need room to grow past one screen. No Time field —
+     the event's start defaults silently to right now, and Duration is a
+     drag-left-to-right slider snapping between Figma's own preset stops
+     (5/10/15/30 min, 1h/2h/3h). Step 1 of 2: Save here hands off to
+     add-event-continue.html (node 19:1547) rather than writing the event
+     itself — see js/add-event.js.
      ================================================================ -->
 <div class="addeventpage">
 
@@ -74,27 +77,19 @@
       </div>
 
       <div class="fieldgroup">
-        <p class="fieldgroup__label"><span class="t-en">Time</span> <span class="t-cn">时间</span></p>
-        <div class="timeslider">
-          <div class="timeslider__value" id="timeValue" aria-hidden="true"></div>
-          <input class="timeslider__input" type="range" id="timeInput" name="time"
-                 min="0" max="1435" step="5" aria-label="Time 时间">
-          <div class="timeslider__ends" aria-hidden="true">
-            <span>0:00</span><span>24:00</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fieldgroup">
         <p class="fieldgroup__label"><span class="t-en">Duration</span> <span class="t-cn">时长</span></p>
-        <div class="durationrow" id="durationRow" role="radiogroup" aria-label="Duration 时长">
-          <button class="durationchip" type="button" data-minutes="5">5</button>
-          <button class="durationchip" type="button" data-minutes="10">10</button>
-          <button class="durationchip" type="button" data-minutes="15">15</button>
-          <button class="durationchip" type="button" data-minutes="30">30</button>
-          <button class="durationchip is-selected" type="button" data-minutes="60">1h</button>
-          <button class="durationchip" type="button" data-minutes="120">2h</button>
-          <button class="durationchip" type="button" data-minutes="180">3h</button>
+        <div class="durationslider">
+          <input class="durationslider__input" type="range" id="durationInput" name="duration"
+                 min="0" max="6" step="1" value="4" aria-label="Duration 时长">
+          <div class="durationslider__ticks" id="durationTicks" aria-hidden="true">
+            <span class="durationslider__tick" data-index="0" data-minutes="5">5</span>
+            <span class="durationslider__tick" data-index="1" data-minutes="10">10</span>
+            <span class="durationslider__tick" data-index="2" data-minutes="15">15</span>
+            <span class="durationslider__tick" data-index="3" data-minutes="30">30</span>
+            <span class="durationslider__tick is-selected" data-index="4" data-minutes="60">1h</span>
+            <span class="durationslider__tick" data-index="5" data-minutes="120">2h</span>
+            <span class="durationslider__tick" data-index="6" data-minutes="180">3h</span>
+          </div>
         </div>
       </div>
 
