@@ -72,11 +72,23 @@
   background: #fff;
 }
 
-.titleinput {
-  display: block;
+/* Figma's placeholder (56:747) is two lines in two different fonts/sizes
+   ("Enter text here" 18px Inria Serif, "在此输入文本" 16px Noto Serif SC) —
+   a native <input placeholder="…"> can only ever be one string in one
+   font, so the real hint text is this overlay instead: shown while the
+   input's empty (js/add-event.js toggles it on `input`), sitting behind
+   the input so typing still lands in the right place. */
+.titlewrap {
+  position: relative;
   flex: 1;
   min-width: 0;
   margin-top: 30px;
+}
+.titleinput {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
   border: 0;
   background: transparent;
   outline: none;
@@ -84,7 +96,16 @@
   color: #fff;
   font: 18px var(--font-en), var(--font-cn);
 }
-.titleinput::placeholder { color: #ccc; }
+.titleinput__placeholder {
+  position: absolute;
+  left: 2px;
+  top: 0;
+  pointer-events: none;
+}
+.titleinput__placeholder > span { display: block; color: #ccc; }
+.titleinput__placeholder .t-en { font-family: var(--font-en); font-size: 18px; }
+.titleinput__placeholder .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .7px; margin-top: 2px; }
+.titleinput__placeholder[hidden] { display: none; }
 
 /* the divider (19:1507) is Figma's own fixed-position line under the
    title *text* (left:133, i.e. past the icon's own 30-126px span, not

@@ -62,8 +62,14 @@
       <div class="addevent__row">
         <div class="iconpicker" aria-hidden="true"></div>
 
-        <input class="titleinput" type="text" id="titleInput" name="title" autocomplete="off"
-               placeholder="Enter text here 在此输入文本" aria-label="Event title 日程标题">
+        <div class="titlewrap">
+          <input class="titleinput" type="text" id="titleInput" name="title" autocomplete="off"
+                 aria-label="Event title 日程标题">
+          <span class="titleinput__placeholder" id="titlePlaceholder" aria-hidden="true">
+            <span class="t-en">Enter text here</span>
+            <span class="t-cn">在此输入文本</span>
+          </span>
+        </div>
       </div>
 
       <div class="addevent__divider" aria-hidden="true"></div>

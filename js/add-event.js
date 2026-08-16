@@ -28,9 +28,17 @@
 
   var DRAFT_KEY = 'guitu.addEventDraft';
 
-  var form       = document.getElementById('eventForm');
-  var titleInput = document.getElementById('titleInput');
-  var status     = document.getElementById('formStatus');
+  var form            = document.getElementById('eventForm');
+  var titleInput      = document.getElementById('titleInput');
+  var titlePlaceholder = document.getElementById('titlePlaceholder');
+  var status          = document.getElementById('formStatus');
+
+  /* Figma's own two-line, two-font placeholder — see the CSS comment on
+     .titleinput__placeholder for why this isn't the input's native
+     placeholder attribute. Shown only while the field is empty. */
+  titleInput.addEventListener('input', function () {
+    titlePlaceholder.hidden = titleInput.value.length > 0;
+  });
 
   /* --------------------------------------------------------- day default
      Plain query param, no persistence involved — "plan tomorrow" on
