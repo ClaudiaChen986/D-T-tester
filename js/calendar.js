@@ -20,6 +20,14 @@
        happened, measured against the real clock; only today's events
        ever show a partial/full fill, since "now" doesn't apply to
        tomorrow/2-days
+     · overlapping events (same day, same or crossing time ranges) used
+       to render exactly on top of each other — same top/height, so only
+       the last-drawn one was ever visible, which looked like events
+       were silently going missing. assignColumns() below is the classic
+       greedy interval-colouring calendar layout: events that don't
+       overlap share column 0; anything that overlaps an already-placed
+       event gets pushed to the next column over, offset a little to the
+       right (both timelines), so every saved event actually shows up.
    ========================================================================== */
 (function () {
   'use strict';
@@ -155,6 +163,27 @@
     } catch (e) { return []; }
   }
 
+  /* Greedy interval-colouring: sorted by start time, each event claims
+     the first column whose last-placed event has already ended by the
+     time this one starts; if none is free, it opens a new column.
+     Returns [{ event, column }, …] in start-time order — column 0 never
+     needs an offset, column 1+ do. */
+  function assignColumns(evs) {
+    var sorted = evs.slice().sort(function (a, b) { return a.start - b.start; });
+    var columnEnds = [];
+    return sorted.map(function (ev) {
+      var end = ev.start + ev.duration;
+      for (var c = 0; c < columnEnds.length; c++) {
+        if (columnEnds[c] <= ev.start) {
+          columnEnds[c] = end;
+          return { event: ev, column: c };
+        }
+      }
+      columnEnds.push(end);
+      return { event: ev, column: columnEnds.length - 1 };
+    });
+  }
+
   function saveEvents(events) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)); } catch (e) { /* best effort only */ }
   }
@@ -203,17 +232,21 @@
   nowLine.style.top = ((nowMinutes / 60) * HOUR_PX) + 'px';
   lanes[0].appendChild(nowLine);
 
-  events.forEach(function (ev) {
-    var lane = lanes[ev.day];
-    if (!lane) return;
-    var pill = document.createElement('div');
-    pill.className = 'tlpill' + (ev.done ? ' tlpill--done' : '');
-    pill.style.top = ((ev.start / 60) * HOUR_PX) + 'px';
-    pill.style.height = Math.max(34, (ev.duration / 60) * HOUR_PX) + 'px';
-    pill.style.background = ev.done ? 'var(--c-accent)' : pillBackground(ev.day === 0, ev);
-    pill.title = ev.title + ' (' + minutesLabel(ev.start) + '–' + minutesLabel(ev.start + ev.duration) + ')';
-    pill.innerHTML = '<span class="material-symbols-outlined">' + (ICONS[ev.icon] || 'event') + '</span>';
-    lane.appendChild(pill);
+  [0, 1, 2].forEach(function (day) {
+    var lane = lanes[day];
+    var laneEvents = events.filter(function (ev) { return ev.day === day; });
+    assignColumns(laneEvents).forEach(function (placed) {
+      var ev = placed.event;
+      var pill = document.createElement('div');
+      pill.className = 'tlpill' + (ev.done ? ' tlpill--done' : '');
+      pill.style.top = ((ev.start / 60) * HOUR_PX) + 'px';
+      pill.style.left = (placed.column * 10) + 'px';
+      pill.style.height = Math.max(34, (ev.duration / 60) * HOUR_PX) + 'px';
+      pill.style.background = ev.done ? 'var(--c-accent)' : pillBackground(day === 0, ev);
+      pill.title = ev.title + ' (' + minutesLabel(ev.start) + '–' + minutesLabel(ev.start + ev.duration) + ')';
+      pill.innerHTML = '<span class="material-symbols-outlined">' + (ICONS[ev.icon] || 'event') + '</span>';
+      lane.appendChild(pill);
+    });
   });
 
   /* --------------------------------------------------- today mini-timeline
@@ -225,6 +258,7 @@
      here beyond the empty-state message. */
   var todays = events.filter(function (ev) { return ev.day === 0; })
     .sort(function (a, b) { return a.start - b.start; });
+  var todaysPlaced = assignColumns(todays);
 
   if (!todays.length) {
     var empty = document.createElement('p');
@@ -268,22 +302,28 @@
     mtlTickCol.style.height = mtlHeight + 'px';
 
     var prevEndPx = 0;
-    todays.forEach(function (ev, i) {
+    todaysPlaced.forEach(function (placed) {
+      var ev = placed.event;
+      var col = placed.column;
       var topPx = ((ev.start / 60) - rangeStart) * HOUR_PX;
       var heightPx = Math.max(34, (ev.duration / 60) * HOUR_PX);
 
-      if (topPx > prevEndPx + 1) {
+      // Connector stems only track the main (column 0) sequence — an
+      // overlapping event sitting in a side column is a parallel event,
+      // not the next stop along the day, so it doesn't get its own stem.
+      if (col === 0 && topPx > prevEndPx + 1) {
         var stem = document.createElement('div');
         stem.className = 'mtl__stem';
         stem.style.top = prevEndPx + 'px';
         stem.style.height = (topPx - prevEndPx) + 'px';
         mtlRail.appendChild(stem);
       }
-      prevEndPx = topPx + heightPx;
+      if (col === 0) prevEndPx = topPx + heightPx;
 
       var pill = document.createElement('div');
       pill.className = 'mtl__pill' + (ev.done ? ' mtl__pill--done' : '');
       pill.style.top = topPx + 'px';
+      pill.style.left = (col * 12) + 'px';
       pill.style.height = heightPx + 'px';
       pill.style.background = ev.done ? 'var(--c-accent)' : pillBackground(true, ev);
       pill.innerHTML = '<span class="material-symbols-outlined">' + (ICONS[ev.icon] || 'event') + '</span>';
@@ -293,6 +333,7 @@
       var entry = document.createElement('div');
       entry.className = 'mtl__entry' + (ev.done ? ' is-done' : '') + (isNow ? ' is-now' : '');
       entry.style.top = topPx + 'px';
+      if (col > 0) entry.style.marginLeft = (col * 12) + 'px';
       entry.innerHTML =
         '<p class="mtl__time">' + minutesLabel(ev.start) + ' – ' + minutesLabel(ev.start + ev.duration) + '</p>' +
         '<p class="mtl__title"><span class="t-en">' + escapeHtml(ev.title) + '</span></p>';
@@ -304,7 +345,7 @@
       tick.setAttribute('role', 'checkbox');
       tick.setAttribute('aria-checked', ev.done ? 'true' : 'false');
       tick.setAttribute('aria-label', 'Mark done');
-      tick.style.top = (topPx + heightPx / 2 - 14.5) + 'px';
+      tick.style.top = (topPx + heightPx / 2 - 14.5 + col * 6) + 'px';
       tick.innerHTML = '<span class="material-symbols-outlined">check</span>';
       tick.addEventListener('click', function () {
         ev.done = !ev.done;

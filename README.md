@@ -557,6 +557,25 @@ filling the whole lane column, in cream (`#edd8b4`) or teal
 the user picked on add-event.html) is this app's own feature, not
 Figma's fixed demo icon set.
 
+**Overlapping events used to render invisibly on top of each other** —
+two events with the same (or crossing) start/end times got the exact
+same `top`/`height`, so only whichever pill was drawn last actually
+showed; the other was still saved, just hidden underneath, which looked
+like events were silently disappearing rather than a rendering gap.
+`assignColumns()` (`js/calendar.js`) is the standard greedy
+interval-colouring layout every real calendar view uses for this: sort
+by start time, and each event claims the first column whose previous
+occupant has already ended by the time this one starts, opening a new
+column only if none is free. Column 0 renders exactly where it always
+did; column 1+ offsets right by 10px per column on the 3-day overview,
+12px on the more detailed today timeline (whose text label and tick
+checkbox shift the same amount, so an overlapping event's whole row
+moves together rather than just its pill) — a small stagger that
+doesn't fully separate them within a lane this narrow, but the "this is
+a second, distinct event" signal doesn't need full separation to read;
+Figma's own mock never showed this state at all, since nothing in a
+static design can overlap two things you'd both need to see.
+
 **The today panel turned out not to be a simple checklist.** Reading
 Figma's own "Slide up card" component (`56:546`/`56:729`) closely showed
 it's actually a *second*, more detailed timeline just for today — its
