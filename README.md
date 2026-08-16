@@ -470,16 +470,32 @@ guards against), so Save never silently does nothing.
 ## "My Calendar" — a 3-day timeline that starts empty
 
 `calendar.html` (node 56:218, "my calendar - both") is Other's *My
-Calendar* tile, and — like `todays-events.html`/`journal.html` — a real
-scrolling page: a 0:00–24:00 timeline across three day-columns plus a
-scrollable events list is genuine page-length content, not something a
-fixed 390×844 mock scaled as one unit can hold. Figma's own mockup ships
-the timeline pre-populated with sample events (a whole day planned out);
-this build deliberately does **not** seed any of that — a fresh visit
-shows only the hour axis and its guide line, three empty lanes underneath
-(`today`/`Tomorrow`/`2 Days`), and an empty today panel, since nothing has
-actually been scheduled yet. Events only appear once added through
-`add-event.html`, read back out of `localStorage`
+Calendar* tile, and — unlike most of this app's list-style pages — a
+fixed 390×844 stage, the same posture as `home.html`, not a scrolling
+page: the 3-day / 0:00–24:00 overview timeline lives in its own bounded,
+independently-scrollable region, and a real draggable slide-up card
+(Figma's "Slide up card" component, node `56:546`/`56:729`) sits on top
+of it holding "Today's events" — collapsed, only its nav row peeks up
+from the bottom edge; dragged open with the *exact* same pointer
+mechanic as `home.html`'s own `.sheet` (threshold-gated pointer capture,
+`--scale`-compensated deltas, a fractional-drag-distance decides which
+state it settles into on release — see `js/calendar.js`, ported from
+`js/app.js`), it reveals the day's schedule. An earlier pass at this
+page built the overview as one long scrolling page with the today panel
+as in-flow content at the bottom instead; that didn't match how Figma
+actually composes this screen (a genuinely fixed card floating over
+scrolling content, not everything scrolling together), so this rebuilds
+it as two independently-scrollable regions — the overview behind, the
+card's own body in front — under one non-scrolling stage, which is also
+what makes the card draggable at all: a sheet that's part of page flow
+has nothing to drag *relative to*.
+
+Figma's own mockup ships the timeline pre-populated with sample events
+(a whole day planned out); this build deliberately does **not** seed any
+of that — a fresh visit shows only the hour axis and its guide line,
+three empty lanes underneath (`today`/`Tomorrow`/`2 Days`), and an empty
+card, since nothing has actually been scheduled yet. Events only appear
+once added through `add-event.html`, read back out of `localStorage`
 (`guitu.calendarEvents`) by `js/calendar.js`.
 
 Header, return button, and the "Add" pill's icon are all reused
@@ -505,13 +521,20 @@ the small centre arrow (`icon-nav-arrow.svg`) are likewise the real
 exported vectors rather than a Material Symbols substitute. Calls still
 uses a Material "call" glyph, since Figma's own icon there is a Code
 Connect reference to a design-system "Phone" component with no
-exportable path behind it. This whole nav row reuses the same
-three-pill arrangement Figma's own "Slide up card" component ships
-elsewhere in this file (see `calling.html`'s notes on that component)
-but, unlike `home.html`'s version, isn't draggable here — on a page this
-tall, a fixed 844px sheet that slides over the timeline doesn't apply;
-it's simply the page's own in-flow navigation row, same posture as every
-other page's bottom bar.
+exportable path behind it. This whole nav row is the card's own header
+strip — it reuses the same three-pill arrangement Figma's own "Slide up
+card" component ships elsewhere in this file (see `calling.html`'s notes
+on that component), and *is* draggable here, same as `home.html`'s
+version: the card is 700px tall with the 128px nav fixed at its top via
+`flex: none` and the rest (`plan tomorrow` + today's detail timeline)
+filling the remainder as its own `overflow-y: auto` region
+(`.calsheet__body`) — "inside the slide-up card the timeline should also
+be scrollable," so a busy day scrolls within the card instead of forcing
+the card itself to grow. At rest the card sits at `top: 716px` (844 minus
+the nav's own 128px — matching Figma's own "715" rest position for this
+component almost exactly), and drags up by 556px to reveal the rest;
+dragging past a quarter of that distance and releasing snaps it the rest
+of the way, exactly like `home.html`'s own sheet.
 
 **Each pill's colour is a live progress indicator**, not a fixed
 category colour: for *today's* lane only, `js/calendar.js` compares the

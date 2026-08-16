@@ -1,37 +1,41 @@
 /* ============================================================================
    归途 GuiTu — "My Calendar" (Figma node 56:218, "my calendar - both")
    ----------------------------------------------------------------------------
-   A real (unbounded-height) scrolling page, same reasoning as
-   todays-events.css: a 3-day, 0:00-24:00 timeline plus a scrollable "today's
-   events" panel is genuine page-length content, not something a fixed
-   390×844 mock scaled as one unit can hold.
+   A fixed 390×844 stage, same posture as home.html — not a scrolling page.
+   The 3-day overview timeline lives in its own bounded, independently
+   scrollable region behind a real draggable slide-up card (Figma's "Slide
+   up card" component, 56:546/56:729): collapsed, only its nav row peeks
+   up from the bottom edge; dragged up (same pointer mechanic as
+   home.html's sheet, see js/calendar.js), it reveals "Today's events" —
+   a second, more detailed timeline just for today, scrollable in its own
+   right since the day's events can run longer than the card's own height.
 
    Default state ships empty — just the hour axis and its straight guide
-   line, no event pills — since nothing has been added yet. Events come from
-   add-event.html (localStorage `guitu.calendarEvents`) and are rendered by
-   js/calendar.js, which also owns the "colour = how much of the event has
-   already happened" logic: only today's lane compares against the live
-   clock, so tomorrow/2-days pills always render as plain unfilled track.
+   line, no event pills — since nothing has been added yet. Events come
+   from add-event.html (localStorage `guitu.calendarEvents`) and are
+   rendered by js/calendar.js, which also owns the "colour = how much of
+   the event has already happened" logic: only today's lane compares
+   against the live clock, so tomorrow/2-days pills always render as
+   plain unfilled track.
 
    Geometry below is lifted directly from Figma's own numbers (56:218 for
-   the 3-day overview, 56:546/56:729 "Slide up card" for the bottom panel):
-   an 83px axis column feeding three 50px lanes at x=83/194/298 (356px
-   total content width, 61px/54px gaps between lanes), and a 907px axis
-   span for 0:00-24:00 — used as a uniform px/hour scale here since Figma's
-   own hand-placed hour labels aren't quite evenly spaced and a real
-   implementation needs one that is. The bottom panel turned out to be a
-   *second*, more detailed vertical timeline for just today (its own axis,
-   coloured pills, connector stems) with each event's text and a tick box
-   beside it — not a plain list — so js/calendar.js renders it with the
-   same pill/axis logic as the 3-day overview, just at a taller px/hour
-   scale and with room for text.
+   the 3-day overview, 56:546/56:729 "Slide up card" for the card): an
+   83px axis column feeding three 50px lanes at x=83/194/298 (356px total
+   content width, 61px/54px gaps between lanes), a 907px axis span for
+   0:00-24:00 used as a uniform px/hour scale (Figma's own hand-placed
+   hour labels aren't quite evenly spaced, and a real implementation
+   needs one that is), and a 128px-tall nav row — 844-128=716, matching
+   Figma's own "715" rest position for the card almost exactly.
    ========================================================================== */
 
-.calendar-body {
-  display: block;
-  place-items: initial;
-  overflow: visible;
+.calscreen {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  overflow: hidden;
   background: var(--c-red);
+  color: var(--c-ink);
+  font-family: var(--font-en);
   --c-track: #edd8b4;
   --c-accent: #37848c;
   --c-badge: #56a8b0;
@@ -39,30 +43,15 @@
   --c-time-text: #cbf9fe;
 }
 
-.calpage {
-  position: relative;
-  width: 390px;
-  max-width: 100%;
-  margin: 0 auto;
-  min-height: 100vh;
-  overflow: hidden;
-  background: var(--c-red);
-  font-family: var(--font-en);
-}
-.calpage::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('../assets/bg-texture2.png') repeat;
-  opacity: .16;
-  pointer-events: none;
-}
-
-/* ------------------------------------------------------------------ header */
+/* ------------------------------------------------------------------ header
+   No z-index here or on .timeline-scroll/.calsheet below — plain DOM order
+   (header, then the scrolling timeline, then the card last) is what lets
+   the card paint over the header's bottom edge once dragged open, the
+   same way home.html's own .sheet does over its .header. */
 .calhead {
-  position: sticky;
+  position: absolute;
+  left: 0;
   top: 0;
-  z-index: 5;
   width: 390px;
   height: 209.144px;
 }
@@ -100,14 +89,25 @@
 .addpill__label .t-en { font-family: var(--font-en); font-size: 16px; }
 .addpill__label .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
 
-/* ---------------------------------------------------------------- timeline
-   Grid columns: 83px axis, then lane/gap/lane/gap/lane (50/61/50/54/50),
-   totalling Figma's own 356px content width almost exactly. */
+/* ---------------------------------------------------------- 3-day overview
+   Its own bounded, independently-scrollable region behind the card — the
+   "other bottom display node" that stays scrollable regardless of the
+   card's own collapsed/expanded state. */
+.timeline-scroll {
+  position: absolute;
+  left: 0;
+  top: 209.144px;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .timeline {
   position: relative;
-  z-index: 1;
   width: 356px;
-  margin: 20px auto 0;
+  margin: 20px auto 40px;
 }
 
 .timeline__days {
@@ -224,19 +224,163 @@
 }
 .tlpill--done .material-symbols-outlined { color: #fff; }
 
-/* ------------------------------------------------------------- today panel
-   Figma's "Slide up card" component (56:546/56:729): a teal panel pinned
-   below the 3-day overview holding a second, more detailed timeline for
-   just today — same pill/axis language, taller px/hour scale, event text
-   and a tick box beside each pill instead of just an icon. */
-.today-panel {
+/* -------------------------------------------------------------- slide-up
+   card. Draggable exactly like home.html's .sheet (see js/calendar.js):
+   collapsed rest position leaves only the 128px nav row peeking above
+   the bottom edge; dragging up reveals "Today's events" underneath. */
+.calsheet {
+  position: absolute;
+  left: 0;
+  top: 716px;
+  width: 390px;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  transition: transform .38s cubic-bezier(.22, .61, .36, 1);
+  cursor: grab;
+  touch-action: none;
+}
+.calsheet[data-state="expanded"] { transform: translateY(-556px); }
+.calsheet.is-dragging { transition: none; cursor: grabbing; }
+
+/* ------------------------------------------------------------------- nav
+   Figma's own scalloped nav background (a real exported asset, notched at
+   top-centre for the medallion to nest into) rather than a plain CSS bar. */
+.calsheet__nav {
   position: relative;
+  flex: none;
+  width: 390px;
+  height: 128px;
+}
+.calsheet__navbg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 128px;
+}
+.navpill {
+  position: absolute;
+  top: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 119px;
+  height: 56px;
+  border-radius: 30px;
+  background: var(--c-badge);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.navpill:active { transform: scale(.96); }
+.navpill--calls { left: 22px; }
+.navpill--profile { left: 253px; }
+.navpill .material-symbols-outlined { font-size: 24px; color: #000; }
+.navpill__icon { width: 24px; height: 27.4px; }
+.navpill__label {
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.navpill__label > span { display: block; font-weight: 700; }
+.navpill__label .t-en { font-family: var(--font-en); font-size: 18px; }
+.navpill__label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+
+.calsheet__handle {
+  position: absolute;
+  left: 50%;
+  top: 71px;
+  width: 70px;
+  height: 49px;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translateX(-50%);
+  cursor: inherit;
+}
+.calsheet__handle > img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 19px;
+  height: 17.25px;
+  transform: translate(-50%, -50%);
+  transition: transform .38s cubic-bezier(.22, .61, .36, 1);
+}
+.calsheet[data-state="expanded"] .calsheet__handle > img { transform: translate(-50%, -50%) rotate(180deg); }
+@keyframes calhandle-bounce {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50%      { transform: translate(-50%, calc(-50% - 6px)); }
+}
+.calsheet[data-state="collapsed"] .calsheet__handle > img {
+  animation: calhandle-bounce 1.8s ease-in-out infinite;
+}
+.calsheet.is-dragging .calsheet__handle > img { animation: none; }
+
+.calsheet__logo {
+  position: absolute;
+  left: 50%;
+  top: 7px;
   z-index: 1;
-  margin-top: 28px;
-  padding: 20px 20px 0;
+  width: 78px;
+  height: 80px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+.calsheet__logo > img {
+  position: absolute;
+  width: 292.75px;
+  height: 203.45px;
+  left: -110.95px;
+  top: -107.65px;
+  max-width: none;
+}
+
+/* ----------------------------------------------------------------- body
+   The card's own scrollable content — "inside the slide up card the
+   timeline should also be scrollable" — a single overflow-y:auto region
+   holding the plan-tomorrow button and today's detail timeline together,
+   so the button scrolls with the list instead of eating fixed space. */
+.calsheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   background: var(--c-accent);
   border-radius: 30px 30px 0 0;
+  padding: 0 20px 24px;
 }
+
+.planbtn {
+  display: block;
+  margin: 20px auto 20px;
+  width: 350px;
+  max-width: 100%;
+  height: 71px;
+  border-radius: 20px;
+  background: #d97e4a;
+  box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.planbtn:active { transform: scale(.98); }
+.planbtn__label {
+  display: inline-block;
+  padding-top: 15px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+}
+.planbtn__label > span { display: block; font-weight: 700; }
+.planbtn__label .t-en { font-family: var(--font-en); font-size: 20px; }
+.planbtn__label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
+
 .today-panel__title {
   margin: 0 0 14px;
   font-size: 0;
@@ -246,15 +390,6 @@
 .today-panel__title > span { display: block; font-weight: 700; }
 .today-panel__title .t-en { font-family: var(--font-en); font-size: 20px; }
 .today-panel__title .t-cn { font-family: var(--font-cn); font-size: 18px; letter-spacing: .9px; }
-
-.today-panel__list {
-  position: relative;
-  max-height: 420px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 6px 0 24px;
-}
 
 .today-panel__empty {
   margin: 12px 4px 24px;
@@ -269,6 +404,7 @@
   display: grid;
   grid-template-columns: 55px 50px 1fr 34px;
   column-gap: 12px;
+  margin-bottom: 16px;
 }
 
 .mtl__axis { position: relative; grid-column: 1; }
@@ -307,7 +443,7 @@
   background: var(--c-track);
 }
 
-.mtl__body { grid-column: 3; }
+.mtl__body { position: relative; grid-column: 3; }
 .mtl__entry {
   position: absolute;
   left: 0;
@@ -354,102 +490,11 @@
 }
 .mtl__tick[aria-checked="true"] .material-symbols-outlined { visibility: visible; }
 
-.planbtn {
-  display: block;
-  margin: 20px auto 20px;
-  width: 350px;
-  max-width: 100%;
-  height: 71px;
-  border-radius: 20px;
-  background: #d97e4a;
-  box-shadow: inset 0 4px 4px 0 rgba(0, 0, 0, .25);
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .12s ease;
-}
-.planbtn:active { transform: scale(.98); }
-.planbtn__label {
-  display: inline-block;
-  padding-top: 15px;
-  font-size: 0;
-  line-height: normal;
-  color: #fff;
-}
-.planbtn__label > span { display: block; font-weight: 700; }
-.planbtn__label .t-en { font-family: var(--font-en); font-size: 20px; }
-.planbtn__label .t-cn { font-family: var(--font-cn); font-size: 20px; letter-spacing: 1px; }
-
-/* ------------------------------------------------------------------- nav
-   Figma's own scalloped nav background (a real exported asset, notched at
-   top-centre for the medallion to nest into) rather than a plain CSS bar. */
-.calnav {
-  position: relative;
-  z-index: 1;
-  width: 390px;
-  height: 128px;
-}
-.calnav__bg {
-  position: absolute;
-  inset: 0;
-  width: 390px;
-  height: 128px;
-}
-.navpill {
-  position: absolute;
-  top: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 119px;
-  height: 56px;
-  border-radius: 30px;
-  background: var(--c-badge);
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .12s ease;
-}
-.navpill:active { transform: scale(.96); }
-.navpill--calls { left: 22px; }
-.navpill--profile { left: 253px; }
-.navpill .material-symbols-outlined { font-size: 24px; color: #000; }
-.navpill__icon { width: 24px; height: 27.4px; }
-.navpill__label {
-  font-size: 0;
-  line-height: normal;
-  color: #000;
-}
-.navpill__label > span { display: block; font-weight: 700; }
-.navpill__label .t-en { font-family: var(--font-en); font-size: 18px; }
-.navpill__label .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
-
-.navarrow {
-  position: absolute;
-  left: 50%;
-  top: 81px;
-  width: 19px;
-  height: 17.25px;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.navlogo {
-  position: absolute;
-  left: 50%;
-  top: 7px;
-  width: 78px;
-  height: 80px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-}
-.navlogo > img {
-  position: absolute;
-  width: 292.75px;
-  height: 203.45px;
-  left: -110.95px;
-  top: -107.65px;
-  max-width: none;
+@media (prefers-reduced-motion: reduce) {
+  .addpill,
+  .navpill,
+  .planbtn,
+  .calsheet,
+  .calsheet__handle > img { transition: none; }
+  .calsheet__handle > img { animation: none; }
 }

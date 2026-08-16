@@ -1,19 +1,137 @@
 /* ============================================================================
    归途 GuiTu — My Calendar behaviour (Figma node 56:218)
+     · fits the fixed 390×844 design to whatever viewport it's opened in,
+       same as home.html — this is a stage, not a scrolling page
+     · the slide-up card (id="sheet") drags open/closed with the exact
+       same pointer mechanic as home.html's own sheet (js/app.js) — drag
+       threshold before capture engages, --scale-compensated deltas, a
+       fractional-drag-distance decides the resting state on release
      · renders the 3-day / 0:00-24:00 overview timeline from localStorage
        (`guitu.calendarEvents`, written by add-event.html), using Figma's
-       own 907px axis span as a uniform px/hour scale
-     · renders the today panel as a *second*, more detailed timeline for
+       own 907px axis span as a uniform px/hour scale — this lives in its
+       own independently-scrollable region behind the card, reachable
+       regardless of the card's own collapsed/expanded state
+     · renders the card's body as a *second*, more detailed timeline for
        just today (Figma's "Slide up card" component, 56:546/56:729) —
        same pill/axis language, a taller scale, event text and a tick box
-       beside each pill instead of just an icon
-     · both colour each pill by how much of it has already happened,
-       measured against the real clock; only today's events ever show a
-       partial/full fill, since "now" doesn't apply to tomorrow/2-days
+       beside each pill instead of just an icon — inside the card's own
+       scrollable region, so a busy day scrolls independently too
+     · both timelines colour each pill by how much of it has already
+       happened, measured against the real clock; only today's events
+       ever show a partial/full fill, since "now" doesn't apply to
+       tomorrow/2-days
    ========================================================================== */
 (function () {
   'use strict';
 
+  var DESIGN_W = 390;
+  var DESIGN_H = 844;
+
+  var stage  = document.querySelector('.stage');
+  var sheet  = document.getElementById('sheet');
+  var handle = document.getElementById('sheetHandle');
+
+  /* ---------------------------------------------------------------- scaling */
+  function fit() {
+    var pad = window.innerWidth < 480 ? 0 : 32;
+    var scale = Math.min(
+      (window.innerWidth  - pad) / DESIGN_W,
+      (window.innerHeight - pad) / DESIGN_H
+    );
+    stage.style.setProperty('--scale', Math.max(0.3, Math.min(scale, 1.6)));
+  }
+  fit();
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
+
+  /* ------------------------------------------------------------- slide-up
+     Drag anywhere on the card to open/close it; the handle stays the only
+     *tap*-to-toggle target. Pointer capture is deliberately deferred until
+     real movement crosses the threshold below — capturing eagerly breaks
+     every button/link inside the card (nav pills, tick boxes, plan
+     tomorrow): a plain tap's trailing click gets silently dropped once an
+     ancestor holds capture. See js/app.js for the fuller version of this
+     same comment — this is the same mechanic, just re-targeted at
+     .calsheet instead of .sheet. */
+  var sheetOffset = 556;
+  var DRAG_THRESHOLD = 4;
+  var drag = null;
+  var justDragged = false;
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  function currentTranslateY() { return sheet.dataset.state === 'expanded' ? -sheetOffset : 0; }
+
+  function setSheet(expanded) {
+    sheet.dataset.state = expanded ? 'expanded' : 'collapsed';
+    handle.setAttribute('aria-expanded', String(expanded));
+    handle.setAttribute('aria-label', expanded ? 'Collapse today’s events' : 'Expand today’s events');
+  }
+
+  sheet.addEventListener('pointerdown', function (e) {
+    if (e.button != null && e.button !== 0) return;
+    drag = {
+      pointerId: e.pointerId,
+      startClientY: e.clientY,
+      startY: currentTranslateY(),
+      scale: parseFloat(getComputedStyle(stage).getPropertyValue('--scale')) || 1,
+      moved: false,
+    };
+  });
+
+  sheet.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    var deltaScreen = e.clientY - drag.startClientY;
+    if (!drag.moved) {
+      if (Math.abs(deltaScreen) <= DRAG_THRESHOLD) return;
+      drag.moved = true;
+      sheet.classList.add('is-dragging');
+      try { sheet.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    }
+    var y = clamp(drag.startY + deltaScreen / drag.scale, -sheetOffset, 0);
+    sheet.style.transform = 'translateY(' + y + 'px)';
+  });
+
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    var deltaScreen = e.clientY - drag.startClientY;
+    var endY = clamp(drag.startY + deltaScreen / drag.scale, -sheetOffset, 0);
+    var moved = drag.moved;
+    var wasExpanded = drag.startY !== 0;
+    var draggedFraction = Math.abs(endY - drag.startY) / sheetOffset;
+
+    if (moved) {
+      sheet.classList.remove('is-dragging');
+      sheet.style.transform = '';
+      try { sheet.releasePointerCapture(drag.pointerId); } catch (err) { /* ignore */ }
+    }
+    drag = null;
+
+    if (moved) {
+      justDragged = true;
+      setTimeout(function () { justDragged = false; }, 0);
+      setSheet(draggedFraction > 0.25 ? !wasExpanded : wasExpanded);
+    }
+  }
+  sheet.addEventListener('pointerup', endDrag);
+  sheet.addEventListener('pointercancel', function (e) {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    if (drag.moved) {
+      sheet.classList.remove('is-dragging');
+      sheet.style.transform = '';
+    }
+    drag = null;
+  });
+
+  handle.addEventListener('click', function () {
+    if (justDragged) { justDragged = false; return; }
+    setSheet(sheet.dataset.state !== 'expanded');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.dataset.state === 'expanded') setSheet(false);
+  });
+
+  /* -------------------------------------------------------------- events */
   var STORAGE_KEY = 'guitu.calendarEvents';
   var HOUR_PX = 907 / 24;         // Figma's own 0:00-24:00 axis span
   var DAY_MIN = 24 * 60;

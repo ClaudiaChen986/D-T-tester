@@ -11,15 +11,22 @@
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/calendar.css">
 </head>
-<body class="calendar-body">
+<body>
 
+<div class="stage">
 <!-- ================================================================
      my calendar - both  ·  Figma node 56:218
-     A real (unbounded-height) scrolling page, like todays-events.html.
-     Ships empty (hour axis only) until events are added via add-event.html
-     — see js/calendar.js.
+     A fixed 390×844 stage like home.html, not a scrolling page: the
+     3-day overview timeline scrolls in its own bounded region, and a
+     real draggable slide-up card (node 56:546/56:729) sits on top,
+     collapsed to just its nav row until dragged open to reveal "Today's
+     events" — same pointer-drag mechanic as home.html's own sheet, see
+     js/calendar.js. Ships empty (hour axis only) until events are added
+     via add-event.html.
      ================================================================ -->
-<div class="calpage">
+<div class="calscreen" id="screen">
+
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
 
   <header class="calhead">
     <img class="header__bg" src="../assets/header.svg" alt="">
@@ -56,57 +63,70 @@
     </a>
   </header>
 
-  <div class="timeline">
-    <div class="timeline__days">
-      <span class="timeline__day"><span class="t-en">today</span><span class="t-cn">今天</span></span>
-      <span class="timeline__day"><span class="t-en">Tomorrow</span><span class="t-cn">明天</span></span>
-      <span class="timeline__day"><span class="t-en">2 Days</span><span class="t-cn">后天</span></span>
-    </div>
-    <div class="timeline__body" id="timelineBody">
-      <div class="timeline__axis" id="timelineAxis">
-        <div class="timeline__axis-line"></div>
+  <!-- 3-day overview — independently scrollable, stays reachable no
+       matter what state the slide-up card below is in. -->
+  <div class="timeline-scroll">
+    <div class="timeline">
+      <div class="timeline__days">
+        <span class="timeline__day"><span class="t-en">today</span><span class="t-cn">今天</span></span>
+        <span class="timeline__day"><span class="t-en">Tomorrow</span><span class="t-cn">明天</span></span>
+        <span class="timeline__day"><span class="t-en">2 Days</span><span class="t-cn">后天</span></span>
       </div>
-      <div class="timeline__lane" id="lane0" data-day="0"></div>
-      <div class="timeline__lane" id="lane1" data-day="1"></div>
-      <div class="timeline__lane" id="lane2" data-day="2"></div>
+      <div class="timeline__body" id="timelineBody">
+        <div class="timeline__axis" id="timelineAxis">
+          <div class="timeline__axis-line"></div>
+        </div>
+        <div class="timeline__lane" id="lane0" data-day="0"></div>
+        <div class="timeline__lane" id="lane1" data-day="1"></div>
+        <div class="timeline__lane" id="lane2" data-day="2"></div>
+      </div>
     </div>
   </div>
 
-  <section class="today-panel">
-    <h2 class="today-panel__title">
-      <span class="t-en">Today&#8217;s events</span>
-      <span class="t-cn">今天的日程</span>
-    </h2>
-    <div class="today-panel__list" id="todayList"></div>
+  <!-- slide-up card — draggable, same mechanic as home.html's .sheet -->
+  <div class="calsheet" id="sheet" data-state="collapsed">
 
-    <a class="planbtn" href="add-event.html?day=1">
-      <span class="planbtn__label">
-        <span class="t-en">plan tomorrow</span>
-        <span class="t-cn">规划明天</span>
-      </span>
-    </a>
-  </section>
+    <div class="calsheet__nav">
+      <img class="calsheet__navbg" src="../assets/calendar-nav-bg.svg" alt="">
 
-  <nav class="calnav">
-    <img class="calnav__bg" src="../assets/calendar-nav-bg.svg" alt="">
+      <a class="navpill navpill--calls" href="contacts.html">
+        <span class="material-symbols-outlined">call</span>
+        <span class="navpill__label"><span class="t-en">Calls</span><span class="t-cn">电话</span></span>
+      </a>
 
-    <a class="navpill navpill--calls" href="contacts.html">
-      <span class="material-symbols-outlined">call</span>
-      <span class="navpill__label"><span class="t-en">Calls</span><span class="t-cn">电话</span></span>
-    </a>
+      <button class="calsheet__handle" id="sheetHandle" type="button"
+              aria-controls="sheet" aria-expanded="false" aria-label="Expand today's events">
+        <img src="../assets/icon-nav-arrow.svg" alt="">
+      </button>
 
-    <img class="navarrow" src="../assets/icon-nav-arrow.svg" alt="">
+      <a class="navpill navpill--profile" href="profile.html">
+        <img class="navpill__icon" src="../assets/icon-profile-outline.svg" alt="">
+        <span class="navpill__label"><span class="t-en">Profile</span><span class="t-cn">个人</span></span>
+      </a>
 
-    <a class="navpill navpill--profile" href="profile.html">
-      <img class="navpill__icon" src="../assets/icon-profile-outline.svg" alt="">
-      <span class="navpill__label"><span class="t-en">Profile</span><span class="t-cn">个人</span></span>
-    </a>
+      <a class="calsheet__logo" href="home.html" aria-label="Back to homepage 返回首页">
+        <img src="../assets/logo-sprite.png" alt="">
+      </a>
+    </div>
 
-    <a class="navlogo" href="home.html" aria-label="Back to homepage 返回首页">
-      <img src="../assets/logo-sprite.png" alt="">
-    </a>
-  </nav>
+    <div class="calsheet__body">
+      <a class="planbtn" href="add-event.html?day=1">
+        <span class="planbtn__label">
+          <span class="t-en">plan tomorrow</span>
+          <span class="t-cn">规划明天</span>
+        </span>
+      </a>
 
+      <h2 class="today-panel__title">
+        <span class="t-en">Today&#8217;s events</span>
+        <span class="t-cn">今天的日程</span>
+      </h2>
+      <div id="todayList"></div>
+    </div>
+
+  </div>
+
+</div>
 </div>
 
 <script src="../js/calendar.js"></script>
