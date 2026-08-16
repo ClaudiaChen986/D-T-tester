@@ -28,8 +28,14 @@ pages/
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
   translation.html         "Translation" menu (node 7:705) — Home's Translation
-                            tile leads here; Daily English/Voice translation/
-                            Phrase library have no destination screen yet
+                            tile leads here; Daily English/Voice translation
+                            have no destination screen yet
+  phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
+                            page, like contacts.html; sixteen seed phrases +
+                            anything saved from add-phrase.html
+  add-phrase.html          "Add phrase" — modeled on Figma's "Set destination"
+                            (node 120:387) with the map removed and its copy
+                            swapped for phrase entry
 
 css/
   styles.css               shared tokens/reset, .stage/.screen scaling,
@@ -43,6 +49,8 @@ css/
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
   translation.css           translation.html's own layout
+  phrase-library.css        phrase-library.html's own layout
+  add-phrase.css            add-phrase.html's own layout
 
 js/
   language.js               index.html: viewport fit, remembers the chosen
@@ -56,6 +64,8 @@ js/
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
   translation.js            translation.html: viewport fit only
+  phrase-library.js         phrase-library.html: renders seed + saved phrases
+  add-phrase.js             add-phrase.html: validation, save + handoff
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
 ```
@@ -93,11 +103,15 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
-- Home's *Translation* tile → `translation.html`. Its three menu cards
-  (Daily English, Voice translation, Phrase library) aren't designed yet, so
-  — same as Home's still-unbuilt Navigation/Other tiles — they're inert
-  `<button>`s rather than links to nowhere; its return arrow and "Back to
-  homepage" bar both go to `home.html`.
+- Home's *Translation* tile → `translation.html`. Daily English/Voice
+  translation aren't designed yet, so — same as Home's still-unbuilt
+  Navigation/Other tiles — they're inert `<button>`s rather than links to
+  nowhere; its return arrow and "Back to homepage" bar both go to `home.html`.
+- Translation's *Phrase library* card → `phrase-library.html`. Its **Add**
+  button (in the sticky header) → `add-phrase.html`, whose **Save** button
+  validates the English phrase, writes it to `localStorage`, and returns to
+  `phrase-library.html`, where it now appears after the sixteen seed
+  phrases. Its return arrow goes back to `translation.html`.
 
 ## "Choose your language" — the real entry point
 
@@ -239,3 +253,44 @@ changes), and one small glyph per row (`translation-icon-book.svg`,
 that badge — the only thing that actually differs between Daily English,
 Voice translation, and Phrase library. Each row's chevron reuses
 `icon-chevron.svg` via the same `.chevron` helper the Home tiles use.
+
+## "Phrase library" and "Add phrase" — the app's second real scrolling page
+
+`phrase-library.html` (node 136:1498) is a real scrolling page for the same
+reason `contacts.html` is one: sixteen phrases is genuine page-length
+content, not something a fixed 390×844 mock scaled as one unit can hold.
+Figma's own canvas for this node is 2827px tall and repeats the header and
+"bottom navigation" bar's coordinates from the fixed-page template partway
+down the design — an artifact of reusing that component, not meaningful
+position data for a page that actually scrolls — so, like `contacts.html`
+already does with its own raw coordinates, this page doesn't try to honor
+them literally: the header is sticky (`.phrasehead`, same treatment as
+`contacts.css`'s `.chheader`) and the "Back to homepage" bar sits at the
+true end of the list, after the sixteenth phrase, not stranded mid-scroll.
+The header also carries a persistent **Add** button (Figma's "Group 55")
+that stays visible while the list scrolls beneath it.
+
+Row backgrounds come in three heights (100/123/151px, one asset each —
+`phrase-row-bg-sm/md/lg.svg`) that Figma hand-picked per phrase to fit its
+wrapped line count; the seed phrases keep their designer-assigned height,
+and anything typed into `add-phrase.html` picks the closest tier from the
+English text's length (`js/phrase-library.js`'s `pickSize`) since a
+free-text phrase has no such assignment — close enough for a click-through
+prototype where exact pixel wrapping isn't load-bearing. One thing Figma
+does differently here than everywhere else in the app: the Chinese line is
+**bold** and the English line isn't (every other bilingual pair in the app
+is the reverse or matched) — kept as designed rather than normalized.
+
+`add-phrase.html` reuses Figma's "Set destination" node (120:387) — a
+teal-label-band-over-grey-fill template `add-contact.html`'s own field
+styles don't share — as asked, with two changes: the map image (node
+120:403) is gone, since this form has nothing to put on a map, and its
+copy is swapped for phrase entry (English phrase / Chinese translation
+instead of Place name / Address). Deleting the map leaves the grey panel
+with far less content than Figma's own version, so **Save** moves up to
+sit right under the second field instead of staying pinned at Figma's
+y763 — anchoring it there would just strand it under several hundred
+pixels of empty grey space where the map used to be. Its own save flow
+mirrors `add-contact.js` exactly, down to the same `?new=` URL-parameter
+fallback for browsers (Firefox, for `file://` pages) that disable
+`localStorage` outright.
