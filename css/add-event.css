@@ -309,20 +309,26 @@
 .wheelcol__item.is-selected { font-weight: 700; }
 
 /* ----------------------------------------------------------------- duration
-   Real drag-left-right control now. The lighter-teal capsule
-   (.durationpill__highlight, Figma's own #56A8B0 shape marking the
-   "common" values 5/10/15/30/1h) stays put, static and decorative,
-   exactly where Figma has it. The darker-teal capsule
-   (Figma's #37848C "1h" highlight) is no longer a fixed shape — it's
-   now the actual draggable thumb of a native <input type="range">
-   (min 0-6, one stop per value), sized/shaped to match that same
-   capsule (49×42, radius 21) via ::-webkit-slider-thumb/::-moz-range-thumb,
-   so dragging it *is* dragging that shape. The seven value labels sit
-   visually on top (`z-index`, `pointer-events: none` so drags/clicks
-   pass straight through to the range input beneath — including clicking
-   a number directly, which native <input type="range"> already treats
-   as "jump the thumb here"), and js/add-event.js toggles which one is
-   white/bold vs. black on every `input` event, live while dragging. */
+   Real drag-left-right control. The darker-teal capsule (Figma's
+   #37848C "1h" highlight) is the actual draggable thumb of a native
+   <input type="range"> (min 0-6, one stop per value), sized/shaped to
+   match that capsule (49×42, radius 21) via
+   ::-webkit-slider-thumb/::-moz-range-thumb, so dragging it *is*
+   dragging that shape. The lighter-teal capsule (#56A8B0,
+   .durationpill__highlight) is no longer a fixed shape either — it's a
+   fill that always runs from the pill's left edge to wherever the
+   thumb currently is (js/add-event.js resizes its `width` on every
+   `input` event from the thumb's own computed track position), the
+   same relationship Figma's own static mock shows at "1h" (the two
+   capsules' right edges align) but now true at every stop, not just
+   that one.
+
+   The seven value labels sit visually on top (`z-index`,
+   `pointer-events: none` so drags/clicks pass straight through to the
+   range input beneath — including clicking a number directly, which
+   native <input type="range"> already treats as "jump the thumb
+   here"), and js/add-event.js toggles which one is white/bold vs.
+   black on every `input` event, live while dragging. */
 .durationpill {
   position: relative;
   display: flex;
@@ -339,11 +345,12 @@
   position: absolute;
   left: 6px;
   top: 4px;
-  width: 215px;
+  width: 43px;
   height: 42px;
   border-radius: 21px;
   background: #56a8b0;
   pointer-events: none;
+  transition: width .05s linear;
 }
 .durationpill__input {
   -webkit-appearance: none;
@@ -364,6 +371,10 @@
   -webkit-appearance: none;
   width: 49px;
   height: 42px;
+  /* WebKit doesn't auto-centre a custom-height thumb on a custom-height
+     track the way Firefox does — without this it renders too high,
+     anchored near the track's top instead of vertically centred on it. */
+  margin-top: 4px;
   border-radius: 21px;
   background: #37848c;
   box-shadow: 0 2px 5px rgba(0, 0, 0, .25);

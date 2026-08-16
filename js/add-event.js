@@ -250,9 +250,19 @@
     return hour24 * 60 + minute;
   }
 
-  /* -------------------------------------------------------------- duration */
+  /* -------------------------------------------------------------- duration
+     The lighter capsule is a fill: its width is recomputed from the
+     thumb's own track math (the same formula the browser itself uses to
+     place the thumb — track width minus thumb width, times how far
+     along the 7 stops the current value is) so its right edge always
+     lands exactly on the thumb's right edge, whichever stop that is —
+     not just at "1h", which is the only place Figma's own static mock
+     shows that relationship holding. */
   var DURATIONS = [5, 10, 15, 30, 60, 120, 180];
+  var THUMB_W = 49;
+  var HIGHLIGHT_LEFT = 6;
   var durationInput = document.getElementById('durationInput');
+  var durationHighlight = document.querySelector('.durationpill__highlight');
   var durationValues = document.querySelectorAll('.durationpill__value');
 
   function paintDuration() {
@@ -260,9 +270,15 @@
     durationValues.forEach(function (v) {
       v.classList.toggle('is-selected', parseInt(v.dataset.index, 10) === index);
     });
+
+    var frac = index / (DURATIONS.length - 1);
+    var trackW = durationInput.offsetWidth;
+    var thumbRight = frac * (trackW - THUMB_W) + THUMB_W;
+    durationHighlight.style.width = Math.max(THUMB_W - HIGHLIGHT_LEFT, thumbRight - HIGHLIGHT_LEFT) + 'px';
   }
   paintDuration();
   durationInput.addEventListener('input', paintDuration);
+  window.addEventListener('resize', paintDuration);
 
   function selectedDuration() {
     return DURATIONS[parseInt(durationInput.value, 10)];

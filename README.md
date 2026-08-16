@@ -648,21 +648,34 @@ Figma's own darker-teal capsule shape. Concretely, right now:
   selected, and Save now reads the real picked time instead of a fixed
   default.
 - **Duration** is real too, and drag-left-right rather than a discrete
-  chip row: a white pill keeps Figma's lighter-teal capsule (`#56A8B0`,
-  `19:1514`/`19:1515`) as a static, decorative backdrop under the
-  "common" values 5/10/15/30/1h, but the darker-teal capsule (`#37848C`,
-  `19:1516`) Figma uses to mark "1h" as selected is no longer a fixed
-  shape sitting there — it's now the actual thumb of a native
+  chip row. The darker-teal capsule (`#37848C`, `19:1516`) Figma uses to
+  mark "1h" as selected is the actual thumb of a native
   `<input type="range">` (`min=0 max=6`, one stop per value), styled via
   `::-webkit-slider-thumb`/`::-moz-range-thumb` to be that exact capsule
-  (49×42, radius 21), so dragging it *is* dragging that shape across all
-  seven stops, not just the 5-1h span the lighter capsule covers. The
-  seven value labels sit visually on top of the thumb/track
-  (`pointer-events: none`, so drags and clicks — including tapping a
-  number directly, which `<input type="range">` already treats as "jump
-  here" — pass straight through to the input underneath) and
-  `js/add-event.js` repaints which one is white/bold on every `input`
-  event, live while dragging rather than only once you let go.
+  (49×42, radius 21), so dragging it *is* dragging that shape. The
+  lighter-teal capsule (`#56A8B0`, `19:1514`/`19:1515`) isn't a fixed
+  backdrop either anymore — it's a **fill that follows the thumb**,
+  recomputed on every `input` event from the same track-width-minus-
+  thumb-width math the browser itself uses to place the thumb, so its
+  right edge always lands exactly on the thumb's right edge at whichever
+  of the seven stops it's on. Figma's own static mock only shows that
+  relationship holding at "1h" (where the two capsules' right edges
+  happen to align); now it holds everywhere. The seven value labels sit
+  visually on top of the thumb/track (`pointer-events: none`, so drags
+  and clicks — including tapping a number directly, which
+  `<input type="range">` already treats as "jump here" — pass straight
+  through to the input underneath) and `js/add-event.js` repaints which
+  one is white/bold on every `input` event, live while dragging rather
+  than only once you let go.
+
+  Getting the thumb to actually sit vertically centred on the pill (and
+  therefore on the text) took an explicit `margin-top` on
+  `::-webkit-slider-thumb` — WebKit doesn't auto-centre a custom-height
+  thumb against a custom-height `::-webkit-slider-runnable-track` the
+  way Firefox's `::-moz-range-thumb` does; left alone, it renders
+  anchored near the track's top edge instead, which is what "the darker
+  blue button is a bit off, a little bit higher" during this pass turned
+  out to be.
 
 The title field's **placeholder is a custom two-line overlay**
 (`.titleinput__placeholder`), not the input's native `placeholder`
