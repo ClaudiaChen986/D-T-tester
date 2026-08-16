@@ -28,8 +28,10 @@ pages/
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
   translation.html         "Translation" menu (node 7:705) — Home's Translation
-                            tile leads here; Daily English/Voice translation
-                            have no destination screen yet
+                            tile leads here; Voice translation has no
+                            destination screen yet
+  daily-english.html       "Daily English" (node 7:812) — a word-of-the-day
+                            card with real, spoken pronunciation
   phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
                             page, like contacts.html; sixteen seed phrases +
                             anything saved from add-phrase.html
@@ -49,6 +51,7 @@ css/
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
   translation.css           translation.html's own layout
+  daily-english.css         daily-english.html's own layout
   phrase-library.css        phrase-library.html's own layout
   add-phrase.css            add-phrase.html's own layout
 
@@ -64,6 +67,8 @@ js/
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
   translation.js            translation.html: viewport fit only
+  daily-english.js          daily-english.html: viewport fit, speaks the word/
+                             sentence aloud via the Web Speech API
   phrase-library.js         phrase-library.html: renders seed + saved phrases
   add-phrase.js             add-phrase.html: validation, save + handoff
 
@@ -103,10 +108,14 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
-- Home's *Translation* tile → `translation.html`. Daily English/Voice
-  translation aren't designed yet, so — same as Home's still-unbuilt
-  Navigation/Other tiles — they're inert `<button>`s rather than links to
-  nowhere; its return arrow and "Back to homepage" bar both go to `home.html`.
+- Home's *Translation* tile → `translation.html`. Voice translation isn't
+  designed yet, so — same as Home's still-unbuilt Navigation/Other tiles —
+  it's an inert `<button>` rather than a link to nowhere; its return arrow
+  and "Back to homepage" bar both go to `home.html`.
+- Translation's *Daily English* card → `daily-english.html`; its two
+  speaker buttons actually speak (Web Speech API), no destination screen
+  needed for that. Its return arrow and "Back to homepage" bar both go to
+  `translation.html`.
 - Translation's *Phrase library* card → `phrase-library.html`. Its **Add**
   button (in the sticky header) → `add-phrase.html`, whose **Save** button
   validates the English phrase, writes it to `localStorage`, and returns to
@@ -253,6 +262,33 @@ changes), and one small glyph per row (`translation-icon-book.svg`,
 that badge — the only thing that actually differs between Daily English,
 Voice translation, and Phrase library. Each row's chevron reuses
 `icon-chevron.svg` via the same `.chevron` helper the Home tiles use.
+
+## "Daily English" — the one screen with a real, working sound button
+
+`daily-english.html` (node 7:812) is a word-of-the-day card: a translucent
+word panel (headword, phonetic spelling, part of speech, definition, a
+photo) over a solid sentence panel (one example sentence), each with its
+own "play pronunciation" speaker button. Header, return button, background
+texture, and bottom bar are the same pixel-identical assets every other
+Translation sub-page uses; genuinely new here are the word's illustration
+photo, the round red speaker badge (a different hand-drawn artwork than
+Translation's teal menu badge — same idea, different color/shape, so kept
+as its own asset rather than recolored), and the white volume glyph.
+Figma's dashed divider under the headword (node 7:817) is a plain
+`border-top: 2px dashed`, cheaper as CSS than round-tripping an SVG for a
+single straight dashed line.
+
+The two speaker buttons are the one place in the whole app where a
+"the interaction is real, the backend isn't" affordance actually *is*
+real: they call the browser's built-in Web Speech API
+(`speechSynthesis`/`SpeechSynthesisUtterance` in `js/daily-english.js`) to
+read the word or sentence aloud, rather than sitting there decoratively
+the way, say, Speaker/Mute/Location do on the calling screen. No backend,
+API key, or audio asset needed — every evergreen browser ships this — so
+there was no reason to fake it. A brief pulse (`.is-speaking`, plain CSS
+`@keyframes`) plays on the badge while speech is in progress so the button
+gives feedback instead of looking inert once tapped; browsers without
+speech synthesis available just get a quiet no-op.
 
 ## "Phrase library" and "Add phrase" — the app's second real scrolling page
 

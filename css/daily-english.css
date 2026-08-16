@@ -1,0 +1,197 @@
+/* ============================================================================
+   归途 GuiTu — "Daily English" (Figma node 7:812)
+   ----------------------------------------------------------------------------
+   Header, return button, background texture, and bottom bar all reuse the
+   same pixel-identical assets/geometry every other Translation sub-page
+   uses. Two content cards — a translucent word card and a solid sentence
+   card, same #edd8b4 cream as every other card in the app, just one at
+   80% opacity — each with its own "play pronunciation" button. Figma's
+   dashed divider (node 7:817) is a plain 2px dashed line, cheaper as a CSS
+   border than an SVG round-trip. The speaker buttons are wired to the
+   Web Speech API (js/daily-english.js) rather than left decorative — a
+   real browser capability, not a fake backend, so unlike Speaker/Mute/
+   Location elsewhere in the app this one interaction doesn't need to
+   pretend.
+   ========================================================================== */
+
+/* "Daily English" is longer than .header__title's box was sized for (it
+   fit "Home"/"Translation") — without this the browser wraps *inside*
+   "Daily English" itself instead of between the English and Chinese
+   lines, same fix contacts.css/phrase-library.css apply to their own
+   longer titles. */
+.header__title {
+  left: 90px;
+  width: 276px;
+}
+.header__title .t-en,
+.header__title .t-cn { white-space: nowrap; }
+
+.dailycard {
+  position: absolute;
+  left: 37px;
+  top: var(--y);
+  width: 317px;
+  height: 307px;
+  border-radius: 20px;
+}
+.dailycard--word     { background: rgba(237, 216, 180, .8); }
+.dailycard--sentence  { background: #edd8b4; }
+
+.dailylabel {
+  position: absolute;
+  left: 19px;
+  top: var(--y);
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.dailylabel > span { display: block; font-weight: 400; }
+.dailylabel .t-en { font-size: 18px; }
+.dailylabel .t-cn { font-size: 16px; font-weight: 500; letter-spacing: .8px; }
+
+.dailyphoto {
+  position: absolute;
+  left: 148px;
+  top: 36px;
+  width: 159px;
+  height: 106px;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+.dailyword {
+  position: absolute;
+  left: 21px;
+  top: 77px;
+  margin: 0;
+  font-family: var(--font-en);
+  font-size: 32px;
+  font-weight: 700;
+  color: #832118;
+  white-space: nowrap;
+}
+
+.dailyphonetic {
+  position: absolute;
+  left: 21px;
+  top: 115px;
+  margin: 0;
+  font-family: var(--font-en);
+  font-size: 18px;
+  color: #bc5147;
+  white-space: nowrap;
+}
+
+.dailydivider {
+  position: absolute;
+  left: 10px;
+  top: 153px;
+  width: 303px;
+  border: 0;
+  border-top: 2px dashed #d7bb89;
+}
+
+.dailypos {
+  position: absolute;
+  left: 19px;
+  top: 164px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #832118;
+  white-space: nowrap;
+}
+.dailypos .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
+.dailypos .t-cn { font-family: var(--font-cn); font-size: 30px; font-weight: 700; letter-spacing: 1.5px; }
+
+.dailydef {
+  position: absolute;
+  left: 19px;
+  top: 211px;
+  width: 207px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.dailydef > span { display: block; font-weight: 400; }
+.dailydef .t-en { font-family: var(--font-en); font-size: 18px; }
+.dailydef .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
+
+.dailysentence {
+  position: absolute;
+  left: 19px;
+  top: 81px;
+  width: 284px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.dailysentence > span { display: block; font-weight: 400; }
+.dailysentence .t-en { font-family: var(--font-en); font-size: 18px; }
+.dailysentence .t-cn { font-family: var(--font-cn); font-size: 16px; letter-spacing: .8px; }
+
+/* ------------------------------------------------------------- speaker btn */
+.dailyspeaker {
+  position: absolute;
+  left: 214px;
+  top: var(--y);
+  width: 89px;
+  height: 89px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.dailyspeaker:active { transform: scale(.94); }
+.dailyspeaker__badge { pointer-events: none; }
+.dailyspeaker__icon {
+  position: absolute;
+  left: 20px;
+  top: 19px;
+  width: 50px;
+  height: 50px;
+  pointer-events: none;
+}
+.dailyspeaker__icon > img { width: 100%; height: 100%; object-fit: contain; }
+
+/* a brief pulse while speechSynthesis is actually talking, so the button
+   gives feedback instead of looking inert once tapped */
+.dailyspeaker.is-speaking .dailyspeaker__badge { animation: dailyspeaker-pulse .6s ease-in-out infinite; }
+@keyframes dailyspeaker-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .55; }
+}
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry family as translation.css's .transbar. */
+.dailybar {
+  position: absolute;
+  left: 0;
+  top: 712px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.dailybar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.dailybar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.dailybar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.dailybar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dailyspeaker { transition: none; }
+  .dailyspeaker.is-speaking .dailyspeaker__badge { animation: none; }
+}
