@@ -57,10 +57,11 @@ pages/
   add-event.html             "Adding event" (node 19:1501, "add task -
                               both") — calendar.html's Add button (or its
                               "plan tomorrow" button) leads here; icon
-                              picker + title are real, Date/Time/Duration
-                              are still a literal static mockup of
-                              Figma's design (non-interactive, matching
-                              the mock's own sample values). Step 1 of 2
+                              picker + title + Date are real, Time/
+                              Duration are still a literal static mockup
+                              of Figma's design (non-interactive,
+                              matching the mock's own sample values).
+                              Step 1 of 2
                               — Save hands off to
                               add-event-continue.html rather than writing
                               the event itself
@@ -113,10 +114,10 @@ js/
   calendar.js                  calendar.html: renders the 3-day overview
                                 timeline plus today's own detail timeline
                                 from localStorage, tick-box save
-  add-event.js                 add-event.html: icon picker, title
-                                validation (date/time/duration are still
-                                static); Save hands off a draft, doesn't
-                                write the event
+  add-event.js                 add-event.html: icon picker, title, real
+                                date picker + validation (time/duration
+                                are still static); Save hands off a
+                                draft, doesn't write the event
   add-event-continue.js        add-event-continue.html: fills the summary
                                 from the handed-off draft, Repeat chips,
                                 sub-task toggle, and the real save
@@ -583,19 +584,17 @@ and, like those other two pages, is a real scrolling page rather than a
 fixed stage: even in its current form there's more content here than one
 screen reliably holds.
 
-**Date, Time, and Duration are a literal static mockup of Figma's
+**Time and Duration are still a literal static mockup of Figma's
 design** — non-interactive markup reproducing the mock exactly, including
-its own literal sample values (Jun 5 2023, 8:00 pm, 1h) — while the
-**icon circle and title field are real again**. The full history: an
-earlier pass turned all four into live controls (a click-to-pick Material
-Symbols icon strip, a native date input, a drag-slider for Duration, no
-Time field at all); matching Figma's actual mock pixel-for-pixel meant
-reverting all four to what it literally shows; then the icon picker was
-asked back explicitly, with a visible "tap me" affordance this time
-(Figma's own mock just shows a blank circle with no indication it's
-interactive at all). Date/Time/Duration are still waiting on their own
-"later pass" once their intended behaviour is specified. Concretely,
-right now:
+its own literal sample values (8:00 pm, 1h) — while the **icon circle,
+title, and Date are all real again**. The full history: an earlier pass
+turned all four (plus the icon picker) into live controls (a
+click-to-pick Material Symbols icon strip, a native date input, a
+drag-slider for Duration, no Time field at all); matching Figma's actual
+mock pixel-for-pixel meant reverting all four to what it literally shows;
+then the icon picker and Date were both asked back explicitly, one after
+the other. Time/Duration are still waiting on their own "later pass" once
+their intended behaviour is specified. Concretely, right now:
 
 - The **icon circle** (`19:1506`) is a real button again: tapping it
   reveals a horizontal, scrollable strip of common Material Symbols (the
@@ -614,9 +613,19 @@ right now:
   follows). Its placeholder is a custom two-line overlay rather than the
   native `placeholder` attribute — see the "two-line, two-font
   placeholder" note further down.
-- **Date** (`19:1531`) is a teal pill with a calendar-badge icon and the
-  literal text "Jun 5 （6月5日）, 2023" — Figma's own "Date Picker -
-  Collapsed" component's sample value, not a real date field.
+- **Date** is real again too, restyled to a black calendar-badge icon
+  plus a nested lighter pill of white bold text (`rgba(255,255,255,.16)`
+  on the outer `#37848c` teal) — a rounder, more layered look than
+  Figma's own flatter "Date Picker - Collapsed" component, matched to a
+  reference screenshot given for this pass. It's a real
+  `<input type="date">` again, but positioned as a fully transparent
+  layer covering the *entire* styled pill (not shown as a native-styled
+  control itself) — so tapping anywhere on it, badge included, opens the
+  browser's own date-picker pop-up, and `change` re-renders the visible
+  text in the "Jun 5 （6月5日）, 2023" format rather than the input's own
+  locale-formatted display. Defaults to today (or the date `?day=`
+  implies), and picking a different one now genuinely changes which of
+  the 3-day lanes the saved event lands in.
 - **Time** (`19:1527`, "Date and Time - Wheels") is a frosted, blurred
   card with three static columns (hour/minute/AM-PM) and a pill-shaped
   selection band behind the middle row, reading "8:00 pm" — the

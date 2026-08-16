@@ -176,29 +176,61 @@
    bilingual text ("Jun 5 （6月5日）, 2023") plus a calendar-icon component —
    neither is something a native <input type="date"> can be styled to
    show, so this is a plain div with the literal sample text for now. */
+/* Now a real control: a transparent native <input type="date"> covers
+   the whole pill (.datepill__input), so tapping anywhere on it — the
+   badge or the text — opens the browser's own date-picker popup. Its
+   `change` updates .datepill__text (js/add-event.js), formatted in
+   Figma's own style ("Jun 5 （6月5日）, 2023") rather than showing the
+   native input's own locale format, which native styling can't reach
+   into a nested badge/text layout to override anyway. */
 .datepill {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   height: 50px;
   border-radius: 30px;
   background: var(--c-teal);
-  color: #fff;
-  padding: 0 16px;
+  padding: 4px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 .datepill__badge {
   flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #154c52;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #1a1a1a;
   display: grid;
   place-items: center;
 }
-.datepill__badge .material-symbols-outlined { font-size: 19px; color: #fff; }
-.datepill__text { font: 18px var(--font-en), var(--font-cn); }
+.datepill__badge .material-symbols-outlined { font-size: 22px; color: #fff; }
+.datepill__text {
+  flex: 1;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-radius: 21px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font: 18px var(--font-en), var(--font-cn);
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.datepill__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
 
 /* --------------------------------------------------- time (wheel picker)
    Static reproduction of Figma's "Date and Time - Wheels" component

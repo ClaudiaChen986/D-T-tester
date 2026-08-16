@@ -1,15 +1,20 @@
 /* ============================================================================
    归途 GuiTu — Adding event behaviour (Figma node 19:1501)
-     · the round icon-picker is a real button again: tapping it reveals a
+     · the round icon-picker is a real button: tapping it reveals a
        horizontal, scrollable strip of common Material Symbols
        (fonts.google.com/icons) — pick one, it lands in the circle
      · title stays real input, same as it's always been
-     · Date, "Date and Time - Wheels", and Duration are still plain,
+     · Date is real again too: a transparent native <input type="date">
+       covers the whole styled pill, so tapping it anywhere opens the
+       browser's own date-picker pop-up; its `change` re-renders the
+       visible text in Figma's own style ("Jun 5 （6月5日）, 2023")
+       instead of the input's native locale format
+     · "Date and Time - Wheels" and Duration are still plain,
        non-interactive markup matching Figma's mock exactly (its own
-       literal sample values — Jun 5 2023, 8:00 pm, 1h) — real
-       interactivity for those is a later pass, per instruction. Save
-       uses fixed values for them meanwhile (not read from the static
-       markup), so the flow keeps working while they wait.
+       literal sample values — 8:00 pm, 1h) — real interactivity for
+       those is a later pass, per instruction. Save uses fixed values
+       for them meanwhile (not read from the static markup), so the
+       flow keeps working while they wait.
      · Save doesn't write the event yet — it's only step 1 of the flow.
        It hands the title/icon/day/start/duration to
        add-event-continue.html (node 19:1547, Repeat + optional sub-task)
@@ -24,13 +29,15 @@
 
   var DRAFT_KEY = 'guitu.addEventDraft';
 
-  var form             = document.getElementById('eventForm');
-  var iconPicker        = document.getElementById('iconPicker');
-  var iconDisplay        = document.getElementById('iconDisplay');
-  var iconBar            = document.getElementById('iconBar');
-  var titleInput         = document.getElementById('titleInput');
-  var titlePlaceholder   = document.getElementById('titlePlaceholder');
-  var status             = document.getElementById('formStatus');
+  var form            = document.getElementById('eventForm');
+  var iconPicker       = document.getElementById('iconPicker');
+  var iconDisplay      = document.getElementById('iconDisplay');
+  var iconBar          = document.getElementById('iconBar');
+  var titleInput       = document.getElementById('titleInput');
+  var titlePlaceholder = document.getElementById('titlePlaceholder');
+  var dateInput        = document.getElementById('dateInput');
+  var dateText         = document.getElementById('dateText');
+  var status           = document.getElementById('formStatus');
 
   var ICONS = [
     'directions_walk', 'restaurant', 'groups', 'home', 'bedtime',
@@ -74,30 +81,50 @@
     titlePlaceholder.hidden = titleInput.value.length > 0;
   });
 
-  /* --------------------------------------------------------- day default
+  /* ------------------------------------------------------------------ date
      Plain query param, no persistence involved — "plan tomorrow" on
-     calendar.html links here with ?day=1; the plain Add button carries
-     nothing, which defaults to today. */
+     calendar.html links here with ?day=1 to default the date picker to
+     tomorrow; the plain Add button carries nothing, which defaults to
+     today. Picking a different date afterwards is real: the change
+     handler below reads whatever the user actually chose. */
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function toDateInputValue(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
   var params = new URLSearchParams(window.location.search);
   var dayParam = parseInt(params.get('day'), 10);
-  var day = (dayParam === 1 || dayParam === 2) ? dayParam : 0;
+  var defaultDate = new Date();
+  if (dayParam === 1 || dayParam === 2) defaultDate.setDate(defaultDate.getDate() + dayParam);
+  dateInput.value = toDateInputValue(defaultDate);
+
+  var MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function formatDate(dateValue) {
+    var d = new Date(dateValue + 'T00:00:00');
+    return MONTHS_EN[d.getMonth()] + ' ' + d.getDate() +
+      ' （' + (d.getMonth() + 1) + '月' + d.getDate() + '日）, ' + d.getFullYear();
+  }
+
+  function updateDateText() {
+    dateText.textContent = dateInput.value ? formatDate(dateInput.value) : '';
+  }
+  updateDateText();
+  dateInput.addEventListener('change', updateDateText);
+
+  function dayOffset(dateValue) {
+    var picked = new Date(dateValue + 'T00:00:00');
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var diffDays = Math.round((picked - today) / 86400000);
+    return Math.max(0, Math.min(2, diffDays));
+  }
 
   /* ------------------------------------------------------------------ save
-     Date/Time/Duration are still fixed values matching what the static
+     Time/Duration are still fixed values matching what the static
      mockup displays (8:00 pm, 1h) — not read from the page, since
-     they're not real controls yet. `date` still tracks the real `day`
-     offset (today, or +1/+2 from ?day=) rather than Figma's literal
-     "Jun 5, 2023" sample — add-event-continue.html's summary reads it to
-     show a real date, and the calendar needs a real ISO date to place
-     the event in the right lane regardless of what this page's own
-     static mock displays. */
+     they're not real controls yet. */
   var FIXED_START = 20 * 60;   // 8:00 pm
   var FIXED_DURATION = 60;     // 1h
-
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  var dateForDay = new Date();
-  dateForDay.setDate(dateForDay.getDate() + day);
-  var isoDate = dateForDay.getFullYear() + '-' + pad(dateForDay.getMonth() + 1) + '-' + pad(dateForDay.getDate());
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -109,12 +136,16 @@
       titleInput.focus();
       return;
     }
+    if (!dateInput.value) {
+      status.textContent = 'Please set a date 请设置日期';
+      return;
+    }
 
     var draft = {
       title: title,
       icon: selectedIcon || 'event',
-      day: day,
-      date: isoDate,
+      day: dayOffset(dateInput.value),
+      date: dateInput.value,
       start: FIXED_START,
       time: FIXED_START,
       duration: FIXED_DURATION,
