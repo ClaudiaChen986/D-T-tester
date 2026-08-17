@@ -48,8 +48,8 @@ pages/
                             row in phrase-library.html, seed or saved, opens
                             its own text here
   navigation.html          "Maps" — Navigation's home (node 7:1284) — Home's
-                            Navigation tile leads here; the third row still
-                            has no destination screen
+                            Navigation tile leads here; second and third
+                            rows both → add-destination.html
   go-home.html              "Go home" (node 120:317) — a live Google Maps
                              route to whatever address is saved on
                              profile.html
@@ -240,10 +240,13 @@ file under `css/`.
   the flash-card display of that one phrase. Its return arrow goes back to
   `phrase-library.html`; its "Back to homepage" bar goes to `home.html`.
 - Home's *Navigation* tile → `navigation.html`. Its "Go home" row →
-  `go-home.html`. Its second "Set destination" row → `add-destination.html`
-  until something's saved, then it shows that destination's name and
-  → `navigate-destination.html` instead; the third row is still a plain
-  "Set destination" placeholder with no destination screen of its own yet.
+  `go-home.html`. Its second row → `add-destination.html` until something's
+  saved, then it shows that destination's name (and the same "Go home"
+  chevron in place of the location icon) and → `navigate-destination.html`
+  instead. The third row always stays the plain "Set destination" trigger
+  → `add-destination.html` — saving from either the second or third row
+  writes to the same single `guitu.savedDestination` slot, so it's always
+  the second row that shows the current destination, never the third.
   Navigation's own return arrow goes to `home.html`.
 - `go-home.html`'s and `navigate-destination.html`'s return arrows both go
   back to `navigation.html`; their "Back to homepage" bars go to `home.html`.
@@ -590,9 +593,10 @@ bottom panels (confirmed via `get_metadata` — same handle, same base
 frame, same 390×685 geometry), so `js/navigation.js`'s drag logic is
 `js/app.js`'s sheet section carried over verbatim; only the dynamic
 contact-row rendering is gone, since this card's three rows ("Go home" →
-`go-home.html`; second "Set destination" row → `add-destination.html`,
-covered below; third row still inert) are static markup instead — only
-the second row's label/link get patched at runtime. Header,
+`go-home.html`; second and third rows both → `add-destination.html`,
+covered below) are static markup instead — only the second row's
+label/link/icon get patched at runtime, to reflect whichever destination
+was last saved from either row. Header,
 return button, background texture, and every piece of the card's own chrome
 (background, panel, handle, medallion, Calls/Profile pills, even the
 contact-row background shape the new rows sit on) are pixel-identical
@@ -671,23 +675,31 @@ Address (the field the map/route actually depends on — Place name is a
 friendly label only, and falls back to the address itself if left blank),
 writes `{ name, address }` to `localStorage` as a single
 `guitu.savedDestination` slot (not a list — only one row on
-`navigation.html`'s sheet is wired to show a saved destination right now),
-and returns to `navigation.html`.
+`navigation.html`'s sheet is wired to *show* a saved destination, even
+though both the second and third rows can trigger this page), and
+returns to `navigation.html`.
 
-That second sheet row is genuinely stateful, not just a link: unset, it
-reads "Set destination" (muted, matching the still-unbuilt third row) and
+The second sheet row is genuinely stateful, not just a link: unset, it
+reads "Set destination" (muted, matching the still-plain third row) and
 points at `add-destination.html`; once something's saved, `js/
 navigation.js` swaps its label to the saved name — in whichever font
 (`t-en`/`t-cn`) actually fits it, picked the same way `contacts.js`'s
 `nameFontClass` picks a saved contact's, since free-typed text isn't
 reliably one language or the other — turns the text from muted grey to
-black, and re-points the row at `navigate-destination.html` (node
+black, swaps its location icon for the same chevron the "Go home" row
+above it uses (both sit at the same x, so the two arrows line up on one
+column), and re-points the row at `navigate-destination.html` (node
 120:363) instead. That page is `go-home.html` again in every way but
 which address it routes to: same live, routed Google Maps embed, same
 destination-only-map-loads-first-then-upgrades-if-geolocation-succeeds
 posture, just reading `guitu.savedDestination` instead of
-`guitu.profile.address`. Verified end to end: saving "Bondi Beach" updates
-the row's label and link, and tapping it routes there.
+`guitu.profile.address`. The third row is always the plain, unchanging
+"Set destination" trigger — never the display — so saving from it
+replaces whatever the second row was showing rather than filling itself
+in too. Verified end to end: saving "Bondi Beach" from the second row
+updates its own label/link/icon; saving "Circular Quay" from the third
+row afterward replaces the second row's display with the new place while
+the third row stays exactly as it was.
 ## "Other" — a second three-card menu, one Figma layout reused
 
 `other.html` (node 142:824) is structurally the same menu Translation's

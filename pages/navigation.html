@@ -123,7 +123,12 @@
       </span>
     </a>
 
-    <button class="row" style="--y:492px" type="button">
+    <!-- Always a plain "Set destination" trigger → add-destination.html,
+         never the display itself: only one saved-destination slot exists
+         (guitu.savedDestination), and the row above is what shows it —
+         saving here replaces whatever's in that row rather than filling
+         this one in too. -->
+    <a class="row" style="--y:492px" href="add-destination.html">
       <img class="row__bg" src="../assets/contact-row.svg" alt="">
       <span class="navrow__label navrow__label--muted" style="--x:28px;--y:29px">
         <span class="t-en">Set destination</span>
@@ -133,7 +138,7 @@
         <img src="../assets/navigation-destination-icon.png" alt=""
              style="--iw:304.967px;--ih:211.926px;--ix:-121.986px;--iy:-22.354px">
       </span>
-    </button>
+    </a>
 
     <button class="sheet__handle" id="sheetHandle" type="button"
             aria-controls="sheet" aria-expanded="false" aria-label="Expand navigation">
