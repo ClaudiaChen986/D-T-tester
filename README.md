@@ -748,9 +748,13 @@ header pattern as `phrase-library.html`'s Add) is a real link to
 <https://www.krg.nsw.gov.au/Community/Seniors> (`target="_blank"
 rel="noopener noreferrer"`) — the Ku-ring-gai Council's actual seniors
 page, not a placeholder, since a link needs nothing this prototype can't
-already do. Only the **Seniors events** card has a destination screen yet
-(`senior-events.html`, below); the other five stay inert `<button>`s, same
-posture as every other not-yet-designed destination in the app.
+already do. The **Seniors events** card has a real destination screen
+(`senior-events.html`, below); the other five cards are real external
+links too, each to its own Ku-ring-gai Council page (Seniors exercise
+classes / Seniors services / Seniors community activities / Seniors
+event presentations and resources / Support at home and aged care),
+same `target="_blank" rel="noopener noreferrer"` treatment as the More
+button — nothing on this menu is a placeholder anymore.
 
 ## "Senior event" — real dates pulled from the council's own events page
 
