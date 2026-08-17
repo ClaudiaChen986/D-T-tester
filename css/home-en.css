@@ -65,6 +65,10 @@
 }
 
 .voicecard__bg { position: absolute; left: -4px; top: 0; width: 325px; height: 121px; }
+/* Solid red disc behind the mic glyph — same call-btn-plain.svg badge the
+   contact rows already use for their call buttons, just bigger, centred on
+   .voicecard__ring (--x:11 --y:5 --w/--h:98.449 → centre 60.2245,54.2245). */
+.voicecard__badge { position: absolute; left: 29.22px; top: 23.22px; width: 62px; height: 62px; }
 .voicecard__mic { position: absolute; left: 47.04px; top: 34.65px; width: 26.368px; height: 39.149px; }
 
 .voicecard__title {
