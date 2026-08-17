@@ -27,6 +27,18 @@ pages/
                             to profile.html
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
+  navigation.html          "Maps" — Navigation's home (node 7:1284) — Home's
+                            Navigation tile leads here; the third row still
+                            has no destination screen
+  go-home.html              "Go home" (node 120:317) — a live Google Maps
+                             route to whatever address is saved on
+                             profile.html
+  add-destination.html      "Set destination" (node 120:387) — same template
+                             add-phrase.html borrows on another branch, but
+                             keeps its map, now a live preview of the typed
+                             address
+  navigate-destination.html "Navigation" (node 120:363) — a live Google Maps
+                             route to whatever add-destination.html saved
   other.html               "Other" menu (node 142:824) — Home's Other tile
                             leads here
   todays-events.html       "What's on today?" (node 7:1322, "Suggestion -
@@ -82,6 +94,10 @@ css/
   edit.css                  edit-contacts.html's own layout
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
+  navigation.css             navigation.html's own layout
+  go-home.css                go-home.html's own layout
+  add-destination.css        add-destination.html's own layout
+  navigate-destination.css   navigate-destination.html's own layout
   other.css                 other.html's own layout
   todays-events.css          todays-events.html's own layout
   senior-events.css          senior-events.html's own layout
@@ -103,6 +119,16 @@ js/
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
+  navigation.js              navigation.html: viewport fit, share-location
+                              toggle, slide-up card drag (same as app.js's),
+                              renders the saved-destination row
+  go-home.js                 go-home.html: viewport fit, builds the maps
+                              embed URL from the saved profile address +
+                              (if granted) real geolocation
+  add-destination.js         add-destination.html: live address→map preview,
+                              validation, save + handoff
+  navigate-destination.js    navigate-destination.html: same as go-home.js,
+                              routed to the saved destination instead
   other.js                  other.html: viewport fit only
   event-location.js         event-location.html: viewport fit, reads
                              ?name=&address=, live routed Google Maps embed
@@ -157,9 +183,22 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
+- Home's *Navigation* tile → `navigation.html`. Its "Go home" row →
+  `go-home.html`. Its second "Set destination" row → `add-destination.html`
+  until something's saved, then it shows that destination's name and
+  → `navigate-destination.html` instead; the third row is still a plain
+  "Set destination" placeholder with no destination screen of its own —
+  same as Home's still-unbuilt Translation tile. Navigation's own
+  return arrow goes to `home.html`.
+- `go-home.html`'s and `navigate-destination.html`'s return arrows both go
+  back to `navigation.html`; their "Back to homepage" bars go to `home.html`.
+- `add-destination.html`'s **Save** button validates the address, writes
+  `{ name, address }` to `localStorage`, and returns to `navigation.html`,
+  where the second row now shows it. Its return arrow also goes back to
+  `navigation.html`.
 - Home's *Other* tile → `other.html`. Its *Today's new events* card →
-  `todays-events.html`; same as Home's still-unbuilt Translation/Navigation
-  tiles, nothing else on this menu is inert anymore. Other's own return
+  `todays-events.html`; same as Home's still-unbuilt Translation tile,
+  nothing else on this menu is inert anymore. Other's own return
   arrow and "Back to homepage" bar both go to `home.html`.
 - `todays-events.html`'s sticky **More** button opens
   <https://www.krg.nsw.gov.au/Community/Seniors> in a new tab — a real
@@ -323,6 +362,112 @@ recolored, so the other two buttons' "on" states were derived the same way
 (swap `#37848C` for `white`) instead of two more round-trips to fetch
 assets that would have come back identical anyway.
 
+## "Maps" — Navigation's home, and the first non-contacts slide-up card
+
+`navigation.html` (node 7:1284) reuses the exact same "Slide up card"
+component `home.html` and `calling.html` already reuse for their own
+bottom panels (confirmed via `get_metadata` — same handle, same base
+frame, same 390×685 geometry), so `js/navigation.js`'s drag logic is
+`js/app.js`'s sheet section carried over verbatim; only the dynamic
+contact-row rendering is gone, since this card's three rows ("Go home" →
+`go-home.html`; second "Set destination" row → `add-destination.html`,
+covered below; third row still inert) are static markup instead — only
+the second row's label/link get patched at runtime. Header,
+return button, background texture, and every piece of the card's own chrome
+(background, panel, handle, medallion, Calls/Profile pills, even the
+contact-row background shape the new rows sit on) are pixel-identical
+assets to what `home.html` already ships (confirmed by comparing exported
+bytes) — the only genuinely new asset is the small medallion icon on the
+two "Set destination" rows (`navigation-destination-icon.png`, a different
+art iteration of the same knot logo used elsewhere, not a crop of the
+existing sprite — confirmed those don't match byte-for-byte).
+
+The **map itself is a live, embedded Google Map** (`.navmap > iframe`),
+not the static screenshot Figma's own mock uses — draggable and
+pinch/scroll-zoomable the way any Google Maps view is, via Maps' keyless
+embed endpoint (`maps.google.com/maps?...&output=embed`), which needs
+neither an API key nor billing to render. The query centers it on the
+same Chatswood/Roseville corner of Sydney Figma's mock shows. This also
+means `navigation-map.png` is gone from `assets/` — nothing renders it
+anymore.
+
+The **share-location button** reuses Figma's two authored states (idle:
+cream circle, drop shadow; active: red circle, inset shadow) but not as
+images — that's the exact same visual convention `calling.css`'s
+Speaker/Mute/Location `.callbtn` toggle already uses, cream `#fbecd1` and
+red `#d42628` included, so it's built the same way (CSS background + box-
+shadow) instead of re-exporting Figma's two button variants as PNGs, and
+the pin glyph itself reuses `icon-call-location-off.svg`/`-on.svg` already
+in `assets/` for that same in-call Location toggle. Figma's component has
+no authored motion between the two states (`get_motion_context` came back
+empty), so the one piece of original motion design here is what happens
+*while* sharing is on: a ring pulses outward from the button and fades,
+signaling a live share the same way Home's listening soundwave signals a
+live mic — `js/navigation.js` just toggles one `.is-active` class; the
+animation itself is a plain CSS `@keyframes` loop, off by default and
+skipped under `prefers-reduced-motion`.
+
+## "Go home" — a routed map, to wherever you've actually said home is
+
+`go-home.html` (node 120:317) is the first page in the app with no
+`header.svg` at all — Figma's own node doesn't use the shared curved
+header shape here, just the plain `.screen` red background with the
+usual texture, a return button, and a centered title (`.header-title-
+centered` from styles.css already matches this page's 24px/22px styling
+exactly, so no new title CSS was needed). Return button, bottom bar, and
+logo are the same pixel-identical assets every other page ships.
+
+The map is real and *routed*, not just centered like Navigation's own
+map: same keyless Google Maps embed endpoint, but now with `saddr`/
+`daddr` so it draws an actual route. The destination is never hardcoded —
+`js/go-home.js` reads `guitu.profile.address` out of `localStorage`, the
+exact field `edit-profile.html` writes and `profile.html` displays, so
+changing your address on the profile screen changes where this page
+routes to (verified: saved a different address, reloaded, the map
+re-centered on it). The origin is the browser's *real* current position
+via `navigator.geolocation`, when the page has permission — a capability
+this prototype hadn't reached for yet, unlike speech recognition/
+synthesis and the Maps embeds already in place. A plain map centered on
+just the destination loads immediately either way, so the page never
+looks broken while geolocation is pending; if it succeeds, that map is
+swapped for the routed one. Denied, unsupported, or timed out (8s) all
+fall back to that same destination-only view — no address unlocks
+nothing here, same "real capability, quiet fallback" posture as every
+other browser-API feature in the app.
+
+## "Set destination" and "Navigation" — a second saved place, with its own route
+
+`add-destination.html` (node 120:387) is the same teal-band-over-grey-fill
+template `add-phrase.html` borrows on the `translation` branch — but here
+it keeps its original job, so the layout is untouched from Figma's own
+mock (Save stays at Figma's y763; nothing needed to move up the way it
+does on `add-phrase.html`, since the map is still there). The one real
+change: the map (node 120:403) is a **live preview** of whatever's typed
+into Address, not the static screenshot Figma's own mock shows — same
+keyless Google Maps embed as everywhere else, debounced 700ms so it
+doesn't re-request on every keystroke, held behind a plain placeholder
+until there's at least three characters worth geocoding. Save validates
+Address (the field the map/route actually depends on — Place name is a
+friendly label only, and falls back to the address itself if left blank),
+writes `{ name, address }` to `localStorage` as a single
+`guitu.savedDestination` slot (not a list — only one row on
+`navigation.html`'s sheet is wired to show a saved destination right now),
+and returns to `navigation.html`.
+
+That second sheet row is genuinely stateful, not just a link: unset, it
+reads "Set destination" (muted, matching the still-unbuilt third row) and
+points at `add-destination.html`; once something's saved, `js/
+navigation.js` swaps its label to the saved name — in whichever font
+(`t-en`/`t-cn`) actually fits it, picked the same way `contacts.js`'s
+`nameFontClass` picks a saved contact's, since free-typed text isn't
+reliably one language or the other — turns the text from muted grey to
+black, and re-points the row at `navigate-destination.html` (node
+120:363) instead. That page is `go-home.html` again in every way but
+which address it routes to: same live, routed Google Maps embed, same
+destination-only-map-loads-first-then-upgrades-if-geolocation-succeeds
+posture, just reading `guitu.savedDestination` instead of
+`guitu.profile.address`. Verified end to end: saving "Bondi Beach" updates
+the row's label and link, and tapping it routes there.
 ## "Other" — a second three-card menu, one Figma layout reused
 
 `other.html` (node 142:824) is structurally the same menu Translation's
