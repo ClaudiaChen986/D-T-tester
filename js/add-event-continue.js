@@ -14,6 +14,13 @@
   var DRAFT_KEY   = 'guitu.addEventDraft';
   var STORAGE_KEY = 'guitu.calendarEvents';
 
+  /* add-event-continue-en.html reuses this file verbatim (see lang-en.css)
+     — route both redirects through here so the English track stays on it
+     instead of dropping back into the bilingual pages. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var summaryIcon  = document.getElementById('summaryIcon');
   var summaryTitle = document.getElementById('summaryTitle');
   var summaryWhen  = document.getElementById('summaryWhen');
@@ -30,7 +37,7 @@
   if (!draft || !draft.title) {
     // Nothing to continue with (direct visit, refresh after the draft was
     // cleared, etc.) — back to step 1 rather than showing an empty summary.
-    window.location.href = 'add-event.html';
+    window.location.href = enPath('add-event.html');
     return;
   }
 
@@ -108,6 +115,6 @@
       sessionStorage.removeItem(DRAFT_KEY);
     } catch (err) { /* best effort only */ }
 
-    window.location.href = 'calendar.html';
+    window.location.href = enPath('calendar.html');
   });
 }());

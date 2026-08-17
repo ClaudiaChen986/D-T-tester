@@ -100,6 +100,16 @@
     }
   }
 
-  var entries = saved.concat(SEED);
+  /* journal-en.html reuses this file verbatim (see lang-en.css), which
+     hides every `.t-cn` run richTextHtml() produces — fine for a mixed-
+     language entry (the English runs still show), but the two wholly-
+     Chinese seed entries above would render as an empty card instead of
+     just untranslated text, so skip them rather than show that. */
+  var IS_EN = document.body.dataset.variant === 'en';
+  var seedEntries = IS_EN
+    ? SEED.filter(function (e) { return !CJK_RE.test(e.title) && !CJK_RE.test(e.body); })
+    : SEED;
+
+  var entries = saved.concat(seedEntries);
   document.getElementById('journalList').innerHTML = entries.map(entryHtml).join('');
 }());

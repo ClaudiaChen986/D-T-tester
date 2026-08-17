@@ -20,6 +20,15 @@
 
   var STORAGE_KEY = 'guitu.contacts';
 
+  /* contacts-en.html reuses this file verbatim (see lang-en.css) — route
+     every link this file builds through here so the English track's Call
+     and Add-contact cards stay on it instead of dropping back into the
+     bilingual pages. */
+  var IS_EN = document.body.dataset.variant === 'en';
+  function enPath(path) {
+    return IS_EN ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var SEED_FAMILY = [
     { name: 'Son (David)',      cn: '儿子（大卫）', phone: '0412345678' },
     { name: 'Daughter (Lily)',  cn: '女儿（莉莉）', phone: '0423456789' },
@@ -91,7 +100,7 @@
   function callButtonHtml(contact) {
     var icon = '<img src="../assets/icon-call-white.svg" alt="">';
     var index = CALL_TARGETS.push(contact) - 1;
-    return '<a class="card__call" href="calling.html" data-call-index="' + index + '" ' +
+    return '<a class="card__call" href="' + enPath('calling.html') + '" data-call-index="' + index + '" ' +
            'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
   }
 
@@ -117,8 +126,8 @@
 
   function addCardHtml(group) {
     return (
-      '<a class="card card--add" href="add-contact.html?group=' + group + '" ' +
-         'aria-label="Add contact 添加联系人">' +
+      '<a class="card card--add" href="' + enPath('add-contact.html') + '?group=' + group + '" ' +
+         'aria-label="Add contact' + (IS_EN ? '' : ' 添加联系人') + '">' +
         ADD_ICON_CROP +
         '<p class="card__name"><span class="t-en">Add</span><span class="t-cn">添加</span></p>' +
       '</a>'

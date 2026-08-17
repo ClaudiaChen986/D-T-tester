@@ -24,6 +24,13 @@
 
   var STORAGE_KEY = 'guitu.emergencyContactOrder';
 
+  /* edit-contacts-en.html reuses this file verbatim (see lang-en.css) —
+     route the post-Save redirect through here so the English track lands
+     back on profile-en.html instead of the bilingual profile.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var CONTACTS = {
     son:       { en: 'Son (David)',       cn: '儿子（大卫）',   icon: 'avatar' },
     daughter:  { en: 'Daughter (Lily)',   cn: '女儿（莉莉）',   icon: 'avatar' },
@@ -195,6 +202,6 @@
   saveBtn.addEventListener('click', function () {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
     announce('Contact order saved.');
-    window.location.href = 'profile.html';
+    window.location.href = enPath('profile.html');
   });
 }());

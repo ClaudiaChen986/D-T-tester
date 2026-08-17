@@ -23,6 +23,13 @@
   var STORAGE_KEY = 'guitu.profile';
   var FIELDS = ['email', 'address', 'phone', 'birthday'];
 
+  /* edit-profile-en.html reuses this file verbatim (see lang-en.css) —
+     route the step-2 handoff through here so the English track lands on
+     edit-contacts-en.html instead of the bilingual edit-contacts.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var stage           = document.querySelector('.stage');
   var form             = document.getElementById('editProfileForm');
   var choosePhotoBtn   = document.getElementById('choosePhotoBtn');
@@ -113,6 +120,6 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(profile)); } catch (err) { /* best effort only */ }
 
     // Step 2 of the same "edit profile" flow — reorder emergency contacts.
-    window.location.href = 'edit-contacts.html';
+    window.location.href = enPath('edit-contacts.html');
   });
 }());

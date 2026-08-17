@@ -10,6 +10,14 @@
   var DESIGN_W = 390;
   var DESIGN_H = 844;
 
+  /* home-en.html and the rest of the English-only track share this same
+     markup/JS (see lang-en.css) — route any link this file builds through
+     here so a call button on the English track stays on it instead of
+     dropping back into the bilingual calling.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var screen   = document.getElementById('screen');
   var stage    = document.querySelector('.stage');
   var voiceBtn = document.getElementById('voiceBtn');
@@ -38,7 +46,7 @@
     isListening = true;
     screen.classList.add('is-listening');
     voiceBtn.setAttribute('aria-pressed', 'true');
-    status.textContent = 'Listening… 正在聆听';
+    status.textContent = document.body.dataset.variant === 'en' ? 'Listening…' : 'Listening… 正在聆听';
   }
 
   function stopListening() {
@@ -135,7 +143,7 @@
     var c = CONTACTS[id];
     var numHtml = c.phone ? '<span class="t-num">' + formatAuPhone(c.phone) + '</span>' : '';
     var callHtml =
-      '<a class="row__call" href="calling.html" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
+      '<a class="row__call" href="' + enPath('calling.html') + '" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
         '<img src="../assets/call-btn.svg" alt="">' +
       '</a>';
     return (
@@ -165,7 +173,7 @@
           '<span class="t-cn">' + c.cn + '</span>' +
           '<span class="t-num">' + c.phone + '</span>' +
         '</span>' +
-        '<a class="row__call row__call--sos" href="calling.html" data-call-id="emergency" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
+        '<a class="row__call row__call--sos" href="' + enPath('calling.html') + '" data-call-id="emergency" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
           '<img src="../assets/call-btn-plain.svg" alt="">' +
           '<img class="row__call-glyph" src="../assets/icon-phone-white.svg" alt="">' +
         '</a>' +

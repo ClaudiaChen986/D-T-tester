@@ -1,0 +1,29 @@
+/* ============================================================================
+   归途 GuiTu — shared English-only override
+   ----------------------------------------------------------------------------
+   Every page's markup is bilingual by default (a `.t-en`/`.t-cn` pair for
+   each piece of text, plus a decorative "返回 return" wordmark behind the
+   header's back button). Pages reached from the "Only English" language
+   choice (home-en.html and its whole subgraph) load this file last so it
+   can switch that markup off without forking any shared component — see
+   home-en.css, which established the pattern for the homepage itself.
+   ========================================================================== */
+
+/* !important is load-bearing: shared components set `display: block` on
+   `.t-cn` through more specific selectors (`.row__text > span`,
+   `.navbtn__label > span`, etc.), and plain source-order cascading loses
+   to that higher specificity. */
+.t-cn { display: none !important; }
+
+/* The header-back-button wordmark spells "返回 return" as 8 individually
+   rotated glyphs, the first two of which are the Chinese characters —
+   hide just those two rather than the "return" lettering after them. */
+.wordmark--return span:nth-child(1),
+.wordmark--return span:nth-child(2) { display: none !important; }
+
+/* navigation.js classifies the saved-destination row's single name as
+   `.t-cn` purely to pick the CJK font if the user typed it in Chinese —
+   unlike every other `.t-cn` here, it's not paired with a `.t-en`
+   duplicate holding the same text, so the blanket rule above would blank
+   the row instead of just leaving it in whatever script was typed. */
+#destRowLabel .t-cn { display: block !important; }

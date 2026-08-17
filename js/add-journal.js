@@ -20,6 +20,13 @@
 
   var STORAGE_KEY = 'guitu.journal';
 
+  /* add-journal-en.html reuses this file verbatim (see lang-en.css) —
+     route the post-Save redirect through here so the English track lands
+     back on journal-en.html instead of the bilingual journal.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var stage      = document.querySelector('.stage');
   var form       = document.getElementById('journalForm');
   var titleInput = document.getElementById('titleInput');
@@ -78,7 +85,7 @@
       storedOk = false;
     }
 
-    var target = 'journal.html';
+    var target = enPath('journal.html');
     if (!storedOk) {
       target += '?new=' + encodeURIComponent(JSON.stringify(entry));
     }

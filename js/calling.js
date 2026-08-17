@@ -19,6 +19,13 @@
 
   var TARGET_KEY = 'guitu.callTarget';
 
+  /* calling-en.html reuses this file verbatim (see lang-en.css) — route
+     the hang-up redirect through here so the English track lands back on
+     home-en.html instead of the bilingual home.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var stage       = document.querySelector('.stage');
   var callName    = document.getElementById('callName');
   var callAvatar  = document.getElementById('callAvatar');
@@ -174,7 +181,7 @@
     if (window.history.length > 1) {
       window.history.back();
     } else {
-      window.location.href = 'home.html';
+      window.location.href = enPath('home.html');
     }
   });
 }());

@@ -24,6 +24,13 @@
 
   var STORAGE_KEY = 'guitu.contacts';
 
+  /* add-contact-en.html reuses this file verbatim (see lang-en.css) — route
+     the post-Save redirect through here so the English track lands back on
+     contacts-en.html instead of the bilingual contacts.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   function targetGroup() {
     var g = new URLSearchParams(window.location.search).get('group');
     return g === 'family' ? 'family' : 'friends';
@@ -150,7 +157,7 @@
       storedOk = false;
     }
 
-    var target = 'contacts.html';
+    var target = enPath('contacts.html');
     if (!storedOk) {
       var carry = {
         id: contact.id, name: contact.name, cn: contact.cn,

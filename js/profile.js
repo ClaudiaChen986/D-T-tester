@@ -11,6 +11,13 @@
 
   var STORAGE_KEY = 'guitu.profile';
 
+  /* profile-en.html reuses this file verbatim (see lang-en.css) — route
+     the Edit-button redirect through here so the English track lands on
+     edit-profile-en.html instead of the bilingual edit-profile.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var stage = document.querySelector('.stage');
   var editBtn = document.getElementById('editBtn');
 
@@ -48,6 +55,6 @@
   }
 
   editBtn.addEventListener('click', function () {
-    window.location.href = 'edit-profile.html';
+    window.location.href = enPath('edit-profile.html');
   });
 }());

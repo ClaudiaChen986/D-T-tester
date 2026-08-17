@@ -39,6 +39,14 @@
 
   var DRAFT_KEY = 'guitu.addEventDraft';
 
+  /* add-event-en.html reuses this file verbatim (see lang-en.css) — route
+     the step-2 handoff and every status message through here so the
+     English track stays on it and never shows the bilingual copy. */
+  var IS_EN = document.body.dataset.variant === 'en';
+  function enPath(path) {
+    return IS_EN ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var form            = document.getElementById('eventForm');
   var iconPicker       = document.getElementById('iconPicker');
   var iconDisplay      = document.getElementById('iconDisplay');
@@ -111,8 +119,9 @@
   var MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function formatDate(dateValue) {
     var d = new Date(dateValue + 'T00:00:00');
-    return MONTHS_EN[d.getMonth()] + ' ' + d.getDate() +
-      ' （' + (d.getMonth() + 1) + '月' + d.getDate() + '日）, ' + d.getFullYear();
+    var enPart = MONTHS_EN[d.getMonth()] + ' ' + d.getDate();
+    if (IS_EN) return enPart + ', ' + d.getFullYear();
+    return enPart + ' （' + (d.getMonth() + 1) + '月' + d.getDate() + '日）, ' + d.getFullYear();
   }
 
   function updateDateText() {
@@ -290,12 +299,12 @@
 
     var title = titleInput.value.trim();
     if (!title) {
-      status.textContent = 'Please enter a title 请输入标题';
+      status.textContent = IS_EN ? 'Please enter a title' : 'Please enter a title 请输入标题';
       titleInput.focus();
       return;
     }
     if (!dateInput.value) {
-      status.textContent = 'Please set a date 请设置日期';
+      status.textContent = IS_EN ? 'Please set a date' : 'Please set a date 请设置日期';
       return;
     }
 
@@ -312,9 +321,9 @@
 
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      window.location.href = 'add-event-continue.html';
+      window.location.href = enPath('add-event-continue.html');
     } catch (err) {
-      status.textContent = 'Could not continue — storage unavailable 无法继续';
+      status.textContent = IS_EN ? 'Could not continue — storage unavailable' : 'Could not continue — storage unavailable 无法继续';
     }
   });
 }());

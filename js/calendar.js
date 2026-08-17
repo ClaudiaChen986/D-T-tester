@@ -263,7 +263,9 @@
   if (!todays.length) {
     var empty = document.createElement('p');
     empty.className = 'today-panel__empty';
-    empty.innerHTML = 'Nothing planned yet — tap Add to plan today.<br>还没有日程，点击“添加”来安排今天吧。';
+    empty.innerHTML = document.body.dataset.variant === 'en'
+      ? 'Nothing planned yet — tap Add to plan today.'
+      : 'Nothing planned yet — tap Add to plan today.<br>还没有日程，点击“添加”来安排今天吧。';
     todayList.appendChild(empty);
   } else {
     var minStart = todays.reduce(function (m, ev) { return Math.min(m, ev.start); }, todays[0].start);

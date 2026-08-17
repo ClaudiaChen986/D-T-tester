@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GuiTu — Your profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/edit.css">
+<link rel="stylesheet" href="../css/lang-en.css">
+</head>
+<body data-variant="en">
+
+<div class="stage">
+<!-- ============================================================
+     profile（edit） - English-only  ·  390 × 844   (Figma node 2:688)
+     Same markup/JS as edit-contacts.html — see lang-en.css — with
+     its links and js/edit.js's Save redirect pointed at the -en
+     counterpart pages instead.
+     ============================================================ -->
+<div class="screen" id="screen">
+
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
+
+  <!-- ---------------------------------------------------------------- header -->
+  <header class="header">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="edit-profile-en.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="Back to editing your profile">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header-title-centered">
+      <span class="t-en">Your profile</span>
+      <span class="t-cn">您的个人资料</span>
+    </h1>
+  </header>
+
+  <!-- ------------------------------------------------------------- content -->
+  <div class="content-bg content-bg--band"></div>
+  <div class="content-bg content-bg--fill"></div>
+
+  <p class="instructions">
+    <span class="t-en">Drag to rearrange the order</span>
+    <span class="t-cn">拖动以调整顺序</span>
+  </p>
+
+  <p class="subtext">
+    <span class="t-en">Top 3 contacts will appear in the emergency slide up card in the homepage</span>
+    <span class="t-cn">首页的紧急联系人卡片中将显示前 3 位联系人</span>
+  </p>
+
+  <div class="top3frame" id="top3frame" aria-hidden="true"></div>
+
+  <!-- ------------------------------------------------------------ contact list -->
+  <ol class="crowlist" id="crowlist"></ol>
+
+  <p class="sr-only" role="status" aria-live="polite" id="reorderStatus"></p>
+
+  <!-- --------------------------------------------------------------- save -->
+  <button class="save" id="saveBtn" type="button">
+    <span class="t-en">Save</span><span class="sp"> </span><span class="t-cn">保存</span>
+  </button>
+
+</div>
+</div>
+
+<script src="../js/edit.js"></script>
+</body>
+</html>

@@ -22,6 +22,13 @@
   var PREVIEW_DEBOUNCE_MS = 700;
   var PREVIEW_MIN_LENGTH = 3;
 
+  /* add-destination-en.html reuses this file verbatim (see lang-en.css) —
+     route the post-Save redirect through here so the English track lands
+     back on navigation-en.html instead of the bilingual navigation.html. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   var stage         = document.querySelector('.stage');
   var form          = document.getElementById('addDestinationForm');
   var addressField  = document.getElementById('addressField');
@@ -85,7 +92,7 @@
       storedOk = false;
     }
 
-    var target = 'navigation.html';
+    var target = enPath('navigation.html');
     if (!storedOk) target += '?newDest=' + encodeURIComponent(JSON.stringify(destination));
 
     window.location.href = target;

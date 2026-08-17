@@ -14,6 +14,13 @@
   var sheet  = document.getElementById('sheet');
   var handle = document.getElementById('sheetHandle');
 
+  /* navigation-en.html reuses this file verbatim (see lang-en.css) — route
+     the saved-destination row's href through here so the English track
+     lands on navigate-destination-en.html instead of the bilingual page. */
+  function enPath(path) {
+    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  }
+
   /* ---------------------------------------------------------------- scaling */
   function fit() {
     var pad = window.innerWidth < 480 ? 0 : 32;
@@ -90,7 +97,7 @@
 
   var savedDestination = pendingDest || loadDestination();
   if (savedDestination) {
-    destRow.href = 'navigate-destination.html';
+    destRow.href = enPath('navigate-destination.html');
     destRowLabel.classList.remove('navrow__label--muted');
     destRowLabel.innerHTML =
       '<span class="' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +
