@@ -21,8 +21,12 @@
 }
 
 .phraseform-bg { position: absolute; left: 0; width: 390px; }
-.phraseform-bg--band { top: 128px; height: 112px; background: #37848c; border-radius: 30px 30px 0 0; }
-.phraseform-bg--fill { top: 240px; height: 604px; background: #efefef; }
+/* Band is tall enough to hold the Chinese field's two-line label plus its
+   input with room to spare — at the old 112px height the input's own
+   bottom border sat 13px below the band/fill seam, bleeding the typed
+   text (and its placeholder) into the grey fill below. */
+.phraseform-bg--band { top: 128px; height: 142px; background: #37848c; border-radius: 30px 30px 0 0; }
+.phraseform-bg--fill { top: 270px; height: 574px; background: #efefef; }
 
 .phrasefield {
   position: absolute;
