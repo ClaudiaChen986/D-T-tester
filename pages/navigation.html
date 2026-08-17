@@ -104,18 +104,22 @@
       </span>
     </a>
 
-    <!-- Unset: "Set destination" placeholder → add-destination.html.
-         Set (js/navigation.js, guitu.savedDestination): shows the saved
-         name and → navigate-destination.html instead. -->
+    <!-- Unset: "Set destination" placeholder → add-destination.html, marked
+         by the location icon. Set (js/navigation.js, guitu.savedDestination):
+         shows the saved name, → navigate-destination.html instead, and swaps
+         the icon for the same chevron the "Go home" row above uses. -->
     <a class="row" id="destRow" style="--y:343px" href="add-destination.html">
       <img class="row__bg" src="../assets/contact-row.svg" alt="">
       <span class="navrow__label navrow__label--muted" id="destRowLabel" style="--x:28px;--y:29px">
         <span class="t-en">Set destination</span>
         <span class="t-cn">设置目的地</span>
       </span>
-      <span class="crop navrow__icon" style="--x:228px;--y:28px;--w:65px;--h:65px">
+      <span class="crop navrow__icon" id="destRowIcon" style="--x:228px;--y:28px;--w:65px;--h:65px">
         <img src="../assets/navigation-destination-icon.png" alt=""
              style="--iw:304.967px;--ih:211.926px;--ix:-121.986px;--iy:-22.354px">
+      </span>
+      <span class="chevron" id="destRowChevron" style="--x:242px;--y:43px;--s:36px" hidden>
+        <img src="../assets/icon-chevron.svg" alt="">
       </span>
     </a>
 

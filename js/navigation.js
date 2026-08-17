@@ -54,6 +54,8 @@
   var DEST_KEY = 'guitu.savedDestination';
   var destRow = document.getElementById('destRow');
   var destRowLabel = document.getElementById('destRowLabel');
+  var destRowIcon = document.getElementById('destRowIcon');
+  var destRowChevron = document.getElementById('destRowChevron');
   var CJK_RE = /[㐀-䶿一-鿿豈-﫿]/;
 
   function escapeHtml(s) {
@@ -93,6 +95,11 @@
     destRowLabel.innerHTML =
       '<span class="' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +
       escapeHtml(savedDestination.name) + '</span>';
+    // Once there's somewhere real to go, this row reads exactly like "Go
+    // home" above it — the location icon (which only ever meant "nothing's
+    // set yet") gives way to the same chevron that row already uses.
+    destRowIcon.hidden = true;
+    destRowChevron.hidden = false;
   }
 
   /* ------------------------------------------------------- slide-up card */
