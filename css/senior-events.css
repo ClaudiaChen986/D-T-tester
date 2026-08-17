@@ -108,8 +108,8 @@
   border-radius: 30px;
   background: #edd8b4;
 }
-.eventpanel--nutrition { height: 789px; }
-.eventpanel--chairyoga { height: 731px; }
+.eventpanel--nutrition { height: 825px; }
+.eventpanel--chairyoga { height: 767px; }
 
 .eventpanel__title {
   position: absolute;
@@ -162,6 +162,13 @@
   border-radius: 30px;
   background: #b44439;
 }
+/* "When"'s body is four lines (two-line date + two-line time) instead of
+   Location's one or two — at the shared 144px height its content (starting
+   --y2:44px down) had nowhere to go but past the card's own bottom edge,
+   worst on Chair yoga's longer "(weekly)" date. Tall enough for both
+   current events with room to spare; Location keeps the shorter default
+   since its single address line was never the problem. */
+.eventdetail--when { height: 180px; }
 a.eventdetail {
   display: block;
   text-decoration: none;
