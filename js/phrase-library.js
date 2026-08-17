@@ -20,6 +20,14 @@
 
   var STORAGE_KEY = 'guitu.phrases';
 
+  /* phrase-library-cn.html reuses this file verbatim (see lang-cn.css) —
+     route each row's link through here so the Chinese track's Display
+     page stays on it instead of dropping back into the bilingual page. */
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
+  }
+
   var SEED_PHRASES = [
     { en: 'I‘m lost',                             cn: '我迷路了',           size: 'sm' },
     { en: 'I need help',                               cn: '我需要帮助',         size: 'sm' },
@@ -92,7 +100,7 @@
     var chevron = CHEVRON[size];
     var index = SHOW_TARGETS.push(phrase) - 1;
     return (
-      '<a class="phraserow phraserow--' + size + '" href="show-phrase.html" data-show-index="' + index + '">' +
+      '<a class="phraserow phraserow--' + size + '" href="' + langPath('show-phrase.html') + '" data-show-index="' + index + '">' +
         '<img class="phraserow__bg" src="' + BG_SRC[size] + '" alt="">' +
         '<span class="phraserow__label" style="--y:' + LABEL_Y[size] + 'px">' +
           '<span class="t-en">' + escapeHtml(phrase.en) + '</span>' +

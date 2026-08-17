@@ -39,12 +39,15 @@
 
   var DRAFT_KEY = 'guitu.addEventDraft';
 
-  /* add-event-en.html reuses this file verbatim (see lang-en.css) — route
-     the step-2 handoff and every status message through here so the
-     English track stays on it and never shows the bilingual copy. */
-  var IS_EN = document.body.dataset.variant === 'en';
-  function enPath(path) {
-    return IS_EN ? path.replace(/\.html$/, '-en.html') : path;
+  /* add-event-en.html/add-event-cn.html reuse this file verbatim (see
+     lang-en.css/lang-cn.css) — route the step-2 handoff and every status
+     message through here so a single-language track stays on it and
+     never shows the bilingual copy. */
+  var LANG = document.body.dataset.variant || '';
+  var IS_EN = LANG === 'en';
+  var IS_CN = LANG === 'cn';
+  function langPath(path) {
+    return LANG ? path.replace(/\.html$/, '-' + LANG + '.html') : path;
   }
 
   var form            = document.getElementById('eventForm');
@@ -121,6 +124,7 @@
     var d = new Date(dateValue + 'T00:00:00');
     var enPart = MONTHS_EN[d.getMonth()] + ' ' + d.getDate();
     if (IS_EN) return enPart + ', ' + d.getFullYear();
+    if (IS_CN) return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
     return enPart + ' （' + (d.getMonth() + 1) + '月' + d.getDate() + '日）, ' + d.getFullYear();
   }
 
@@ -299,12 +303,12 @@
 
     var title = titleInput.value.trim();
     if (!title) {
-      status.textContent = IS_EN ? 'Please enter a title' : 'Please enter a title 请输入标题';
+      status.textContent = IS_EN ? 'Please enter a title' : IS_CN ? '请输入标题' : 'Please enter a title 请输入标题';
       titleInput.focus();
       return;
     }
     if (!dateInput.value) {
-      status.textContent = IS_EN ? 'Please set a date' : 'Please set a date 请设置日期';
+      status.textContent = IS_EN ? 'Please set a date' : IS_CN ? '请设置日期' : 'Please set a date 请设置日期';
       return;
     }
 
@@ -321,9 +325,9 @@
 
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-      window.location.href = enPath('add-event-continue.html');
+      window.location.href = langPath('add-event-continue.html');
     } catch (err) {
-      status.textContent = IS_EN ? 'Could not continue — storage unavailable' : 'Could not continue — storage unavailable 无法继续';
+      status.textContent = IS_EN ? 'Could not continue — storage unavailable' : IS_CN ? '无法继续 — 存储不可用' : 'Could not continue — storage unavailable 无法继续';
     }
   });
 }());

@@ -14,8 +14,9 @@
   /* profile-en.html reuses this file verbatim (see lang-en.css) — route
      the Edit-button redirect through here so the English track lands on
      edit-profile-en.html instead of the bilingual edit-profile.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
 
   var stage = document.querySelector('.stage');
@@ -55,6 +56,6 @@
   }
 
   editBtn.addEventListener('click', function () {
-    window.location.href = enPath('edit-profile.html');
+    window.location.href = langPath('edit-profile.html');
   });
 }());

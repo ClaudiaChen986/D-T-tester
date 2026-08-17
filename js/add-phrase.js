@@ -28,6 +28,15 @@
 
   var STORAGE_KEY = 'guitu.phrases';
 
+  /* add-phrase-cn.html reuses this file verbatim (see lang-cn.css) —
+     route the post-Save redirect through here so the Chinese track lands
+     back on phrase-library-cn.html instead of the bilingual page. */
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
+  }
+  var IS_CN = document.body.dataset.variant === 'cn';
+
   var stage      = document.querySelector('.stage');
   var form       = document.getElementById('addPhraseForm');
   var cnField    = document.querySelector('.phrasefield--source');
@@ -121,7 +130,7 @@
       storedOk = false;
     }
 
-    var target = 'phrase-library.html';
+    var target = langPath('phrase-library.html');
     if (!storedOk) target += '?new=' + encodeURIComponent(JSON.stringify(phrase));
 
     // Always navigate — Save must never look like it did nothing, whether
@@ -137,7 +146,7 @@
       cnField.classList.add('is-invalid');
       cnInput.focus();
       status.classList.add('is-error');
-      status.textContent = 'Please enter a Chinese phrase before saving.';
+      status.textContent = IS_CN ? '保存前请输入中文短语。' : 'Please enter a Chinese phrase before saving.';
       return;
     }
     cnField.classList.remove('is-invalid');
@@ -153,7 +162,7 @@
     clearTimeout(translateTimer);
     saveBtn.disabled = true;
     status.classList.remove('is-error');
-    status.textContent = 'Translating…';
+    status.textContent = IS_CN ? '正在翻译…' : 'Translating…';
     translateText(cn, 'zh-CN', 'en')
       .catch(function () { return ''; })
       .then(function (translated) {

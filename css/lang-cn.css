@@ -1,0 +1,94 @@
+/* ============================================================================
+   归途 GuiTu — shared Chinese-only override
+   ----------------------------------------------------------------------------
+   Mirror image of css/lang-en.css — every page's markup is bilingual by
+   default (a `.t-en`/`.t-cn` pair for each piece of text), and pages
+   reached from the "Only Chinese" language choice load this file last so
+   it can hide the English half without forking any shared component.
+
+   Unlike the English track, the Chinese track covers every page the
+   bilingual site has, including the translation feature (translation.html
+   and its five sub-pages) — a Chinese-speaking user is exactly who wants
+   the CN↔EN phrase tool, so nothing is skipped here.
+
+   The "归途 GuiTu" header wordmark is intentionally NOT touched by this
+   file: it's the brand's logotype, not translated UI copy, so it renders
+   identically (all 7 glyphs) on every language track — see home-en.html,
+   which originally dropped its two Chinese glyphs and was corrected to
+   match this.
+   ========================================================================== */
+
+/* !important is load-bearing: shared components set `display: block` on
+   `.t-en` through more specific selectors, and plain source-order
+   cascading loses to that higher specificity. */
+.t-en { display: none !important; }
+
+/* The header-back-button wordmark spells "返回 return" as 8 individually
+   rotated glyphs — the first two (返回) are Chinese, the rest spell
+   "return" in English. Hide the English half, keep 返回. */
+.wordmark--return span:nth-child(n+3) { display: none !important; }
+
+/* `.destname` marks text that isn't a real translation pair even though
+   it carries a `.t-en`/`.t-cn` class for its font: navigation.js's saved-
+   destination name (picked by script-detecting whatever the user typed)
+   and event-location-cn.html's #destName (always a real AU street
+   address passed in from senior-events-cn.html, which isn't translated).
+   The blanket rule above would blank either one out instead of just
+   leaving it in whatever language it's actually in, so force it visible
+   regardless of which class it landed on — same carve-out as
+   `.card__name .savedname` below, just for elements that keep their
+   .t-en/.t-cn class instead of switching to a dedicated one. */
+.destname { display: block !important; }
+
+/* contacts.js picks a saved contact's own name a `.t-en`/`.t-cn` class
+   purely for its font, same non-translation-pair situation as
+   `.destname` above — force it visible whichever class it landed on. */
+.card__name .savedname { display: block !important; }
+
+/* Stacked bilingual labels (.t-en on its own line above .t-cn) were
+   positioned with `top` calibrated to vertically centre the *pair* inside
+   their card — hiding one line leaves the remaining line sitting off
+   from that centre, which also throws it out of line with independently-
+   centred elements like a card's chevron. Re-centre within the nearest
+   positioned ancestor (an explicit-height card/row) instead of trying to
+   patch each pixel offset by hand — same fix as lang-en.css's, just
+   mirrored to the other language. */
+.othercard__label { top: 50% !important; transform: translateY(-50%); }
+.eventcard--sm .eventcard__label { top: 50% !important; transform: translateY(-50%); }
+.eventcard--lg .eventcard__desc { top: 56px !important; }
+
+/* daily-english-cn.html is the one page where .t-en holds real content,
+   not translatable UI chrome: the English vocabulary word, its
+   definition, and its example sentence are literally what a Chinese-
+   speaking learner is there to read, alongside their Chinese meaning —
+   hiding them would defeat the page. `.keep-en` opts those three spans
+   out of the blanket `.t-en` hide above. */
+.keep-en.t-en { display: block !important; }
+
+/* calling.css hardcodes .callscreen__caption to the Latin font, since
+   the bilingual page's own copy ("Emergency contact") is English-only
+   already — calling-cn.html swaps that text for Chinese directly (not
+   worth a .t-en/.t-cn pair for one static caption), so give it the
+   Chinese font to match. */
+.callscreen__caption { font-family: var(--font-cn); }
+
+/* Every "Back to homepage" bottom bar lays its .t-en/.t-cn out on one
+   line inside a fixed-width box that's left-anchored, not centred — the
+   full bilingual string filled that width, so it read as centred by
+   coincidence. With only one language's text left, recentre it. Includes
+   the translation-section bars (phrasebar, dailybar, showbar, transbar)
+   since the Chinese track keeps that whole feature. */
+.backbar__text,
+.otherbar__text,
+.journalbar__text,
+.eventsbar__text,
+.gohomebar__text,
+.navdestbar__text,
+.eventlocbar__text,
+.profilebar__text,
+.phrasebar__text,
+.dailybar__text,
+.showbar__text,
+.transbar__text {
+  text-align: center;
+}

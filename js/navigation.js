@@ -17,8 +17,9 @@
   /* navigation-en.html reuses this file verbatim (see lang-en.css) — route
      the saved-destination row's href through here so the English track
      lands on navigate-destination-en.html instead of the bilingual page. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
 
   /* ---------------------------------------------------------------- scaling */
@@ -97,7 +98,7 @@
 
   var savedDestination = pendingDest || loadDestination();
   if (savedDestination) {
-    destRow.href = enPath('navigate-destination.html');
+    destRow.href = langPath('navigate-destination.html');
     destRowLabel.classList.remove('navrow__label--muted');
     destRowLabel.innerHTML =
       '<span class="destname ' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +

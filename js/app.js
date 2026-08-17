@@ -10,12 +10,15 @@
   var DESIGN_W = 390;
   var DESIGN_H = 844;
 
-  /* home-en.html and the rest of the English-only track share this same
-     markup/JS (see lang-en.css) — route any link this file builds through
-     here so a call button on the English track stays on it instead of
-     dropping back into the bilingual calling.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  /* home-en.html/home-cn.html and the rest of their single-language
+     tracks share this same markup/JS (see lang-en.css/lang-cn.css) —
+     route any link this file builds through here so a call button on
+     one of those tracks stays on it instead of dropping back into the
+     bilingual calling.html. body[data-variant] is 'en'/'cn' on those
+     pages and unset on the bilingual ones. */
+  var LANG = document.body.dataset.variant || '';
+  function langPath(path) {
+    return LANG ? path.replace(/\.html$/, '-' + LANG + '.html') : path;
   }
 
   var screen   = document.getElementById('screen');
@@ -46,7 +49,7 @@
     isListening = true;
     screen.classList.add('is-listening');
     voiceBtn.setAttribute('aria-pressed', 'true');
-    status.textContent = document.body.dataset.variant === 'en' ? 'Listening…' : 'Listening… 正在聆听';
+    status.textContent = LANG === 'en' ? 'Listening…' : LANG === 'cn' ? '正在聆听' : 'Listening… 正在聆听';
   }
 
   function stopListening() {
@@ -142,8 +145,9 @@
   function personRowHtml(id, slot) {
     var c = CONTACTS[id];
     var numHtml = c.phone ? '<span class="t-num">' + formatAuPhone(c.phone) + '</span>' : '';
+    var callLabel = LANG === 'cn' ? '拨打给' + c.cn : 'Call ' + c.en;
     var callHtml =
-      '<a class="row__call" href="' + enPath('calling.html') + '" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="Call ' + c.en + '">' +
+      '<a class="row__call" href="' + langPath('calling.html') + '" data-call-id="' + id + '" style="--y:' + slot.callY + 'px" aria-label="' + callLabel + '">' +
         '<img src="../assets/call-btn.svg" alt="">' +
       '</a>';
     return (
@@ -162,6 +166,7 @@
 
   function emergencyRowHtml(slot) {
     var c = CONTACTS.emergency;
+    var emergencyLabel = LANG === 'cn' ? '拨打紧急电话 ' + c.phone : 'Call emergency ' + c.phone;
     return (
       '<div class="row row--emergency" style="--y:' + slot.y + 'px">' +
         '<img class="row__bg" src="../assets/contact-row.svg" alt="">' +
@@ -173,7 +178,7 @@
           '<span class="t-cn">' + c.cn + '</span>' +
           '<span class="t-num">' + c.phone + '</span>' +
         '</span>' +
-        '<a class="row__call row__call--sos" href="' + enPath('calling.html') + '" data-call-id="emergency" style="--y:' + slot.callY + 'px" aria-label="Call emergency ' + c.phone + '">' +
+        '<a class="row__call row__call--sos" href="' + langPath('calling.html') + '" data-call-id="emergency" style="--y:' + slot.callY + 'px" aria-label="' + emergencyLabel + '">' +
           '<img src="../assets/call-btn-plain.svg" alt="">' +
           '<img class="row__call-glyph" src="../assets/icon-phone-white.svg" alt="">' +
         '</a>' +

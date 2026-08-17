@@ -21,16 +21,20 @@
 .wordmark--return span:nth-child(1),
 .wordmark--return span:nth-child(2) { display: none !important; }
 
-/* navigation.js classifies the saved-destination row's single name as
-   `.t-cn` purely to pick the CJK font if the user typed it in Chinese —
-   unlike every other `.t-cn` here, it's not paired with a `.t-en`
-   duplicate holding the same text, so the blanket rule above would blank
-   the row instead of just leaving it in whatever script was typed. Scoped
-   to the `.destname` span that one JS-built case adds (see navigation.js)
-   rather than every `.t-cn` under #destRowLabel — the row's *static*
-   unset-state markup has a real `.t-en`/`.t-cn` pair that still needs
-   hiding like everywhere else. */
-#destRowLabel .destname.t-cn { display: block !important; }
+/* `.destname` marks text that isn't a real translation pair even though
+   it carries a `.t-en`/`.t-cn` class for its font: navigation.js's saved-
+   destination name (picked by script-detecting whatever the user typed).
+   The blanket rule above would blank it out instead of just leaving it
+   in whatever language it's actually in, so force it visible regardless
+   of which class it landed on — same carve-out as `.card__name
+   .savedname` below, just for an element that keeps its .t-en/.t-cn
+   class instead of switching to a dedicated one. */
+.destname { display: block !important; }
+
+/* contacts.js picks a saved contact's own name a `.t-en`/`.t-cn` class
+   purely for its font, same non-translation-pair situation as
+   `.destname` above — force it visible whichever class it landed on. */
+.card__name .savedname { display: block !important; }
 
 /* Stacked bilingual labels (.t-en on its own line above .t-cn) were
    positioned with `top` calibrated to vertically centre the *pair* inside

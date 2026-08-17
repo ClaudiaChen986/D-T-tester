@@ -26,8 +26,9 @@
   /* edit-profile-en.html reuses this file verbatim (see lang-en.css) —
      route the step-2 handoff through here so the English track lands on
      edit-contacts-en.html instead of the bilingual edit-contacts.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
 
   var stage           = document.querySelector('.stage');
@@ -120,6 +121,6 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(profile)); } catch (err) { /* best effort only */ }
 
     // Step 2 of the same "edit profile" flow — reorder emergency contacts.
-    window.location.href = enPath('edit-contacts.html');
+    window.location.href = langPath('edit-contacts.html');
   });
 }());

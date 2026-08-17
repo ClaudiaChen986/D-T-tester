@@ -22,12 +22,15 @@
   var PREVIEW_DEBOUNCE_MS = 700;
   var PREVIEW_MIN_LENGTH = 3;
 
-  /* add-destination-en.html reuses this file verbatim (see lang-en.css) —
-     route the post-Save redirect through here so the English track lands
-     back on navigation-en.html instead of the bilingual navigation.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  /* add-destination-en.html/add-destination-cn.html reuse this file
+     verbatim (see lang-en.css/lang-cn.css) — route the post-Save redirect
+     through here so a single-language track lands back on its own
+     navigation page instead of the bilingual navigation.html. */
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
+  var IS_CN = document.body.dataset.variant === 'cn';
 
   var stage         = document.querySelector('.stage');
   var form          = document.getElementById('addDestinationForm');
@@ -76,7 +79,7 @@
       addressField.classList.add('is-invalid');
       addressInput.focus();
       status.classList.add('is-error');
-      status.textContent = 'Please enter an address before saving.';
+      status.textContent = IS_CN ? '保存前请输入地址。' : 'Please enter an address before saving.';
       return;
     }
     addressField.classList.remove('is-invalid');
@@ -92,7 +95,7 @@
       storedOk = false;
     }
 
-    var target = enPath('navigation.html');
+    var target = langPath('navigation.html');
     if (!storedOk) target += '?newDest=' + encodeURIComponent(JSON.stringify(destination));
 
     window.location.href = target;

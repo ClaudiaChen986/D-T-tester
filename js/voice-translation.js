@@ -40,6 +40,12 @@
   var voiceBtn = document.getElementById('voiceBtn');
   var status   = document.getElementById('status');
 
+  /* voice-translation-cn.html reuses this file verbatim (see
+     lang-cn.css) — this page is Chinese-track-only (the English track
+     never needs the CN↔EN phrase tool), so only a 'cn' branch is
+     needed here, unlike the 3-way split elsewhere. */
+  var IS_CN = document.body.dataset.variant === 'cn';
+
   var topField    = document.getElementById('topField');
   var topLabel    = document.getElementById('topLabel');
   var topWell     = document.getElementById('topWell');
@@ -183,7 +189,7 @@
     isListening = true;
     screen.classList.add('is-listening');
     voiceBtn.setAttribute('aria-pressed', 'true');
-    status.textContent = 'Listening… 正在聆听';
+    status.textContent = IS_CN ? '正在聆听' : 'Listening… 正在聆听';
     if (recognizer) {
       recognizer.lang = LANG[topLang].recognition;
       try { recognizer.start(); } catch (e) { /* already started, or mic unavailable */ }

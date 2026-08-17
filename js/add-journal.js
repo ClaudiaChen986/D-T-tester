@@ -20,12 +20,15 @@
 
   var STORAGE_KEY = 'guitu.journal';
 
-  /* add-journal-en.html reuses this file verbatim (see lang-en.css) —
-     route the post-Save redirect through here so the English track lands
-     back on journal-en.html instead of the bilingual journal.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  /* add-journal-en.html/add-journal-cn.html reuse this file verbatim (see
+     lang-en.css/lang-cn.css) — route the post-Save redirect through here
+     so a single-language track lands back on its own journal page
+     instead of the bilingual journal.html. */
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
+  var IS_CN = document.body.dataset.variant === 'cn';
 
   var stage      = document.querySelector('.stage');
   var form       = document.getElementById('journalForm');
@@ -63,7 +66,7 @@
       bodyInput.classList.add('is-invalid');
       bodyInput.focus();
       status.classList.add('is-error');
-      status.textContent = 'Please write something before saving.';
+      status.textContent = IS_CN ? '保存前请输入内容。' : 'Please write something before saving.';
       return;
     }
     bodyInput.classList.remove('is-invalid');
@@ -85,7 +88,7 @@
       storedOk = false;
     }
 
-    var target = enPath('journal.html');
+    var target = langPath('journal.html');
     if (!storedOk) {
       target += '?new=' + encodeURIComponent(JSON.stringify(entry));
     }

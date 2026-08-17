@@ -20,13 +20,13 @@
 
   var STORAGE_KEY = 'guitu.contacts';
 
-  /* contacts-en.html reuses this file verbatim (see lang-en.css) — route
-     every link this file builds through here so the English track's Call
-     and Add-contact cards stay on it instead of dropping back into the
-     bilingual pages. */
-  var IS_EN = document.body.dataset.variant === 'en';
-  function enPath(path) {
-    return IS_EN ? path.replace(/\.html$/, '-en.html') : path;
+  /* contacts-en.html/contacts-cn.html reuse this file verbatim (see
+     lang-en.css/lang-cn.css) — route every link this file builds through
+     here so a single-language track's Call and Add-contact cards stay on
+     it instead of dropping back into the bilingual pages. */
+  var LANG = document.body.dataset.variant || '';
+  function langPath(path) {
+    return LANG ? path.replace(/\.html$/, '-' + LANG + '.html') : path;
   }
 
   var SEED_FAMILY = [
@@ -100,12 +100,18 @@
   function callButtonHtml(contact) {
     var icon = '<img src="../assets/icon-call-white.svg" alt="">';
     var index = CALL_TARGETS.push(contact) - 1;
-    return '<a class="card__call" href="' + enPath('calling.html') + '" data-call-index="' + index + '" ' +
+    return '<a class="card__call" href="' + langPath('calling.html') + '" data-call-index="' + index + '" ' +
            'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
   }
 
   function cardHtml(contact) {
-    var nameLines = '<span class="' + nameFontClass(contact.name) + '">' + escapeHtml(contact.name) + '</span>';
+    /* contact.name is a single free-typed field, not a real en/cn
+       translation pair — nameFontClass just picks it the right font.
+       Tag it `.savedname` so lang-en.css/lang-cn.css can force it
+       visible regardless of which of .t-en/.t-cn it lands on; otherwise
+       the single-language tracks' blanket hide rule would blank a saved
+       contact whose name happens to be in the "wrong" language. */
+    var nameLines = '<span class="savedname ' + nameFontClass(contact.name) + '">' + escapeHtml(contact.name) + '</span>';
     if (contact.cn) nameLines += '<span class="t-cn">' + escapeHtml(contact.cn) + '</span>';
     return (
       '<div class="card">' +
@@ -125,9 +131,10 @@
     '</span>';
 
   function addCardHtml(group) {
+    var addLabel = LANG === 'en' ? 'Add contact' : LANG === 'cn' ? '添加联系人' : 'Add contact 添加联系人';
     return (
-      '<a class="card card--add" href="' + enPath('add-contact.html') + '?group=' + group + '" ' +
-         'aria-label="Add contact' + (IS_EN ? '' : ' 添加联系人') + '">' +
+      '<a class="card card--add" href="' + langPath('add-contact.html') + '?group=' + group + '" ' +
+         'aria-label="' + addLabel + '">' +
         ADD_ICON_CROP +
         '<p class="card__name"><span class="t-en">Add</span><span class="t-cn">添加</span></p>' +
       '</a>'

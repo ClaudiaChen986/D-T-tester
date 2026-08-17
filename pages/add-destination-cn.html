@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — 设置目的地</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/add-destination.css">
+<link rel="stylesheet" href="../css/lang-cn.css">
+</head>
+<body data-variant="cn">
+
+<div class="stage">
+<!-- ============================================================
+     add destination - Chinese-only  ·  390 × 844   (Figma node 120:387)
+     Same markup/JS as add-destination.html — see lang-cn.css — with
+     its links and js/add-destination.js's Save redirect pointed at
+     the -cn counterpart pages instead.
+     ============================================================ -->
+<div class="screen screen--dest" id="screen">
+
+  <header class="header">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="navigation-cn.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="返回">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header-title-centered">
+      <span class="t-cn">设置目的地</span>
+    </h1>
+  </header>
+
+  <form id="addDestinationForm" novalidate>
+
+    <div class="destform-bg destform-bg--band"></div>
+    <div class="destform-bg destform-bg--fill"></div>
+
+    <label class="destfield destfield--name" style="--y:153px">
+      <span class="destfield__label">
+        <span class="t-cn">地点名称：</span>
+      </span>
+      <input type="text" id="nameInput" name="name" autocomplete="off"
+             aria-label="地点名称">
+    </label>
+
+    <label class="destfield destfield--address" id="addressField" style="--y:288px">
+      <span class="destfield__label">
+        <span class="t-cn"> 地址：</span>
+      </span>
+      <input type="text" id="addressInput" name="address" autocomplete="off"
+             placeholder="在此输入文本" aria-label="地址">
+    </label>
+
+    <div class="destmap" id="destMap">
+      <div class="destmap__placeholder">
+        <span class="t-cn">输入地址以预览</span>
+      </div>
+      <iframe class="destmap__frame" id="destMapFrame" title="Location preview"
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <p class="formstatus" role="status" aria-live="polite" id="formStatus"></p>
+
+    <button class="save" id="saveBtn" type="submit">
+      <span class="t-cn">保存</span>
+    </button>
+
+  </form>
+
+</div>
+</div>
+
+<script src="../js/add-destination.js"></script>
+</body>
+</html>

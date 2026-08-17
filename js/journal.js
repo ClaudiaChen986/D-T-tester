@@ -100,14 +100,22 @@
     }
   }
 
-  /* journal-en.html reuses this file verbatim (see lang-en.css), which
-     hides every `.t-cn` run richTextHtml() produces — fine for a mixed-
-     language entry (the English runs still show), but the two wholly-
-     Chinese seed entries above would render as an empty card instead of
-     just untranslated text, so skip them rather than show that. */
-  var IS_EN = document.body.dataset.variant === 'en';
-  var seedEntries = IS_EN
+  /* journal-en.html/journal-cn.html reuse this file verbatim (see
+     lang-en.css/lang-cn.css), which hide every `.t-cn`/`.t-en` run
+     richTextHtml() produces — fine for a mixed-language entry (the
+     surviving-language runs still show), but a wholly-foreign-language
+     seed entry would render as an empty card instead of just
+     untranslated text, so skip those rather than show that. English
+     track skips the two wholly-Chinese entries; Chinese track skips the
+     wholly-English one (any Latin letters at all, not just CJK's own
+     opposite test, since "A Walk by the Sea" has none of the CJK ranges
+     to test against). */
+  var LATIN_RE = /[A-Za-z]/;
+  var LANG = document.body.dataset.variant || '';
+  var seedEntries = LANG === 'en'
     ? SEED.filter(function (e) { return !CJK_RE.test(e.title) && !CJK_RE.test(e.body); })
+    : LANG === 'cn'
+    ? SEED.filter(function (e) { return !LATIN_RE.test(e.title) && !LATIN_RE.test(e.body); })
     : SEED;
 
   var entries = saved.concat(seedEntries);

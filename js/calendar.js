@@ -263,8 +263,9 @@
   if (!todays.length) {
     var empty = document.createElement('p');
     empty.className = 'today-panel__empty';
-    empty.innerHTML = document.body.dataset.variant === 'en'
-      ? 'Nothing planned yet — tap Add to plan today.'
+    var todayLang = document.body.dataset.variant;
+    empty.innerHTML = todayLang === 'en' ? 'Nothing planned yet — tap Add to plan today.'
+      : todayLang === 'cn' ? '还没有日程，点击“添加”来安排今天吧。'
       : 'Nothing planned yet — tap Add to plan today.<br>还没有日程，点击“添加”来安排今天吧。';
     todayList.appendChild(empty);
   } else {

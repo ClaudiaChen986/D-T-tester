@@ -27,8 +27,9 @@
   /* edit-contacts-en.html reuses this file verbatim (see lang-en.css) —
      route the post-Save redirect through here so the English track lands
      back on profile-en.html instead of the bilingual profile.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
 
   var CONTACTS = {
@@ -202,6 +203,6 @@
   saveBtn.addEventListener('click', function () {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
     announce('Contact order saved.');
-    window.location.href = enPath('profile.html');
+    window.location.href = langPath('profile.html');
   });
 }());

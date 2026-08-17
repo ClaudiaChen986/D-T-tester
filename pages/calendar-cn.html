@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — 我的日历</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Inter:wght@900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/calendar.css">
+<link rel="stylesheet" href="../css/lang-cn.css">
+</head>
+<body data-variant="cn">
+
+<div class="stage">
+<!-- ================================================================
+     my calendar - Chinese-only  ·  Figma node 56:218
+     Same markup/JS as calendar.html — see lang-cn.css — with its
+     links pointed at the -cn counterpart pages instead.
+     ================================================================ -->
+<div class="calscreen" id="screen">
+
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
+
+  <header class="calhead">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="other-cn.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="返回其他">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header__title">
+      <span class="t-cn">日常生活</span>
+    </h1>
+
+    <a class="addpill" href="add-event-cn.html" aria-label="添加日程">
+      <span class="crop addpill__icon" style="--x:6px;--y:2px;--w:53px;--h:53px">
+        <img src="../assets/add-icon.png" alt=""
+             style="--iw:248.665px;--ih:172.801px;--ix:-99.465px;--iy:-18.227px">
+      </span>
+      <span class="addpill__label">
+        <span class="t-cn">添加</span>
+      </span>
+    </a>
+  </header>
+
+  <!-- 3-day overview — independently scrollable, stays reachable no
+       matter what state the slide-up card below is in. -->
+  <div class="timeline-scroll">
+    <div class="timeline">
+      <div class="timeline__days">
+        <span class="timeline__day"><span class="t-cn">今天</span></span>
+        <span class="timeline__day"><span class="t-cn">明天</span></span>
+        <span class="timeline__day"><span class="t-cn">后天</span></span>
+      </div>
+      <div class="timeline__body" id="timelineBody">
+        <div class="timeline__axis" id="timelineAxis">
+          <div class="timeline__axis-line"></div>
+        </div>
+        <div class="timeline__lane" id="lane0" data-day="0"></div>
+        <div class="timeline__lane" id="lane1" data-day="1"></div>
+        <div class="timeline__lane" id="lane2" data-day="2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- slide-up card — draggable, same mechanic as home.html's .sheet -->
+  <div class="calsheet" id="sheet" data-state="collapsed">
+
+    <div class="calsheet__nav">
+      <img class="calsheet__navbg" src="../assets/calendar-nav-bg.svg" alt="">
+
+      <a class="navpill navpill--calls" href="contacts-cn.html">
+        <span class="material-symbols-outlined">call</span>
+        <span class="navpill__label"><span class="t-cn">电话</span></span>
+      </a>
+
+      <button class="calsheet__handle" id="sheetHandle" type="button"
+              aria-controls="sheet" aria-expanded="false" aria-label="展开今天的日程">
+        <img src="../assets/icon-nav-arrow.svg" alt="">
+      </button>
+
+      <a class="navpill navpill--profile" href="profile-cn.html">
+        <img class="navpill__icon" src="../assets/icon-profile-outline.svg" alt="">
+        <span class="navpill__label"><span class="t-cn">个人</span></span>
+      </a>
+
+      <a class="calsheet__logo" href="home-cn.html" aria-label="返回首页">
+        <img src="../assets/logo-sprite.png" alt="">
+      </a>
+    </div>
+
+    <div class="calsheet__body">
+      <a class="planbtn" href="add-event-cn.html?day=1">
+        <span class="planbtn__label">
+          <span class="t-cn">规划明天</span>
+        </span>
+      </a>
+
+      <h2 class="today-panel__title">
+        <span class="t-cn">今天的日程</span>
+      </h2>
+      <div id="todayList"></div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<script src="../js/calendar.js"></script>
+</body>
+</html>

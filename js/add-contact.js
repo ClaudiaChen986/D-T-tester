@@ -24,12 +24,15 @@
 
   var STORAGE_KEY = 'guitu.contacts';
 
-  /* add-contact-en.html reuses this file verbatim (see lang-en.css) — route
-     the post-Save redirect through here so the English track lands back on
-     contacts-en.html instead of the bilingual contacts.html. */
-  function enPath(path) {
-    return document.body.dataset.variant === 'en' ? path.replace(/\.html$/, '-en.html') : path;
+  /* add-contact-en.html/add-contact-cn.html reuse this file verbatim (see
+     lang-en.css/lang-cn.css) — route the post-Save redirect through here
+     so a single-language track lands back on its own contacts page
+     instead of the bilingual contacts.html. */
+  function langPath(path) {
+    var v = document.body.dataset.variant;
+    return v ? path.replace(/\.html$/, '-' + v + '.html') : path;
   }
+  var IS_CN = document.body.dataset.variant === 'cn';
 
   function targetGroup() {
     var g = new URLSearchParams(window.location.search).get('group');
@@ -107,10 +110,10 @@
       photoDataUrl = dataUrl;
       avatarPreview.src = photoDataUrl;
       status.classList.remove('is-error');
-      status.textContent = 'Photo selected.';
+      status.textContent = IS_CN ? '已选择照片。' : 'Photo selected.';
     }, function () {
       status.classList.add('is-error');
-      status.textContent = 'Could not read that photo — please try another.';
+      status.textContent = IS_CN ? '无法读取该照片，请重试。' : 'Could not read that photo — please try another.';
     });
   });
 
@@ -130,7 +133,7 @@
       nameField.classList.add('is-invalid');
       nameInput.focus();
       status.classList.add('is-error');
-      status.textContent = 'Please enter a name before saving.';
+      status.textContent = IS_CN ? '保存前请输入姓名。' : 'Please enter a name before saving.';
       return;
     }
     nameField.classList.remove('is-invalid');
@@ -157,7 +160,7 @@
       storedOk = false;
     }
 
-    var target = enPath('contacts.html');
+    var target = langPath('contacts.html');
     if (!storedOk) {
       var carry = {
         id: contact.id, name: contact.name, cn: contact.cn,
