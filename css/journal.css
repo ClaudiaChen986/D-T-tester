@@ -97,7 +97,10 @@
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  padding: 23px 0 32px;
+  /* bottom padding clears the now-fixed .journalbar (134px tall) plus the
+     same ~38px gap it used to sit behind in normal flow, so the last
+     entry never scrolls in underneath it. */
+  padding: 23px 0 166px;
 }
 
 .entry {
@@ -136,14 +139,23 @@
 .entry__body .t-cn { font-size: 16px; }
 
 /* -------------------------------------------------------------- back bar
-   Same asset/geometry as contacts.html's own .backbar. */
+   Pinned to the bottom of the viewport instead of sitting in normal flow —
+   it should always be reachable without scrolling, with the entry list
+   scrolling underneath it (same treatment as contacts.css/phrase-
+   library.css/todays-events.css/senior-events.css's own bars).
+   .journalpage has no transform/filter, so this stays positioned against
+   the viewport rather than getting clipped by its ancestor's
+   overflow: hidden. */
 .journalbar {
-  position: relative;
-  z-index: 1;
+  position: fixed;
+  z-index: 5;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
   display: block;
   width: 390px;
+  max-width: 100%;
   height: 134px;
-  margin: 6px 0 0;
   cursor: pointer;
   text-decoration: none;
 }
