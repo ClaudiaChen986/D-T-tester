@@ -40,3 +40,32 @@
    ancestor (an explicit-height card/row, confirmed per component below)
    instead of trying to patch each pixel offset by hand. */
 .othercard__label { top: 50% !important; transform: translateY(-50%); }
+
+/* Every "Back to homepage" bottom bar lays its .t-en/.t-cn out on one
+   line (`white-space: nowrap`, no `display: block` on the spans) inside
+   a fixed-width box that's left-anchored, not centred — the full
+   bilingual string ("Back to homepage 返回首页") roughly filled that
+   width, so it read as centred by coincidence. With only the English
+   half left the same left edge now reads as shifted left; text-align
+   recentres whatever's actually there instead of hardcoding a width. */
+.backbar__text,
+.otherbar__text,
+.journalbar__text,
+.eventsbar__text,
+.gohomebar__text,
+.navdestbar__text,
+.eventlocbar__text,
+.profilebar__text {
+  text-align: center;
+}
+
+/* .eventcard--sm cards (todays-events.html) are the same "single
+   absolutely-positioned label + independently-centred chevron" shape as
+   .othercard above, so the same fix applies. .eventcard--lg (the one
+   "Seniors events" card with a description line too) can't use it —
+   centering both .eventcard__label and .eventcard__desc at 50% would
+   stack them on top of each other — so instead just close the gap that
+   opens under the now-single-line title, keeping both anchored near the
+   top the way this card's title+description composition already was. */
+.eventcard--sm .eventcard__label { top: 50% !important; transform: translateY(-50%); }
+.eventcard--lg .eventcard__desc { top: 56px !important; }
