@@ -1,12 +1,12 @@
 /* ============================================================================
    归途 GuiTu — "Choose your language" (Figma node 1:5)
    ----------------------------------------------------------------------------
-   The true entry point: every session starts here. For now all three
-   options lead to the same Home screen (per-language content is a later
-   phase) — but the choice is still recorded, both in localStorage (so a
-   future visit can remember it) and as the ?lang= the link already
-   carries (so pages/home.html can read it this session even before
-   anything actually branches on it).
+   The true entry point: every session starts here. "Only English" links
+   straight to pages/home-en.html now that it exists; Chinese-only and
+   bilingual still fall back to pages/home.html?lang=cn|both until their
+   own per-language homepages are built. The choice is recorded in
+   localStorage either way, so a future visit can remember it once
+   every branch has a real destination.
    ========================================================================== */
 (function () {
   'use strict';
