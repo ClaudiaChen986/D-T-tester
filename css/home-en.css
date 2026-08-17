@@ -1,0 +1,98 @@
+/* ============================================================================
+   归途 GuiTu — Home page, English-only variant
+   ----------------------------------------------------------------------------
+   Figma "prototype-4" › Home page - both (node 6140:1286). Reuses home.html's
+   shared components verbatim (header, voice-assistant button behaviour, the
+   slide-up contacts sheet — see styles.css and js/app.js), so this file only
+   holds what's actually new: the language override and the three stacked
+   cards that replace the bilingual homepage's 2×2 tile grid.
+   ========================================================================== */
+
+/* English-only pages carry no Chinese text at all — every component this
+   page reuses (header, sheet, contact rows, nav pills) still emits a
+   `.t-cn` span alongside `.t-en` because that markup is shared with the
+   bilingual homepage; this just switches it off site-wide for this one
+   page rather than forking every shared template into en/both copies. */
+/* !important is load-bearing here: shared components set `display: block`
+   on `.t-cn` through more specific selectors (`.row__text > span`,
+   `.navbtn__label > span`, etc.) for the bilingual homepage, and plain
+   source-order cascading loses to that higher specificity. */
+.t-cn { display: none !important; }
+
+/* ------------------------------------------------------------- connect cards */
+.connectcard {
+  display: block;
+  position: absolute;
+  left: 37px;
+  top: var(--y);
+  width: 317px;
+  height: 107px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.connectcard:active { transform: scale(.975); }
+
+.connectcard__bg { position: absolute; left: -4px; top: 0; width: 325px; height: 121px; }
+
+.connectcard__label {
+  position: absolute;
+  left: 115px;
+  top: var(--y);
+  width: 209px;
+  font-size: 0;
+  line-height: normal;
+  color: var(--c-ink);
+}
+.connectcard__label > span { display: block; font-weight: 400; }
+.connectcard__label .t-en { font-size: 24px; }
+
+/* -------------------------------------------------------- voice assistant */
+.voicecard {
+  position: absolute;
+  left: 37px;
+  top: 622px;
+  width: 317px;
+  height: 107px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  touch-action: none;              /* keep press-and-hold from scrolling */
+  -webkit-touch-callout: none;
+}
+
+.voicecard__bg { position: absolute; left: -4px; top: 0; width: 325px; height: 121px; }
+.voicecard__mic { position: absolute; left: 47.04px; top: 34.65px; width: 26.368px; height: 39.149px; }
+
+.voicecard__title {
+  position: absolute;
+  left: 119px;
+  top: 31px;
+  width: 182px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #fff;
+}
+.voicecard__title > span { display: block; font-weight: 700; }
+.voicecard__title .t-en { font-size: 20px; }
+
+.voicecard__hint {
+  position: absolute;
+  left: 119px;
+  top: 63px;
+  width: 183px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #e7dbd6;
+}
+.voicecard__hint .t-en { font-size: 16px; font-weight: 400; }
+
+@media (prefers-reduced-motion: reduce) {
+  .connectcard,
+  .voicecard { transition: none; }
+}

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GuiTu — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/soundwave.css">
+<link rel="stylesheet" href="../css/home-en.css">
+</head>
+<body>
+
+<div class="stage">
+<!-- ============================================================
+     Home page - both  ·  390 × 844   (Figma "prototype-4", node 6140:1286)
+     English-only homepage: no bilingual t-cn text, no Translation tile
+     (English-only users don't need the CN↔EN phrase tool), and the four
+     square tiles are replaced with three stacked cards linking to the same
+     destinations as their bilingual-homepage equivalents (per product
+     decision: "Daily connect & communication" → contacts.html,
+     "Suggestions" → other.html, "Navigation" → navigation.html unchanged).
+     Header, voice-assistant press-and-hold behaviour, and the slide-up
+     contacts sheet are pixel-identical to home.html's — same components,
+     same app.js — this page only overrides the language (.t-cn hidden,
+     see home-en.css) and swaps the middle section for the new card list.
+     ============================================================ -->
+<div class="screen" id="screen">
+
+  <!-- background texture -->
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
+
+  <!-- ---------------------------------------------------------- header -->
+  <header class="header">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <div class="header__logo"><img src="../assets/logo-sprite.png" alt="GuiTu"></div>
+
+    <h1 class="header__title">
+      <span class="t-en">Home&nbsp;</span>
+    </h1>
+
+    <p class="header__welcome">
+      <span class="t-en">Welcome, XXX!</span>
+    </p>
+  </header>
+
+  <!-- ---------------------------------------------------------- 3 stacked cards -->
+  <a class="connectcard" style="--y:232px" href="contacts.html">
+    <img class="connectcard__bg" src="../assets/home-en-card-bg.svg" alt="">
+    <span class="crop connectcard__icon" style="--x:48px;--y:25px;--w:56px;--h:56px">
+      <img src="../assets/home-en-icon-connect.png" alt=""
+           style="--iw:194.32px;--ih:135.03px;--ix:-71.26px;--iy:-6.69px">
+    </span>
+    <span class="chevron" style="--x:280px;--y:35px;--s:36px">
+      <img src="../assets/icon-chevron.svg" alt="">
+    </span>
+    <span class="connectcard__label" style="--y:25px">
+      <span class="t-en">Daily connect &amp; communication</span>
+    </span>
+  </a>
+
+  <a class="connectcard" style="--y:362px" href="other.html">
+    <img class="connectcard__bg" src="../assets/home-en-card-bg.svg" alt="">
+    <span class="crop connectcard__icon" style="--x:48px;--y:26px;--w:56px;--h:56px">
+      <img src="../assets/home-en-icon-suggest-nav.png" alt=""
+           style="--iw:205.44px;--ih:142.77px;--ix:-144.35px;--iy:-12.92px">
+    </span>
+    <span class="chevron" style="--x:280px;--y:35px;--s:36px">
+      <img src="../assets/icon-chevron.svg" alt="">
+    </span>
+    <span class="connectcard__label" style="--y:39px">
+      <span class="t-en">Suggestions</span>
+    </span>
+  </a>
+
+  <a class="connectcard" style="--y:492px" href="navigation.html">
+    <img class="connectcard__bg" src="../assets/home-en-card-bg.svg" alt="">
+    <span class="crop connectcard__icon" style="--x:48px;--y:26px;--w:56px;--h:56px">
+      <img src="../assets/home-en-icon-suggest-nav.png" alt=""
+           style="--iw:205.44px;--ih:142.77px;--ix:-81.72px;--iy:-75.94px">
+    </span>
+    <span class="chevron" style="--x:280px;--y:35px;--s:36px">
+      <img src="../assets/icon-chevron.svg" alt="">
+    </span>
+    <span class="connectcard__label" style="--y:39px">
+      <span class="t-en">Navigation</span>
+    </span>
+  </a>
+
+  <!-- ---------------------------------------------------------- voice assistant (press & hold) -->
+  <button class="voicecard" id="voiceBtn" type="button" aria-pressed="false"
+          aria-label="Voice assistant — press and hold to speak">
+    <img class="voicecard__bg" src="../assets/home-en-voice-card-bg.svg" alt="">
+    <span class="crop voicecard__ring" style="--x:11px;--y:5px;--w:98.449px;--h:98.449px">
+      <img src="../assets/mic-ring.svg" alt="" style="--iw:98.449px;--ih:98.449px;--ix:0;--iy:0">
+    </span>
+    <img class="voicecard__mic" src="../assets/icon-mic.svg" alt="">
+    <span class="voicecard__title">
+      <span class="t-en">Voice assistant</span>
+    </span>
+    <span class="voicecard__hint" id="voiceHint">
+      <span class="t-en">click to speak</span>
+    </span>
+  </button>
+
+  <!-- ---------------------------------------------------------- slide up card -->
+  <div class="sheet" id="sheet" data-state="collapsed">
+    <img class="sheet__bg" src="../assets/sheet-bg.svg" alt="">
+
+    <button class="navbtn navbtn--calls" type="button" data-action="open-contacts">
+      <img class="navbtn__icon" src="../assets/icon-phone.svg" alt=""
+           style="--x:15.256px;--y:11.322px;--w:34.662px;--h:35.294px">
+      <span class="navbtn__label" style="--x:51px;--y:5.773px;--w:51px">
+        <span class="t-en">Calls</span>
+      </span>
+    </button>
+
+    <a class="navbtn navbtn--profile" href="profile.html">
+      <img class="navbtn__icon" src="../assets/icon-profile.svg" alt=""
+           style="--x:14px;--y:10.185px;--w:32px;--h:37.251px">
+      <span class="navbtn__label" style="--x:50px;--y:5.773px;--w:60px">
+        <span class="t-en">Profile</span>
+      </span>
+    </a>
+
+    <img class="sheet__panel" src="../assets/sheet-panel.svg" alt="">
+
+    <!-- contact rows — the top 3 from guitu.emergencyContactOrder (edit-contacts.html),
+         rendered by app.js; falls back to Son/Daughter/Emergency if nothing's saved yet.
+         Chinese names it also writes into each row are hidden site-wide on this page
+         by home-en.css's `.t-cn { display: none }` rule. -->
+    <div id="sheetRows"></div>
+
+    <button class="sheet__handle" id="sheetHandle" type="button"
+            aria-controls="sheet" aria-expanded="false" aria-label="Expand contacts">
+      <img src="../assets/sheet-handle-arrow.svg" alt="">
+    </button>
+
+    <span class="crop sheet__medallion" style="--x:156px;--y:7px;--w:78.179px;--h:79.817px">
+      <img src="../assets/logo-sprite.png" alt=""
+           style="--iw:292.75px;--ih:203.45px;--ix:-110.95px;--iy:-107.65px">
+    </span>
+  </div>
+
+  <!-- ---------------------------------------------------------- listening overlay -->
+  <div class="listening" id="listening" aria-hidden="true">
+    <div class="listening__scrim"></div>
+    <div class="wave" id="wave">
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+    </div>
+  </div>
+
+  <p class="sr-only" role="status" id="status"></p>
+</div>
+</div>
+
+<script src="../js/app.js"></script>
+</body>
+</html>
