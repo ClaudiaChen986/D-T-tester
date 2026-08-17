@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — Voice translation 语音翻译</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/soundwave.css">
+<link rel="stylesheet" href="../css/voice-translation.css">
+</head>
+<body>
+
+<div class="stage">
+<!-- ============================================================
+     Voice translation - both  ·  390 × 844   (Figma node 7:886)
+     listening state: node 257:444 — same scrim + soundwave as home.html
+     swapped direction: node 255:1584 (listening+swapped: 257:489) —
+     js/voice-translation.js swaps which field is English/Chinese
+     ============================================================ -->
+<div class="screen" id="screen">
+
+  <div class="bg-texture"><img src="../assets/background-texture.png" alt=""></div>
+
+  <!-- ---------------------------------------------------------------- header -->
+  <header class="header">
+    <img class="header__bg" src="../assets/header.svg" alt="">
+
+    <a class="crop return" href="translation.html" style="--x:9px;--y:16px;--w:93px;--h:93px" aria-label="Back to Translation 返回翻译">
+      <img src="../assets/return-button.png" alt=""
+           style="--iw:414.68px;--ih:288.1px;--ix:-147.91px;--iy:-160.29px">
+    </a>
+
+    <div class="wordmark wordmark--return" aria-hidden="true">
+      <span style="--x:6.56px;--y:90.41px;--w:23.743px;--h:22.607px"><i style="--r:52.91deg">返</i></span>
+      <span style="--x:21.43px;--y:99.65px;--w:22.019px;--h:23.744px"><i style="--r:32.94deg">回</i></span>
+      <span style="--x:45.26px;--y:105.56px;--w:9.41px;--h:20.213px"><i style="--r:7.86deg">r</i></span>
+      <span style="--x:54.2px;--y:105.73px;--w:8.248px;--h:19.645px"><i style="--r:-1.37deg">e</i></span>
+      <span style="--x:61.59px;--y:103.79px;--w:9.849px;--h:20.261px"><i style="--r:-12.29deg">t</i></span>
+      <span style="--x:66.4px;--y:100.39px;--w:15.703px;--h:21.602px"><i style="--r:-19.62deg">u</i></span>
+      <span style="--x:74.37px;--y:96.07px;--w:16.24px;--h:20.063px"><i style="--r:-32.66deg">r</i></span>
+      <span style="--x:79.37px;--y:89.44px;--w:20.241px;--h:20.988px"><i style="--r:-41.89deg">n</i></span>
+    </div>
+
+    <h1 class="header__title">
+      <span class="t-en">Voice translation</span>
+      <span class="t-cn">语音翻译</span>
+    </h1>
+  </header>
+
+  <!-- ------------------------------------------------------------------ fields
+       Two fixed physical slots (top/bottom); which language each one shows
+       — label, card background (translucent vs solid), placeholder — is
+       set by js/voice-translation.js and flips on swap, not hardcoded to
+       "English"/"Chinese" here. The keyboard button stays with the top
+       slot regardless of language, matching Figma (it doesn't move to the
+       bottom card in the swapped node either). -->
+  <div class="transfield" id="topField" style="--y:162px">
+    <p class="transfield__label" id="topLabel" style="--x:98px;--y2:53px"></p>
+    <textarea class="transfield__well" id="topWell" style="--x:20px;--y2:96px" aria-label="Top text field"></textarea>
+    <button class="transkeyboard" id="keyboardBtn" type="button" aria-label="Type instead 改为打字">
+      <img src="../assets/icon-keyboard.svg" alt="">
+    </button>
+  </div>
+
+  <div class="transfield" id="bottomField" style="--y:452px">
+    <p class="transfield__label" id="bottomLabel" style="--x:101px;--y2:33px"></p>
+    <textarea class="transfield__well" id="bottomWell" style="--x:19px;--y2:74px" aria-label="Bottom text field"></textarea>
+  </div>
+
+  <!-- --------------------------------------------------------------- swap button
+       Painted after both fields (not between them) so it sits visually on
+       top of the seam between the two cards, matching Figma. -->
+  <button class="transswap" id="swapBtn" type="button" aria-label="Swap translation direction 切换翻译方向">
+    <span class="crop transswap__badge" style="--x:0px;--y:0px;--w:80px;--h:80px">
+      <img src="../assets/translation-icon-badge.png" alt=""
+           style="--iw:115.152px;--ih:80.024px;--ix:-16.968px;--iy:-0.008px">
+    </span>
+    <span class="transswap__icon"><img src="../assets/icon-swap.svg" alt=""></span>
+  </button>
+
+  <!-- ---------------------------------------------------------- voice assistant (press & hold) -->
+  <button class="voice" id="voiceBtn" type="button" aria-pressed="false"
+          aria-label="Translate by voice 语音翻译 — press and hold to speak">
+    <img class="voice__bg" src="../assets/voice-assistant-card.svg" alt="">
+    <img class="voice__ring" src="../assets/mic-ring.svg" alt="">
+    <span class="crop voice__micbg" style="--x:33px;--y:28px;--s:80px">
+      <img src="../assets/translation-icon-badge.png" alt=""
+           style="--iw:115.152px;--ih:80.024px;--ix:-16.968px;--iy:-0.008px">
+    </span>
+    <img class="voice__mic" src="../assets/icon-mic.svg" alt="">
+    <span class="voice__title">
+      <span class="t-en">Translate by voice</span>
+      <span class="t-cn">语音翻译</span>
+    </span>
+    <span class="voice__hint" id="voiceHint">
+      <span class="t-en">press to speak</span><span class="sp"> </span><span class="t-cn">按住说话</span>
+    </span>
+  </button>
+
+  <!-- ---------------------------------------------------------- listening overlay -->
+  <div class="listening" id="listening" aria-hidden="true">
+    <div class="listening__scrim"></div>
+    <div class="wave" id="wave">
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+      <span class="wave__bar"></span><span class="wave__bar"></span><span class="wave__bar"></span>
+    </div>
+  </div>
+
+  <p class="sr-only" role="status" id="status"></p>
+
+</div>
+</div>
+
+<script src="../js/voice-translation.js"></script>
+</body>
+</html>

@@ -27,6 +27,26 @@ pages/
                             to profile.html
   contacts.html            "My Contact" list (node 7:1121) — real scrolling page
   add-contact.html         "Adding contact" form (node 120:408)
+  translation.html         "Translation" menu (node 7:705) — Home's Translation
+                            tile leads here
+  daily-english.html       "Daily English" (node 7:812) — a word-of-the-day
+                            card with real, spoken pronunciation
+  voice-translation.html   "Voice translation" (node 7:886; listening
+                            257:444; swapped 255:1584; swapped+listening
+                            257:489) — real (MyMemory API) translation as
+                            you type or speak, a direction-swap button, and
+                            home.html's press-and-hold listening overlay
+  phrase-library.html      "Phrase library" (node 136:1498) — real scrolling
+                            page, like contacts.html; sixteen seed phrases +
+                            anything saved from add-phrase.html
+  add-phrase.html          "Add phrase" — modeled on Figma's "Set destination"
+                            (node 120:387) with the map removed and its copy
+                            swapped for phrase entry
+  show-phrase.html         "Display page" (node 7:928) — flash-card view of
+                            one phrase (white/black, not the app's red theme),
+                            held up for someone else to read; every phrase
+                            row in phrase-library.html, seed or saved, opens
+                            its own text here
   navigation.html          "Maps" — Navigation's home (node 7:1284) — Home's
                             Navigation tile leads here; the third row still
                             has no destination screen
@@ -94,6 +114,12 @@ css/
   edit.css                  edit-contacts.html's own layout
   contacts.css              contacts.html's own layout
   add-contact.css           add-contact.html's own layout
+  translation.css           translation.html's own layout
+  daily-english.css         daily-english.html's own layout
+  voice-translation.css     voice-translation.html's own layout
+  phrase-library.css        phrase-library.html's own layout
+  add-phrase.css            add-phrase.html's own layout
+  show-phrase.css           show-phrase.html's own layout
   navigation.css             navigation.html's own layout
   go-home.css                go-home.html's own layout
   add-destination.css        add-destination.html's own layout
@@ -119,6 +145,18 @@ js/
   edit.js                   edit-contacts.html: drag-to-reorder + save/persist
   contacts.js               contacts.html: renders seed + saved contacts
   add-contact.js            add-contact.html: photo picker, validation, save
+  translation.js            translation.html: viewport fit only
+  daily-english.js          daily-english.html: viewport fit, speaks the word/
+                             sentence aloud via the Web Speech API
+  voice-translation.js      voice-translation.html: viewport fit, press-to-speak
+                             listening overlay, direction swap, real MyMemory-API
+                             translation, speech-to-text where the browser
+                             supports it
+  phrase-library.js         phrase-library.html: renders seed + saved phrases,
+                             each linking to show-phrase.html
+  add-phrase.js             add-phrase.html: validation, save + handoff
+  show-phrase.js            show-phrase.html: reads the tapped phrase from
+                             sessionStorage, falls back to Figma's sample
   navigation.js              navigation.html: viewport fit, share-location
                               toggle, slide-up card drag (same as app.js's),
                               renders the saved-destination row
@@ -183,13 +221,30 @@ file under `css/`.
 - Both new pages' return arrows go back to where navigating to them makes
   sense (`contacts.html` for add-contact's cancel arrow, `home.html` for
   contacts' arrow and its "Back to homepage" bar).
+- Home's *Translation* tile → `translation.html`, all three of whose cards
+  now lead somewhere (Daily English, Voice translation, Phrase library);
+  its return arrow and "Back to homepage" bar both go to `home.html`.
+- Translation's *Daily English* card → `daily-english.html`; its two
+  speaker buttons actually speak (Web Speech API), no destination screen
+  needed for that. Its return arrow and "Back to homepage" bar both go to
+  `translation.html`.
+- Translation's *Voice translation* card → `voice-translation.html`. No
+  return "Back to homepage" bar on this one — Figma's own node doesn't
+  have one — so only its return arrow goes back to `translation.html`.
+- Translation's *Phrase library* card → `phrase-library.html`. Its **Add**
+  button (in the sticky header) → `add-phrase.html`, whose **Save** button
+  validates the English phrase, writes it to `localStorage`, and returns to
+  `phrase-library.html`, where it now appears after the sixteen seed
+  phrases. Its return arrow goes back to `translation.html`.
+- Every row in `phrase-library.html` — seed or saved — → `show-phrase.html`,
+  the flash-card display of that one phrase. Its return arrow goes back to
+  `phrase-library.html`; its "Back to homepage" bar goes to `home.html`.
 - Home's *Navigation* tile → `navigation.html`. Its "Go home" row →
   `go-home.html`. Its second "Set destination" row → `add-destination.html`
   until something's saved, then it shows that destination's name and
   → `navigate-destination.html` instead; the third row is still a plain
-  "Set destination" placeholder with no destination screen of its own —
-  same as Home's still-unbuilt Translation tile. Navigation's own
-  return arrow goes to `home.html`.
+  "Set destination" placeholder with no destination screen of its own yet.
+  Navigation's own return arrow goes to `home.html`.
 - `go-home.html`'s and `navigate-destination.html`'s return arrows both go
   back to `navigation.html`; their "Back to homepage" bars go to `home.html`.
 - `add-destination.html`'s **Save** button validates the address, writes
@@ -197,9 +252,8 @@ file under `css/`.
   where the second row now shows it. Its return arrow also goes back to
   `navigation.html`.
 - Home's *Other* tile → `other.html`. Its *Today's new events* card →
-  `todays-events.html`; same as Home's still-unbuilt Translation tile,
-  nothing else on this menu is inert anymore. Other's own return
-  arrow and "Back to homepage" bar both go to `home.html`.
+  `todays-events.html`; nothing else on this menu is inert anymore. Other's
+  own return arrow and "Back to homepage" bar both go to `home.html`.
 - `todays-events.html`'s sticky **More** button opens
   <https://www.krg.nsw.gov.au/Community/Seniors> in a new tab — a real
   external link, not a placeholder. Its return arrow goes back to
@@ -362,6 +416,172 @@ recolored, so the other two buttons' "on" states were derived the same way
 (swap `#37848C` for `white`) instead of two more round-trips to fetch
 assets that would have come back identical anyway.
 
+## "Translation" — first of three Home tile menus
+
+`translation.html` (node 7:705) is the first of Home's four tiles to get a
+destination screen (Navigation and Other are still the plain, non-navigating
+`<button>`s they were before). Header, return button, background texture,
+and bottom "Back to homepage" bar are all pixel-identical assets/geometry to
+what `profile.html` already uses, so nothing new was exported for those.
+What *is* new: `translation-card-bg.svg` (the scalloped ticket shape behind
+each of the three menu rows — one asset, reused three times, same seam-bleed
+pattern as `tile-bg.svg`), `translation-icon-badge.png` (the round teal
+badge, also reused identically all three times — the badge itself never
+changes), and one small glyph per row (`translation-icon-book.svg`,
+`translation-icon-voice.svg`, `translation-icon-phrase.svg`) laid on top of
+that badge — the only thing that actually differs between Daily English,
+Voice translation, and Phrase library. Each row's chevron reuses
+`icon-chevron.svg` via the same `.chevron` helper the Home tiles use.
+
+## "Daily English" — the one screen with a real, working sound button
+
+`daily-english.html` (node 7:812) is a word-of-the-day card: a translucent
+word panel (headword, phonetic spelling, part of speech, definition, a
+photo) over a solid sentence panel (one example sentence), each with its
+own "play pronunciation" speaker button. Header, return button, background
+texture, and bottom bar are the same pixel-identical assets every other
+Translation sub-page uses; genuinely new here are the word's illustration
+photo, the round red speaker badge (a different hand-drawn artwork than
+Translation's teal menu badge — same idea, different color/shape, so kept
+as its own asset rather than recolored), and the white volume glyph.
+Figma's dashed divider under the headword (node 7:817) is a plain
+`border-top: 2px dashed`, cheaper as CSS than round-tripping an SVG for a
+single straight dashed line.
+
+The two speaker buttons are the one place in the whole app where a
+"the interaction is real, the backend isn't" affordance actually *is*
+real: they call the browser's built-in Web Speech API
+(`speechSynthesis`/`SpeechSynthesisUtterance` in `js/daily-english.js`) to
+read the word or sentence aloud, rather than sitting there decoratively
+the way, say, Speaker/Mute/Location do on the calling screen. No backend,
+API key, or audio asset needed — every evergreen browser ships this — so
+there was no reason to fake it. A brief pulse (`.is-speaking`, plain CSS
+`@keyframes`) plays on the badge while speech is in progress so the button
+gives feedback instead of looking inert once tapped; browsers without
+speech synthesis available just get a quiet no-op.
+
+## "Voice translation" — home.html's press-and-hold, borrowed whole
+
+`voice-translation.html` (node 7:886; listening state node 257:444) reuses
+home.html's "Translate/Voice assistant" button — background, mic ring,
+badge, mic icon, all pixel-identical assets — just moved to this page's
+own position, and its press-and-hold listening overlay (scrim + animated
+soundwave) *exactly*: `js/voice-translation.js`'s `startListening`/
+`stopListening` pair is app.js's, unchanged, toggling the same
+`.screen.is-listening` class `soundwave.css` already animates off of. That
+was the one explicit ask here — "the animation of the soundwave is the
+same as the one on homepage" — and reusing the actual component instead
+of re-implementing it is what guarantees that.
+
+The English/Chinese boxes are real `<textarea>`s, and the translation
+between them is real too — [MyMemory](https://mymemory.translated.net)'s
+free, keyless translation API, called from `js/voice-translation.js` and
+debounced (600ms) so it fires after a pause instead of on every
+keystroke. Typing into either box translates into the other; each source
+box gets its own debounce timer and request-sequence number, so a fast
+typist doesn't fire one request per keystroke and a slow response that's
+since been superseded can't clobber the target box with stale text. Where
+the browser exposes live speech recognition (`webkitSpeechRecognition` —
+Chrome/Edge; not universal, same tier of support as the calendar/location
+APIs elsewhere in the platform), holding the mic also transcribes real
+speech into the top box — and that transcription feeds the same
+translate-on-pause pipeline — while the soundwave plays; unsupported
+browsers still get the full press-and-hold animation and can still type.
+MyMemory's anonymous tier is rate-limited and occasionally slow to
+respond; a translation that fails just leaves the existing text in place
+rather than erroring visibly, since it's a nicety layered on top of a
+click-through prototype, not something the rest of the page depends on.
+Swapping direction cancels any translation still in flight — one scheduled
+for the pre-swap language pairing landing after the swap would overwrite
+whatever's now in that box with a stale, mismatched result.
+
+**Swap** (node 255:1584, listening: 257:489) turned out to be a direction
+toggle, not a text-exchange button: Figma's swapped node shows the top
+card's *style* change too — translucent becomes solid and vice versa,
+traveling with the language — while the keyboard button stays on the top
+physical slot regardless of which language ends up there. So the two
+fields are two fixed slots whose label/card-style/placeholder is set by
+`js/voice-translation.js` from one `topLang` flag rather than hardcoded
+per position, and swapping moves each field's typed text along with its
+language (English text stays labeled English after a swap, wherever it
+physically lands) instead of leaving it mislabeled in place. Recognition
+language follows the same flag, so holding the mic recognizes whichever
+language currently sits on top.
+
+Two longer titles on this page ("Voice translation" in the header,
+"Translate by voice" on the button) needed the same fix every longer title
+elsewhere in the app does — `.header__title`/`.voice__title` were both
+sized for shorter Home-screen copy, so without widening the box and
+stopping mid-phrase wrapping, the browser breaks the English words
+themselves instead of only between the English and Chinese lines.
+
+## "Phrase library" and "Add phrase" — the app's second real scrolling page
+
+`phrase-library.html` (node 136:1498) is a real scrolling page for the same
+reason `contacts.html` is one: sixteen phrases is genuine page-length
+content, not something a fixed 390×844 mock scaled as one unit can hold.
+Figma's own canvas for this node is 2827px tall and repeats the header and
+"bottom navigation" bar's coordinates from the fixed-page template partway
+down the design — an artifact of reusing that component, not meaningful
+position data for a page that actually scrolls — so, like `contacts.html`
+already does with its own raw coordinates, this page doesn't try to honor
+them literally: the header is sticky (`.phrasehead`, same treatment as
+`contacts.css`'s `.chheader`) and the "Back to homepage" bar sits at the
+true end of the list, after the sixteenth phrase, not stranded mid-scroll.
+The header also carries a persistent **Add** button (Figma's "Group 55")
+that stays visible while the list scrolls beneath it.
+
+Row backgrounds come in three heights (100/123/151px, one asset each —
+`phrase-row-bg-sm/md/lg.svg`) that Figma hand-picked per phrase to fit its
+wrapped line count; the seed phrases keep their designer-assigned height,
+and anything typed into `add-phrase.html` picks the closest tier from the
+English text's length (`js/phrase-library.js`'s `pickSize`) since a
+free-text phrase has no such assignment — close enough for a click-through
+prototype where exact pixel wrapping isn't load-bearing. One thing Figma
+does differently here than everywhere else in the app: the Chinese line is
+**bold** and the English line isn't (every other bilingual pair in the app
+is the reverse or matched) — kept as designed rather than normalized.
+
+`add-phrase.html` reuses Figma's "Set destination" node (120:387) — a
+teal-label-band-over-grey-fill template `add-contact.html`'s own field
+styles don't share — as asked, with two changes: the map image (node
+120:403) is gone, since this form has nothing to put on a map, and its
+copy is swapped for phrase entry (English phrase / Chinese translation
+instead of Place name / Address). Deleting the map leaves the grey panel
+with far less content than Figma's own version, so **Save** moves up to
+sit right under the second field instead of staying pinned at Figma's
+y763 — anchoring it there would just strand it under several hundred
+pixels of empty grey space where the map used to be. Its own save flow
+mirrors `add-contact.js` exactly, down to the same `?new=` URL-parameter
+fallback for browsers (Firefox, for `file://` pages) that disable
+`localStorage` outright.
+
+## "Display page" — the one screen that isn't red
+
+`show-phrase.html` (node 7:928) is a flash-card view of a single phrase,
+reached by tapping any row in `phrase-library.html` — seed or user-added
+alike. It's the one screen in the whole app that isn't built on the red
+theme: white background, black text and wordmark, a very faint (5%,
+against the usual 20%) version of the shared hexagon texture, because the
+point of this screen is to be held up and read by someone else (a
+stranger being asked for help), where the app's usual dark-red-on-cream
+palette would just be harder to read at arm's length. Return button,
+bottom bar, and logo medallion are the same pixel-identical assets every
+other page uses; only the background texture is a new export — same
+artwork, re-colored black instead of red-tinted, since it now sits on
+white instead of on `var(--c-red)`.
+
+Which phrase to show is a `sessionStorage` handoff (`guitu.showPhrase`),
+the same pattern `calling.html` uses for `guitu.callTarget`: `js/phrase-
+library.js` keeps the real phrase objects in an in-memory array (seed
+*and* saved) rather than baking them into each row's markup — a saved
+phrase's text could contain quotes or other HTML-sensitive characters
+awkward to round-trip through a `data-` attribute — and a delegated click
+handler on the list resolves the tapped row back to its phrase and writes
+it to `sessionStorage` right before the browser follows the link. Opened
+directly with nothing set, `show-phrase.html` falls back to Figma's own
+sample phrase ("I am lost, please help me." / 我迷路了，请帮助我), the
+same seed-data-fallback reasoning every other page's fallback uses.
 ## "Maps" — Navigation's home, and the first non-contacts slide-up card
 
 `navigation.html` (node 7:1284) reuses the exact same "Slide up card"

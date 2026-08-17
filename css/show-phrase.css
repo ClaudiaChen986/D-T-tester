@@ -1,0 +1,93 @@
+/* ============================================================================
+   归途 GuiTu — "Display page" (Figma node 7:928)
+   ----------------------------------------------------------------------------
+   The one screen in the whole app with a white background instead of red —
+   this is a flash-card view meant to be held up and read by someone else
+   (a stranger being asked for help), so it trades the app's usual red
+   theme for maximum legibility: plain white, a very faint (5%, vs. the
+   usual 20%) version of the shared hexagon texture, and black instead of
+   white text/wordmark. Return button, bottom bar, and logo medallion are
+   all still the same pixel-identical assets every other page uses — only
+   the background texture is re-exported (same artwork, black instead of
+   red-tinted, since it now sits on white instead of on var(--c-red)).
+   ========================================================================== */
+
+.screen--show { background: #fff; }
+
+.showbg-texture {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: .05;
+  pointer-events: none;
+}
+.showbg-texture > img {
+  position: absolute;
+  left: -191.18px;
+  top: -56.29px;
+  width: 674.66px;
+  height: 922.32px;
+  max-width: none;
+}
+
+/* the return arrow's "返回 return" wordmark is black here, not white —
+   only this page needs that, so it's scoped rather than added as a new
+   variant to the shared .wordmark--return in styles.css. */
+.screen--show .wordmark--return i { color: #000; }
+
+.showhint {
+  position: absolute;
+  left: 50%;
+  top: 140px;
+  transform: translateX(-50%);
+  width: 299px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.showhint > span { display: block; font-weight: 400; }
+.showhint .t-en { font-family: var(--font-en); font-size: 24px; }
+.showhint .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
+
+.showphrase {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 64px);
+  transform: translateX(-50%);
+  width: 299px;
+  margin: 0;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.showphrase > span { display: block; }
+.showphrase .t-en { font-family: var(--font-en); font-size: 40px; font-weight: 700; }
+.showphrase .t-cn { font-family: var(--font-cn); font-size: 24px; font-weight: 400; letter-spacing: 1.2px; margin-top: 8px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry family as translation.css's .transbar. */
+.showbar {
+  position: absolute;
+  left: 0;
+  top: 712px;
+  width: 390px;
+  height: 134px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.showbar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.showbar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.showbar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.showbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }

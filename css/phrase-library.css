@@ -1,0 +1,177 @@
+/* ============================================================================
+   归途 GuiTu — "Phrase library" (Figma node 136:1498)
+   ----------------------------------------------------------------------------
+   Sixteen phrases is real, page-length content — same reasoning contacts.css
+   gives for its own page: not a fixed 390×844 mock scaled as one unit, but a
+   real (unbounded-height) scrolling page, width capped at 390px and
+   centered. Reuses styles.css for tokens/fonts and the .crop/.return/
+   .wordmark/.chevron helpers; only this page's own layout lives here.
+
+   Figma's own canvas also carries a second header/"bottom navigation" copy
+   part-way down (the raw export of a component reused mid-canvas) — not
+   meaningful position data for a page that actually scrolls, so it's
+   ignored the same way contacts.html doesn't try to honor every fixed
+   coordinate from its own source either; the "Back to homepage" bar goes
+   at the true end of the list, after the last phrase, not stranded
+   mid-scroll.
+   ========================================================================== */
+
+.phrase-body {
+  display: block;
+  place-items: initial;
+  overflow: visible;
+  background: var(--c-red);
+}
+
+.phrasepage {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--c-red);
+  font-family: var(--font-en);
+}
+.phrasepage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('../assets/bg-texture2.png') repeat;
+  opacity: .16;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ header
+   Same artwork/positions as every other return-button page, sticky since
+   this page scrolls (contacts.html's own .chheader does the same). */
+.phrasehead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  width: 390px;
+  height: 209.144px;
+}
+/* "Phrase library" is longer than .header__title's box was sized for
+   (it fit "Home"/"Translation") — without this, the browser wraps *inside*
+   "Phrase library" itself instead of between the English and Chinese
+   lines (same fix contacts.css applies to its own longer title), and
+   without the wider box even the fixed one-line phrase has nowhere to
+   go but off the right edge of the screen. */
+.phrasehead .header__title {
+  left: 100px;
+  width: 266px;
+}
+.phrasehead .header__title .t-en,
+.phrasehead .header__title .t-cn { white-space: nowrap; }
+
+/* the header's persistent "Add" button (Figma: Group 55) */
+.addphrasebtn {
+  position: absolute;
+  left: 247px;
+  top: 157px;
+  width: 119px;
+  height: 56px;
+  border-radius: 30px;
+  background: var(--c-teal);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.addphrasebtn:active { transform: scale(.96); }
+.addphrasebtn__icon { pointer-events: none; }
+.addphrasebtn__label {
+  position: absolute;
+  left: 59px;
+  top: 10px;
+  width: 47px;
+  font-size: 0;
+  line-height: normal;
+  text-align: center;
+  color: #000;
+}
+.addphrasebtn__label > span { display: block; font-weight: 700; }
+.addphrasebtn__label .t-en { font-size: 16px; }
+.addphrasebtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
+
+/* -------------------------------------------------------------------- list */
+.phraselist {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 25px 0 32px;
+}
+
+.phraserow {
+  position: relative;
+  display: block;
+  width: 317px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.phraserow:active { transform: scale(.98); }
+.phraserow--sm { height: 100px; }
+.phraserow--md { height: 123px; }
+.phraserow--lg { height: 151px; }
+
+.phraserow__bg { position: absolute; left: -4px; top: 0; width: 325px; }
+.phraserow--sm .phraserow__bg { height: 108px; }
+.phraserow--md .phraserow__bg { height: 131px; }
+.phraserow--lg .phraserow__bg { height: 159px; }
+
+.phraserow__label {
+  position: absolute;
+  left: 24px;
+  top: var(--y);
+  width: 242px;
+  font-size: 0;
+  line-height: normal;
+  color: #000;
+}
+.phraserow__label > span { display: block; }
+/* English regular, Chinese bold — the one place in the app where the
+   Chinese line carries more weight than the English, matching Figma. */
+.phraserow__label .t-en { font-size: 24px; font-weight: 400; }
+.phraserow__label .t-cn { font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+/* -------------------------------------------------------------- back bar
+   Same asset/geometry as contacts.html's own .backbar (position: relative,
+   in normal flow — this page scrolls like that one, not a fixed stage). */
+.phrasebar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 390px;
+  height: 134px;
+  margin: 6px 0 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.phrasebar__bg { position: absolute; inset: 0; width: 390px; height: 134px; }
+.phrasebar__text {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+  width: 300px;
+  font-size: 0;
+  line-height: normal;
+  color: #fff;
+  white-space: nowrap;
+}
+.phrasebar__text .t-en { font-family: var(--font-en); font-size: 24px; font-weight: 700; }
+.phrasebar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .addphrasebtn,
+  .phraserow { transition: none; }
+}
