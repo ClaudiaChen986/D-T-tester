@@ -51,23 +51,23 @@
     <div class="phraseform-bg phraseform-bg--band"></div>
     <div class="phraseform-bg phraseform-bg--fill"></div>
 
-    <label class="phrasefield phrasefield--en" style="--y:153px">
+    <label class="phrasefield phrasefield--source" style="--y:153px">
       <span class="phrasefield__label">
-        <span class="t-en">English phrase:</span>
-        <span class="t-cn">英语短语：</span>
+        <span class="t-en">Chinese phrase:</span>
+        <span class="t-cn">中文短语：</span>
       </span>
-      <input type="text" id="enInput" name="en" autocomplete="off" required
-             aria-label="English phrase 英语短语">
+      <input type="text" id="cnInput" name="cn" autocomplete="off" required
+             placeholder="在此输入文本 Enter text here" aria-label="Chinese phrase 中文短语">
     </label>
 
-    <label class="phrasefield phrasefield--cn" style="--y:258px">
+    <div class="phrasefield phrasefield--preview" style="--y:258px">
       <span class="phrasefield__label">
-        <span class="t-en">Chinese translation:</span>
-        <span class="t-cn">中文翻译：</span>
+        <span class="t-en">English translation (auto):</span>
+        <span class="t-cn">英语翻译（自动）：</span>
       </span>
-      <input type="text" id="cnInput" name="cn" autocomplete="off"
-             placeholder="Enter text here 在此输入文本" aria-label="Chinese translation 中文翻译">
-    </label>
+      <input type="text" id="enPreview" name="en" readonly tabindex="-1"
+             placeholder="Translation preview 翻译预览" aria-label="Auto-translated English phrase 自动翻译的英语短语">
+    </div>
 
     <p class="formstatus" role="status" aria-live="polite" id="formStatus"></p>
 

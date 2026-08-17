@@ -5,13 +5,15 @@
    ----------------------------------------------------------------------------
    Two changes from that template: the map image (node 120:403) is gone —
    this form has nothing to put on a map — and its copy is swapped for
-   phrase entry (English phrase / Chinese translation instead of Place
-   name / Address). Removing the map leaves the grey panel with far less
-   content than Figma's own version had, so Save moves up to sit right
-   under the second field instead of pinned to the bottom of the screen
-   the way Figma's own Save (and add-contact.html's) is — anchoring it at
-   the original y763 here would just strand it under a few hundred pixels
-   of empty grey space where the map used to be.
+   phrase entry. The *typed* field is Chinese (matching this app's other
+   translation flows, where Chinese is the source a senior speaks/types and
+   English is generated for them) — English is a read-only preview,
+   auto-translated live as the Chinese field is typed into (js/add-phrase.js),
+   not a second thing to type. Save stays pinned to the bottom of the
+   screen (y763, same as add-contact.html/add-destination.html's own Save)
+   rather than floating right under the two fields — the grey fill panel
+   already runs the full remaining height down to the screen edge, so
+   nothing strands between the preview field and the button.
    ========================================================================== */
 
 .screen--addphrase {
@@ -38,8 +40,8 @@
 .phrasefield__label .t-en { font-family: var(--font-en); font-size: 24px; }
 .phrasefield__label .t-cn { font-family: var(--font-cn); font-size: 22px; letter-spacing: 1.1px; }
 
-.phrasefield--en .phrasefield__label { color: #fff; }
-.phrasefield--cn .phrasefield__label { color: #000; }
+.phrasefield--source .phrasefield__label { color: #fff; }
+.phrasefield--preview .phrasefield__label { color: #000; }
 
 .phrasefield input {
   display: block;
@@ -50,31 +52,35 @@
   padding: 0 0 6px;
   font: 20px var(--font-en), var(--font-cn);
 }
-.phrasefield--en input {
+.phrasefield--source input {
   color: #fff;
   border-bottom: 1px solid rgba(255, 255, 255, .6);
 }
-.phrasefield--en input::placeholder { color: rgba(255, 255, 255, .55); }
-.phrasefield--en.is-invalid input { border-bottom-color: #ffb3ac; }
+.phrasefield--source input::placeholder { color: rgba(255, 255, 255, .55); }
+.phrasefield--source.is-invalid input { border-bottom-color: #ffb3ac; }
 
-.phrasefield--cn input {
+.phrasefield--preview input {
   color: #000;
   font-size: 18px;
+  cursor: default;
 }
-.phrasefield--cn input::placeholder {
+.phrasefield--preview input::placeholder {
   font-family: var(--font-cn);
   font-size: 16px;
   letter-spacing: .8px;
   color: #979797;
 }
+/* while a translation request is in flight, the not-yet-updated preview
+   text dims and italicizes rather than just silently sitting there stale */
+.phrasefield--preview.is-loading input { opacity: .55; font-style: italic; }
 
 /* -------------------------------------------------------------------- save
-   Same button style as add-contact.css's .save, just repositioned (see
-   the file comment above for why). */
+   Same button style and position as add-contact.css's/add-destination.css's
+   own .save — pinned to the bottom of the screen. */
 .save {
   position: absolute;
   left: 37px;
-  top: 410px;
+  top: 763px;
   width: 317px;
   height: 52px;
   padding: 0;
@@ -89,13 +95,14 @@
   transition: transform .12s ease;
 }
 .save:active { transform: scale(.98); }
+.save:disabled { opacity: .6; cursor: default; }
 .save .t-en { font-family: var(--font-en); font-size: 20px; font-weight: 700; }
 .save .t-cn { font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .9px; }
 
 .formstatus {
   position: absolute;
   left: 37px;
-  top: 378px;
+  top: 731px;
   width: 317px;
   margin: 0;
   text-align: center;
