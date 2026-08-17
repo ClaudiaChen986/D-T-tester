@@ -11,9 +11,10 @@
    part-way down (the raw export of a component reused mid-canvas) — not
    meaningful position data for a page that actually scrolls, so it's
    ignored the same way contacts.html doesn't try to honor every fixed
-   coordinate from its own source either; the "Back to homepage" bar goes
-   at the true end of the list, after the last phrase, not stranded
-   mid-scroll.
+   coordinate from its own source either; the "Back to homepage" bar is
+   pinned to the bottom of the viewport (.phrasebar, position: fixed)
+   instead, always reachable without scrolling all the way down, with the
+   phrase list scrolling underneath it.
    ========================================================================== */
 
 .phrase-body {
@@ -102,7 +103,10 @@
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  padding: 25px 0 32px;
+  /* bottom padding clears the now-fixed .phrasebar (134px tall) plus the
+     same ~38px gap the bar used to sit behind when it was in normal flow,
+     so the last phrase never scrolls in underneath it. */
+  padding: 25px 0 166px;
 }
 
 .phraserow {
@@ -145,15 +149,22 @@
 .phraserow__label .t-cn { font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
 
 /* -------------------------------------------------------------- back bar
-   Same asset/geometry as contacts.html's own .backbar (position: relative,
-   in normal flow — this page scrolls like that one, not a fixed stage). */
+   Same artwork/geometry as contacts.html's own .backbar, but pinned to the
+   bottom of the viewport instead of sitting in normal flow at the end of
+   the list — it should always be reachable without scrolling all the way
+   down, with the phrase list scrolling underneath it. .phrasepage has no
+   transform/filter, so this stays positioned against the viewport rather
+   than getting clipped by its ancestor's overflow: hidden. */
 .phrasebar {
-  position: relative;
-  z-index: 1;
+  position: fixed;
+  z-index: 5;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
   display: block;
   width: 390px;
+  max-width: 100%;
   height: 134px;
-  margin: 6px 0 0;
   cursor: pointer;
   text-decoration: none;
 }
