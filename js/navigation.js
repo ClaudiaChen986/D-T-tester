@@ -100,7 +100,7 @@
     destRow.href = enPath('navigate-destination.html');
     destRowLabel.classList.remove('navrow__label--muted');
     destRowLabel.innerHTML =
-      '<span class="' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +
+      '<span class="destname ' + (CJK_RE.test(savedDestination.name) ? 't-cn' : 't-en') + '">' +
       escapeHtml(savedDestination.name) + '</span>';
     // Once there's somewhere real to go, this row reads exactly like "Go
     // home" above it — the location icon (which only ever meant "nothing's
