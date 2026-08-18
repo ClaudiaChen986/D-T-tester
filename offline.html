@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>归途 GuiTu — Offline</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#832118">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<style>
+  :root { --c-red: #832118; --c-cream: #f2e4d8; --c-teal: #56a8b0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 32px;
+    text-align: center;
+    background: var(--c-red);
+    color: var(--c-cream);
+    font-family: 'Inria Serif', serif;
+  }
+  img { width: 96px; height: 96px; }
+  h1 { margin: 0; font-size: 26px; font-weight: 700; }
+  p { margin: 0; max-width: 320px; line-height: 1.5; font-size: 17px; }
+  p.cn { font-family: 'Noto Serif SC', serif; }
+  button {
+    margin-top: 8px;
+    padding: 12px 28px;
+    border: 0;
+    border-radius: 24px;
+    background: var(--c-teal);
+    color: #fff;
+    font: 700 17px 'Inria Serif', serif;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <img src="assets/icons/icon-192.png" alt="归途 GuiTu">
+  <h1>You're offline</h1>
+  <p>This page hasn't been saved for offline use yet. Reconnect and visit it once, and it'll be available offline after that.</p>
+  <p class="cn">此页面尚未保存供离线使用。请重新连接网络并访问一次，之后即可离线打开。</p>
+  <button type="button" onclick="location.reload()">Try again</button>
+</body>
+</html>

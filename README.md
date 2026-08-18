@@ -9,6 +9,13 @@ browser — no build step, no dependencies.
 index.html                "Choose your language" (node 1:5) — the true entry
                            point, kept at the root so opening the project
                            always means this; every session starts here
+manifest.webmanifest      PWA install metadata — name, icons, standalone
+                           display, theme colour
+sw.js                     Service worker — hand-maintained precache list
+                           (see its own header comment) plus runtime
+                           caching for everything else
+offline.html              Fallback shown for a navigation that's neither
+                           cached nor reachable over the network
 
 pages/
   home.html                Home screen (node 2:40) — what index.html used to
@@ -186,6 +193,7 @@ js/
                                 sub-task toggle, and the real save
 
 assets/                    PNGs/SVGs exported from Figma, shared by every page
+  icons/                   Generated PWA icons (see the manifest section below)
 ```
 
 `index.html` stays at the root; everything under `pages/` (now including
@@ -1145,3 +1153,56 @@ opted into. This page's own Save is what
 finally writes `{ title, icon, day, start, duration, done, repeat,
 subtask? }` to `guitu.calendarEvents`, clears the draft, and returns to
 `calendar.html`.
+
+## Progressive Web App
+
+Every page — all three language tracks, every sub-page — registers a
+service worker and links `manifest.webmanifest`, so the whole site is
+installable to a phone or tablet's home screen and works offline once
+visited. No build step here either: the manifest is hand-written JSON,
+the icons are static PNGs, and `sw.js` is plain, dependency-free JS (no
+Workbox), consistent with the rest of this project's "no build step, no
+dependencies" posture.
+
+**Icons** (`assets/icons/`) are cropped straight from the existing
+`logo-sprite.png` medallion — the same circular "归途 GuiTu" badge every
+page's header already shows — at 192px and 512px for `"any"` purpose,
+plus maskable variants (logo scaled to the inner ~72% "safe zone" on a
+`#832118` brand-red backdrop, so Android's adaptive-icon masking doesn't
+clip it) and a 180px solid-background version for `apple-touch-icon`,
+since iOS doesn't composite transparency the way Android does.
+
+**Caching strategy** (`sw.js`): the install step precaches a hand-
+maintained "shell" — every page's `.css`/`.js` (small text files, ~450KB
+combined, cheap enough to just cache all of it rather than curate a
+subset), the three language-track homepages, and the handful of assets
+(`header.svg`, `return-button.png`, `logo-sprite.png`,
+`background-texture.png`, `bottomnav-bg.svg`, `icon-chevron.svg`) that
+15+ pages all reference. That's deliberately *not* every one of the
+~70 HTML pages or ~90 other asset files — with no bundler to generate a
+manifest of every build output, precaching literally everything by hand
+would mean re-editing `sw.js` every time a page's own art gets added,
+and would make the first install slow for content most visitors won't
+reach in one sitting anyway. Instead, the fetch handler runtime-caches
+same-origin requests as they're seen (network-first, so an online visit
+always gets the latest copy, falling back to whatever's cached when
+offline) — so any page or asset is available offline after its first
+successful load, without needing to be named in advance. Google Fonts
+(cross-origin) get the opposite treatment, cache-first, since a font
+file is effectively immutable once published and there's no reason to
+re-fetch it. A navigation that's neither cached nor reachable falls back
+to `offline.html` instead of the browser's own disconnected-page, so the
+language-specific chrome isn't lost mid-flow.
+
+Bump `CACHE_VERSION` in `sw.js` whenever the precache list changes (a
+new shared asset, a renamed shell file) or a shipped fix needs
+previously-cached pages invalidated outright — the activate handler
+deletes every cache whose name doesn't match the current version.
+
+**Deploying this** needs HTTPS (or `localhost`) — service workers
+refuse to register over plain HTTP or `file://`, so a hosting step
+(GitHub Pages, Netlify, Vercel, etc., all of which serve HTTPS by
+default) is required before "Add to Home Screen" will actually offer
+to install it; opening `index.html` directly still works exactly as
+before; it just won't be installable or offline-capable from a local
+file.

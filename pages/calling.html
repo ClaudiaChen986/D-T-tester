@@ -9,6 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inria+Serif:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/calling.css">
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#832118">
+<link rel="icon" href="../assets/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="归途 GuiTu">
 </head>
 <body>
 
@@ -91,5 +98,12 @@
 </div>
 
 <script src="../js/calling.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('../sw.js');
+  });
+}
+</script>
 </body>
 </html>
