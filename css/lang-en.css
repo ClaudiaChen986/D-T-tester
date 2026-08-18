@@ -44,6 +44,7 @@
    ancestor (an explicit-height card/row, confirmed per component below)
    instead of trying to patch each pixel offset by hand. */
 .othercard__label { top: 50% !important; transform: translateY(-50%); }
+.morebtn__label { top: 50% !important; transform: translateY(-50%); }
 
 /* Every "Back to homepage" bottom bar lays its .t-en/.t-cn out on one
    line (`white-space: nowrap`, no `display: block` on the spans) inside
@@ -68,8 +69,12 @@
    .othercard above, so the same fix applies. .eventcard--lg (the one
    "Seniors events" card with a description line too) can't use it —
    centering both .eventcard__label and .eventcard__desc at 50% would
-   stack them on top of each other — so instead just close the gap that
-   opens under the now-single-line title, keeping both anchored near the
-   top the way this card's title+description composition already was. */
+   stack them on top of each other. Instead, meet them at the card's own
+   midpoint: the label's bottom edge lands on 50% (translateY(-100%)),
+   the desc's top edge starts there (translateY(0), i.e. plain top:50%) —
+   a seam at the card centre that works regardless of how many lines
+   either one wraps to, instead of a hardcoded offset tuned for one
+   specific string's wrap width. */
 .eventcard--sm .eventcard__label { top: 50% !important; transform: translateY(-50%); }
-.eventcard--lg .eventcard__desc { top: 56px !important; }
+.eventcard--lg .eventcard__label { top: 50% !important; transform: translateY(-100%); }
+.eventcard--lg .eventcard__desc { top: 50% !important; transform: translateY(0); }

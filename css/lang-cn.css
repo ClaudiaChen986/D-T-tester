@@ -54,8 +54,20 @@
    patch each pixel offset by hand — same fix as lang-en.css's, just
    mirrored to the other language. */
 .othercard__label { top: 50% !important; transform: translateY(-50%); }
+.morebtn__label { top: 50% !important; transform: translateY(-50%); }
+
+/* .eventcard--sm cards are the same shape as .othercard above, so the
+   same fix applies. .eventcard--lg (the one "Seniors events" card with
+   a description line too) can't use it — centering both
+   .eventcard__label and .eventcard__desc at 50% would stack them on
+   top of each other. Instead, meet them at the card's own midpoint: the
+   label's bottom edge lands on 50% (translateY(-100%)), the desc's top
+   edge starts there (translateY(0), i.e. plain top:50%) — a seam at the
+   card centre that works regardless of how many lines either one wraps
+   to, instead of a hardcoded offset tuned for one specific string. */
 .eventcard--sm .eventcard__label { top: 50% !important; transform: translateY(-50%); }
-.eventcard--lg .eventcard__desc { top: 56px !important; }
+.eventcard--lg .eventcard__label { top: 50% !important; transform: translateY(-100%); }
+.eventcard--lg .eventcard__desc { top: 50% !important; transform: translateY(0); }
 
 /* daily-english-cn.html is the one page where .t-en holds real content,
    not translatable UI chrome: the English vocabulary word, its
