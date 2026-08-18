@@ -106,7 +106,7 @@
           '<span class="t-en">' + escapeHtml(phrase.en) + '</span>' +
           '<span class="t-cn">' + escapeHtml(phrase.cn) + '</span>' +
         '</span>' +
-        '<span class="chevron" style="--x:302px;--y:' + chevron.y + 'px;--s:' + chevron.s + 'px">' +
+        '<span class="chevron" style="--x:272px;--y:' + chevron.y + 'px;--s:' + chevron.s + 'px">' +
           '<img src="../assets/icon-chevron.svg" alt="">' +
         '</span>' +
       '</a>'

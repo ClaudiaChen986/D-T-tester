@@ -72,6 +72,16 @@
       });
   }
 
+  /* enPreview is a readonly textarea (js/add-phrase.css handles the
+     wrapping) — its height still needs a JS nudge on every programmatic
+     value change since a textarea's own height:auto doesn't grow with
+     content the way a plain block element's does. */
+  function setPreview(text) {
+    enPreview.value = text;
+    enPreview.style.height = 'auto';
+    enPreview.style.height = enPreview.scrollHeight + 'px';
+  }
+
   var TRANSLATE_DEBOUNCE_MS = 600;
   var translateTimer = null;
   var translateSeq = 0;
@@ -81,7 +91,7 @@
     var text = cnInput.value.trim();
     if (!text) {
       previewField.classList.remove('is-loading');
-      enPreview.value = '';
+      setPreview('');
       return;
     }
     translateTimer = setTimeout(function () {
@@ -90,7 +100,7 @@
       translateText(text, 'zh-CN', 'en')
         .then(function (translated) {
           if (seq !== translateSeq) return; // a newer request already superseded this one
-          enPreview.value = translated;
+          setPreview(translated);
         })
         .catch(function () { /* offline or the endpoint hiccuped — leave existing preview as-is */ })
         .then(function () {

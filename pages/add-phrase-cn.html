@@ -19,7 +19,7 @@
      Same markup/JS as add-phrase.html — see lang-cn.css — with its
      links and js/add-phrase.js's Save redirect pointed at the -cn
      counterpart pages instead. The auto-translated English preview
-     (#enPreview) is a real input value, not .t-en markup, so it
+     (#enPreview) is a real textarea value, not .t-en markup, so it
      keeps showing the live English translation regardless of track —
      only the field's own label follows the hide-English rule.
      ============================================================ -->
@@ -66,8 +66,8 @@
       <span class="phrasefield__label">
         <span class="t-cn">英语翻译（自动）：</span>
       </span>
-      <input type="text" id="enPreview" name="en" readonly tabindex="-1"
-             placeholder="翻译预览" aria-label="自动翻译的英语短语">
+      <textarea id="enPreview" name="en" readonly tabindex="-1" rows="1"
+                placeholder="翻译预览" aria-label="自动翻译的英语短语"></textarea>
     </div>
 
     <p class="formstatus" role="status" aria-live="polite" id="formStatus"></p>
