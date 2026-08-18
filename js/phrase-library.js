@@ -113,6 +113,56 @@
     );
   }
 
+  var SIZE_ORDER = ['sm', 'md', 'lg'];
+  // Below the label's real rendered bottom edge, leave this much room
+  // before the card's own bottom edge — roughly what every Figma-sized
+  // seed phrase already sits at.
+  var BOTTOM_PAD = 14;
+
+  /* pickSize()'s char-count guess is only ever a first pass for phrases
+     that don't come with a designer-picked size (anything typed into
+     add-phrase.html) — it can't know how the actual zh/en text wraps at
+     this box's real width/fonts. A row that guessed too small doesn't
+     grow to fit: .phraserow__label is absolutely positioned, so an
+     undersized card just lets the label's text spill out past the
+     card's own bottom edge. This corrects it after layout, promoting a
+     row to the next size tier — bigger card art, repositioned label and
+     chevron — whenever the label's real rendered height overflows what
+     its current tier gives it. Runs on every row, not just guessed
+     ones, in case a web font ever wraps slightly differently than
+     whatever Figma assumed for the seed sizes. */
+  function fixOversizedRows() {
+    list.querySelectorAll('.phraserow').forEach(function (row) {
+      var label = row.querySelector('.phraserow__label');
+      var bg = row.querySelector('.phraserow__bg');
+      var chevron = row.querySelector('.chevron');
+      if (!label || !bg || !chevron) return;
+
+      var idx = SIZE_ORDER.findIndex(function (s) { return row.classList.contains('phraserow--' + s); });
+      if (idx < 0) return;
+
+      while (idx < SIZE_ORDER.length - 1 &&
+             label.offsetTop + label.offsetHeight > row.clientHeight - BOTTOM_PAD) {
+        row.classList.remove('phraserow--' + SIZE_ORDER[idx]);
+        idx += 1;
+        var size = SIZE_ORDER[idx];
+        row.classList.add('phraserow--' + size);
+        bg.src = BG_SRC[size];
+        label.style.setProperty('--y', LABEL_Y[size] + 'px');
+        chevron.style.setProperty('--y', CHEVRON[size].y + 'px');
+        chevron.style.setProperty('--s', CHEVRON[size].s + 'px');
+      }
+
+      // Even 'lg' has a real content ceiling — there's no taller card art
+      // to promote to. Rather than let a phrase long enough to blow past
+      // that ceiling bleed into the row below, widen the gap after this
+      // one row by exactly how much its label overflows its own card, so
+      // the next card can never be touched no matter how long the text is.
+      var overflow = label.offsetTop + label.offsetHeight - row.clientHeight;
+      row.style.marginBottom = overflow > 0 ? (overflow + BOTTOM_PAD) + 'px' : '';
+    });
+  }
+
   var saved = loadSaved();
 
   var pending = takePendingFromUrl();
@@ -126,6 +176,10 @@
 
   var list = document.getElementById('phraseList');
   list.innerHTML = SEED_PHRASES.map(rowHtml).join('') + saved.map(rowHtml).join('');
+  fixOversizedRows();
+  // Re-check once the real web fonts are in (initial measurement above
+  // may have run against a fallback font, which can wrap differently).
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fixOversizedRows);
 
   list.addEventListener('click', function (e) {
     var link = e.target.closest('a[data-show-index]');
