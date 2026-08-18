@@ -55,6 +55,20 @@
    mirrored to the other language. */
 .othercard__label { top: 50% !important; transform: translateY(-50%); }
 .morebtn__label { top: 50% !important; transform: translateY(-50%); }
+.transcard__label { top: 50% !important; transform: translateY(-50%); }
+.navrow__label { top: 50% !important; transform: translateY(-50%); }
+
+/* The two Seniors-events panels' header chevron sits at a fixed offset
+   from the panel's own top — never centred on the whole (800px+) panel,
+   which is why it can't use the trick above. Anchor the title's own
+   *centre* (not its top) to the chevron's fixed centre instead of a
+   hardcoded top offset: `top` set to the chevron's centre point, then
+   `translateY(-50%)` pulls the title up by half of *its own* rendered
+   height, whatever that is — robust regardless of how many lines the
+   title wraps to. Two values because the two panels' chevrons sit at
+   different fixed offsets (centres at 45+18=63 and 31+18=49). */
+.eventpanel--nutrition .eventpanel__title { top: 63px !important; transform: translateY(-50%); }
+.eventpanel--chairyoga .eventpanel__title { top: 49px !important; transform: translateY(-50%); }
 
 /* .eventcard--sm cards are the same shape as .othercard above, so the
    same fix applies. .eventcard--lg (the one "Seniors events" card with

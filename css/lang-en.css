@@ -45,6 +45,22 @@
    instead of trying to patch each pixel offset by hand. */
 .othercard__label { top: 50% !important; transform: translateY(-50%); }
 .morebtn__label { top: 50% !important; transform: translateY(-50%); }
+.navrow__label { top: 50% !important; transform: translateY(-50%); }
+
+/* The two Seniors-events panels' header chevron sits at a fixed offset
+   from the panel's own top — never centred on the whole (800px+) panel,
+   which is why it can't use the trick above. Anchor the title's own
+   *centre* (not its top) to the chevron's fixed centre instead of a
+   hardcoded top offset: `top` set to the chevron's centre point, then
+   `translateY(-50%)` pulls the title up by half of *its own* rendered
+   height, whatever that is. That matters because "Nutrition and Health
+   workshop" wraps to two lines in English but not in Chinese ("营养与
+   健康研讨会") — a fixed top tuned for one language's line count
+   drifted right back off for the other's. Two values because the two
+   panels' chevrons sit at different fixed offsets (centres at 45+18=63
+   and 31+18=49). */
+.eventpanel--nutrition .eventpanel__title { top: 63px !important; transform: translateY(-50%); }
+.eventpanel--chairyoga .eventpanel__title { top: 49px !important; transform: translateY(-50%); }
 
 /* Every "Back to homepage" bottom bar lays its .t-en/.t-cn out on one
    line (`white-space: nowrap`, no `display: block` on the spans) inside
