@@ -118,6 +118,10 @@
   // before the card's own bottom edge — roughly what every Figma-sized
   // seed phrase already sits at.
   var BOTTOM_PAD = 14;
+  // .phraserow__bg is always this many px taller than its row — same
+  // bleed on every tier (108-100, 131-123, 159-151) — so a stretched
+  // card keeps that same overhang instead of ending flush with its text.
+  var BG_OVERHANG = 8;
 
   /* pickSize()'s char-count guess is only ever a first pass for phrases
      that don't come with a designer-picked size (anything typed into
@@ -130,7 +134,13 @@
      chevron — whenever the label's real rendered height overflows what
      its current tier gives it. Runs on every row, not just guessed
      ones, in case a web font ever wraps slightly differently than
-     whatever Figma assumed for the seed sizes. */
+     whatever Figma assumed for the seed sizes.
+
+     Even 'lg' has a real content ceiling — there's no taller card art to
+     promote to. There's no asset for anything bigger, so past that
+     ceiling the row and its existing 'lg' art both get stretched taller
+     (width untouched) to actually contain the text, rather than leaving
+     it spilling past the card's own bottom edge. */
   function fixOversizedRows() {
     list.querySelectorAll('.phraserow').forEach(function (row) {
       var label = row.querySelector('.phraserow__label');
@@ -138,8 +148,17 @@
       var chevron = row.querySelector('.chevron');
       if (!label || !bg || !chevron) return;
 
+      // Reset any stretch from a previous pass (this runs again once web
+      // fonts are ready) so re-measuring starts from each tier's own
+      // plain CSS height/chevron position, not whatever the last pass
+      // grew it to.
+      row.style.height = '';
+      bg.style.height = '';
+
       var idx = SIZE_ORDER.findIndex(function (s) { return row.classList.contains('phraserow--' + s); });
       if (idx < 0) return;
+      chevron.style.setProperty('--y', CHEVRON[SIZE_ORDER[idx]].y + 'px');
+      chevron.style.setProperty('--s', CHEVRON[SIZE_ORDER[idx]].s + 'px');
 
       while (idx < SIZE_ORDER.length - 1 &&
              label.offsetTop + label.offsetHeight > row.clientHeight - BOTTOM_PAD) {
@@ -153,13 +172,16 @@
         chevron.style.setProperty('--s', CHEVRON[size].s + 'px');
       }
 
-      // Even 'lg' has a real content ceiling — there's no taller card art
-      // to promote to. Rather than let a phrase long enough to blow past
-      // that ceiling bleed into the row below, widen the gap after this
-      // one row by exactly how much its label overflows its own card, so
-      // the next card can never be touched no matter how long the text is.
-      var overflow = label.offsetTop + label.offsetHeight - row.clientHeight;
-      row.style.marginBottom = overflow > 0 ? (overflow + BOTTOM_PAD) + 'px' : '';
+      var needed = label.offsetTop + label.offsetHeight + BOTTOM_PAD;
+      if (needed > row.clientHeight) {
+        row.style.height = needed + 'px';
+        bg.style.height = (needed + BG_OVERHANG) + 'px';
+        // CHEVRON[size].y centers the chevron for that tier's own plain
+        // height — recenter it for the stretched height instead, or a
+        // tall stretch leaves it stranded up near the top.
+        var chevronSize = CHEVRON[SIZE_ORDER[idx]].s;
+        chevron.style.setProperty('--y', (needed / 2 - chevronSize / 2) + 'px');
+      }
     });
   }
 
