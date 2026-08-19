@@ -101,6 +101,7 @@
       title: draft.title,
       icon: draft.icon || 'event',
       day: draft.day,
+      date: draft.date,
       start: draft.start,
       duration: draft.duration,
       done: false,

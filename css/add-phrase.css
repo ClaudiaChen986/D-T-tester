@@ -47,7 +47,8 @@
 .phrasefield--source .phrasefield__label { color: #fff; }
 .phrasefield--preview .phrasefield__label { color: #000; }
 
-.phrasefield input {
+.phrasefield input,
+.phrasefield textarea {
   display: block;
   width: 100%;
   border: 0;
@@ -63,12 +64,22 @@
 .phrasefield--source input::placeholder { color: rgba(255, 255, 255, .55); }
 .phrasefield--source.is-invalid input { border-bottom-color: #ffb3ac; }
 
-.phrasefield--preview input {
+/* The preview is a readonly textarea, not an input, so a long auto-
+   translation wraps onto further lines instead of just scrolling out of
+   view sideways. Height tracks its content (js/add-phrase.js resizes it
+   on every value change) up to max-height, past which it scrolls rather
+   than growing into the Save button pinned near the bottom of the panel. */
+.phrasefield--preview textarea {
   color: #000;
   font-size: 18px;
   cursor: default;
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  max-height: 200px;
 }
-.phrasefield--preview input::placeholder {
+.phrasefield--preview textarea::placeholder {
   font-family: var(--font-cn);
   font-size: 16px;
   letter-spacing: .8px;
@@ -76,7 +87,7 @@
 }
 /* while a translation request is in flight, the not-yet-updated preview
    text dims and italicizes rather than just silently sitting there stale */
-.phrasefield--preview.is-loading input { opacity: .55; font-style: italic; }
+.phrasefield--preview.is-loading textarea { opacity: .55; font-style: italic; }
 
 /* -------------------------------------------------------------------- save
    Same button style and position as add-contact.css's/add-destination.css's

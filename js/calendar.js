@@ -16,10 +16,18 @@
        same pill/axis language, a taller scale, event text and a tick box
        beside each pill instead of just an icon — inside the card's own
        scrollable region, so a busy day scrolls independently too
-     · both timelines colour each pill by how much of it has already
-       happened, measured against the real clock; only today's events
-       ever show a partial/full fill, since "now" doesn't apply to
-       tomorrow/2-days
+     · the 3-day overview colours today's pills by how much of each has
+       already happened, measured against the real clock ("now" doesn't
+       apply to tomorrow/2-days, so those stay a plain track colour);
+       the slide-up card's own today timeline doesn't do this — every
+       pill there stays plain yellow/cream regardless of the clock
+     · repeat (daily/weekly/fortnightly/monthly/yearly, set on
+       add-event-continue.html) is real recurrence against each event's
+       saved `date`, not just its 0/1/2 lane — occurrencesForOffset()
+       below re-derives which events land on today/tomorrow/2-days from
+       that anchor date every render, so a daily event shows on all
+       three, a weekly one shows again only once 7 real days have
+       passed, etc.
      · overlapping events (same day, same or crossing time ranges) used
        to render exactly on top of each other — same top/height, so only
        the last-drawn one was ever visible, which looked like events
@@ -191,6 +199,44 @@
   var events = loadEvents();
   var now = new Date();
   var nowMinutes = now.getHours() * 60 + now.getMinutes();
+  var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  function dateForOffset(offset) {
+    var d = new Date(today0);
+    d.setDate(d.getDate() + offset);
+    return d;
+  }
+
+  function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+
+  /* Whether `ev` (anchored on its own saved `date`) also lands on
+     `date`, per its `repeat` rule — real calendar-date recurrence,
+     independent of the 0/1/2 lane it was originally created on.
+     Negative diff (date before the event was ever created) never
+     matches, repeat or not. */
+  function repeatsOnto(ev, date) {
+    var anchor = new Date(ev.date + 'T00:00:00');
+    var diff = daysBetween(anchor, date);
+    if (diff < 0) return false;
+    switch (ev.repeat) {
+      case 'daily': return true;
+      case 'weekly': return diff % 7 === 0;
+      case 'fortnightly': return diff % 14 === 0;
+      case 'monthly': return date.getDate() === anchor.getDate();
+      case 'yearly': return date.getDate() === anchor.getDate() && date.getMonth() === anchor.getMonth();
+      default: return diff === 0; // 'none' / unset
+    }
+  }
+
+  /* Events saved before `date` was recorded alongside `day` have no
+     anchor to recur from — they still render once, on the same fixed
+     lane they always did. */
+  function occurrencesForOffset(offset) {
+    var date = dateForOffset(offset);
+    return events.filter(function (ev) {
+      return ev.date ? repeatsOnto(ev, date) : ev.day === offset;
+    });
+  }
 
   function minutesLabel(mins) {
     var h = Math.floor(mins / 60), m = mins % 60;
@@ -234,7 +280,7 @@
 
   [0, 1, 2].forEach(function (day) {
     var lane = lanes[day];
-    var laneEvents = events.filter(function (ev) { return ev.day === day; });
+    var laneEvents = occurrencesForOffset(day);
     assignColumns(laneEvents).forEach(function (placed) {
       var ev = placed.event;
       var pill = document.createElement('div');
@@ -256,7 +302,7 @@
      box beside each pill. Range shown is whatever covers today's events
      (rounded out to 3-hour boundaries), so an empty today renders nothing
      here beyond the empty-state message. */
-  var todays = events.filter(function (ev) { return ev.day === 0; })
+  var todays = occurrencesForOffset(0)
     .sort(function (a, b) { return a.start - b.start; });
   var todaysPlaced = assignColumns(todays);
 
@@ -328,7 +374,11 @@
       pill.style.top = topPx + 'px';
       pill.style.left = (col * 12) + 'px';
       pill.style.height = heightPx + 'px';
-      pill.style.background = ev.done ? 'var(--c-accent)' : pillBackground(true, ev);
+      // Unlike the 3-day overview behind it, the slide-up card's own
+      // timeline never fills in with elapsed-time colour — every pill
+      // here stays the plain yellow/cream track colour regardless of
+      // "now", only "done" changes it.
+      pill.style.background = ev.done ? 'var(--c-accent)' : 'var(--c-track)';
       pill.innerHTML = '<span class="material-symbols-outlined">' + (ICONS[ev.icon] || 'event') + '</span>';
       mtlRail.appendChild(pill);
 
@@ -355,7 +405,7 @@
         saveEvents(events);
         entry.classList.toggle('is-done', ev.done);
         pill.classList.toggle('mtl__pill--done', ev.done);
-        pill.style.background = ev.done ? 'var(--c-accent)' : pillBackground(true, ev);
+        pill.style.background = ev.done ? 'var(--c-accent)' : 'var(--c-track)';
         tick.setAttribute('aria-checked', String(ev.done));
       });
       mtlTickCol.appendChild(tick);
