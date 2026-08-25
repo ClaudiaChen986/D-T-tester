@@ -39,17 +39,6 @@
     return g === 'family' ? 'family' : 'friends';
   }
 
-  /* Editing an existing contact reuses this same form rather than a
-     separate screen — contacts.js's own "Edit" toggle links here with
-     ?edit=<id> instead of ?group=, so Save below needs to update that
-     record in place (same id, same group it already belonged to)
-     instead of creating a new one. loadContacts is declared further
-     down but hoisted, so it's already callable here. */
-  var editId = new URLSearchParams(window.location.search).get('edit');
-  var editingContact = editId
-    ? loadContacts().filter(function (c) { return c.id === editId; })[0] || null
-    : null;
-
   var stage           = document.querySelector('.stage');
   var form            = document.getElementById('addForm');
   var nameField        = document.querySelector('.namefield');
@@ -62,16 +51,6 @@
   var status           = document.getElementById('formStatus');
 
   var photoDataUrl = null;
-
-  if (editingContact) {
-    nameInput.value = editingContact.name || '';
-    relationshipInput.value = editingContact.relationship || '';
-    phoneInput.value = (editingContact.phone || '').replace(/^04/, '');
-    if (editingContact.photo) {
-      photoDataUrl = editingContact.photo;
-      avatarPreview.src = editingContact.photo;
-    }
-  }
 
   /* ---------------------------------------------------------------- scaling
      Same fit-to-viewport approach as the other fixed-size screens. */
@@ -162,20 +141,19 @@
 
     var digits = phoneInput.value.trim();
     var contact = {
-      id: editingContact ? editingContact.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
       name: name,
       cn: '',
       relationship: relationshipInput.value.trim(),
       phone: digits ? '04' + digits.replace(/[^\d ]/g, '') : '',
       photo: photoDataUrl,
-      group: editingContact ? editingContact.group : targetGroup(),
+      group: targetGroup(),
     };
 
     var storedOk = false;
     try {
       var contacts = loadContacts();
-      var existingIndex = contacts.findIndex(function (c) { return c.id === contact.id; });
-      if (existingIndex === -1) contacts.push(contact); else contacts[existingIndex] = contact;
+      contacts.push(contact);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(contacts));
       storedOk = true;
     } catch (err) {

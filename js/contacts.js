@@ -104,27 +104,6 @@
            'aria-label="Call ' + escapeHtml(contact.name) + '">' + icon + '</a>';
   }
 
-  /* Only a saved contact (one with an `id`) can be edited or deleted —
-     the seed Family/Friends above are hardcoded, not localStorage
-     records, so there's nothing to update or remove them from. Their
-     controls only ever render once a group's own manage toggle below
-     has switched that grid into "is-managing". */
-  function manageControlsHtml(contact) {
-    if (!contact.id) return '';
-    return (
-      '<div class="card__manage">' +
-        '<button type="button" class="card__managebtn card__managebtn--edit" data-edit-id="' + contact.id + '" ' +
-           'aria-label="Edit ' + escapeHtml(contact.name) + '">' +
-          '<img src="../assets/icon-edit.svg" alt="">' +
-        '</button>' +
-        '<button type="button" class="card__managebtn card__managebtn--delete" data-delete-id="' + contact.id + '" ' +
-           'aria-label="Delete ' + escapeHtml(contact.name) + '">' +
-          '<span aria-hidden="true">&times;</span>' +
-        '</button>' +
-      '</div>'
-    );
-  }
-
   function cardHtml(contact) {
     /* contact.name is a single free-typed field, not a real en/cn
        translation pair — nameFontClass just picks it the right font.
@@ -141,7 +120,6 @@
           callButtonHtml(contact) +
         '</div>' +
         '<p class="card__name">' + nameLines + '</p>' +
-        manageControlsHtml(contact) +
       '</div>'
     );
   }
@@ -163,90 +141,33 @@
     );
   }
 
-  /* The manage toggle sits right beside "+ Add" in the same grid, styled
-     identically (same .card--add shell) so it reads as this section's
-     other action rather than a one-off control — flipping it switches
-     this one group's own saved cards into showing their edit/delete
-     buttons, independent of the other group's toggle. */
-  var managing = { family: false, friends: false };
-
-  function manageToggleHtml(group) {
-    var isOn = managing[group];
-    var enLabel = isOn ? 'Done' : 'Edit';
-    var cnLabel = isOn ? '完成' : '编辑';
-    return (
-      '<button type="button" class="card card--add card--manage' + (isOn ? ' is-active' : '') + '" ' +
-         'data-manage-group="' + group + '" aria-pressed="' + String(isOn) + '" ' +
-         'aria-label="' + enLabel + ' ' + cnLabel + '">' +
-        '<img class="card--manage__icon" src="../assets/icon-edit.svg" alt="">' +
-        '<p class="card__name"><span class="t-en">' + enLabel + '</span><span class="t-cn">' + cnLabel + '</span></p>' +
-      '</button>'
-    );
-  }
-
   function renderGrid(el, seed, group, saved) {
     var extra = saved.filter(function (c) { return c.group === group; });
-    el.classList.toggle('is-managing', managing[group]);
-    el.innerHTML = seed.map(cardHtml).join('') + extra.map(cardHtml).join('') + addCardHtml(group) + manageToggleHtml(group);
+    var html = seed.map(cardHtml).join('') + extra.map(cardHtml).join('') + addCardHtml(group);
+    el.innerHTML = html;
   }
 
-  var familyGrid = document.getElementById('familyGrid');
-  var friendsGrid = document.getElementById('friendsGrid');
+  var saved = loadSaved();
 
-  function renderAll() {
-    CALL_TARGETS.length = 0;
-    var saved = loadSaved();
-    renderGrid(familyGrid, SEED_FAMILY, 'family', saved);
-    renderGrid(friendsGrid, SEED_FRIENDS, 'friends', saved);
-  }
-
-  (function foldInPending() {
-    var saved = loadSaved();
-    var pending = takePendingFromUrl();
-    if (!pending) return;
-    var existingIndex = saved.findIndex(function (c) { return c.id === pending.id; });
+  var pending = takePendingFromUrl();
+  if (pending && !saved.some(function (c) { return c.id === pending.id; })) {
     pending.photo = pending.photo || null;
-    if (existingIndex === -1) saved.push(pending); else saved[existingIndex] = pending;
+    saved.push(pending);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch (e) { /* still render it below either way */ }
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', window.location.pathname);
     }
-  }());
+  }
 
-  renderAll();
+  renderGrid(document.getElementById('familyGrid'), SEED_FAMILY, 'family', saved);
+  renderGrid(document.getElementById('friendsGrid'), SEED_FRIENDS, 'friends', saved);
 
   document.addEventListener('click', function (e) {
-    var call = e.target.closest('a[data-call-index]');
-    if (call) {
-      var contact = CALL_TARGETS[Number(call.dataset.callIndex)];
-      if (!contact) return;
-      var target = { en: contact.name, cn: contact.cn || '', phone: contact.phone, photo: contact.photo || null, type: 'person' };
-      try { sessionStorage.setItem('guitu.callTarget', JSON.stringify(target)); } catch (err) { /* best effort only */ }
-      return;
-    }
-
-    var manageToggle = e.target.closest('button[data-manage-group]');
-    if (manageToggle) {
-      var group = manageToggle.dataset.manageGroup;
-      managing[group] = !managing[group];
-      renderAll();
-      return;
-    }
-
-    var editBtn = e.target.closest('button[data-edit-id]');
-    if (editBtn) {
-      window.location.href = langPath('add-contact.html') + '?edit=' + encodeURIComponent(editBtn.dataset.editId);
-      return;
-    }
-
-    var deleteBtn = e.target.closest('button[data-delete-id]');
-    if (deleteBtn) {
-      var id = deleteBtn.dataset.deleteId;
-      var confirmMsg = LANG === 'cn' ? '删除这个联系人？' : LANG === 'en' ? 'Delete this contact?' : 'Delete this contact? 删除这个联系人？';
-      if (!window.confirm(confirmMsg)) return;
-      var remaining = loadSaved().filter(function (c) { return c.id !== id; });
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining)); } catch (err) { /* best effort only */ }
-      renderAll();
-    }
+    var link = e.target.closest('a[data-call-index]');
+    if (!link) return;
+    var contact = CALL_TARGETS[Number(link.dataset.callIndex)];
+    if (!contact) return;
+    var target = { en: contact.name, cn: contact.cn || '', phone: contact.phone, photo: contact.photo || null, type: 'person' };
+    try { sessionStorage.setItem('guitu.callTarget', JSON.stringify(target)); } catch (err) { /* best effort only */ }
   });
 }());

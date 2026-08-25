@@ -97,7 +97,6 @@
    holds a variable number of contacts, so a fixed height per card (as
    Figma's two seed heights, 153/162px, imply) can't scale to real data. */
 .card {
-  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 150px;
@@ -153,56 +152,8 @@
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  border: 0;
-  font: inherit;
 }
 .card--add .crop { position: relative; left: 0; top: 0; }
-
-/* the "Edit"/"Done" toggle beside it — same shell, own icon, and a teal
-   fill once active so the whole grid visibly reads as "in manage mode"
-   rather than just its cards quietly growing extra buttons. */
-.card--manage__icon { width: 44px; height: 44px; }
-.card--manage.is-active {
-  background: var(--c-teal, #56a8b0);
-  color: #fff;
-}
-.card--manage.is-active .card__name { color: #fff; }
-
-/* Per-card edit/delete controls — only ever rendered for a saved
-   contact (an id-bearing one, never the hardcoded seed rows), and only
-   ever shown once this card's own grid has been switched into
-   is-managing by its section's "Edit" toggle above. */
-.card__manage {
-  display: none;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  gap: 6px;
-}
-.section__grid.is-managing .card__manage { display: flex; }
-
-.card__managebtn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-}
-.card__managebtn--edit img { width: 15px; height: 15px; }
-.card__managebtn--delete {
-  background: #b3261e;
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-  font-weight: 700;
-}
-.card__managebtn:focus-visible { outline: 2px solid #154c52; outline-offset: 2px; }
 
 /* -------------------------------------------------------------- back bar
    Pinned to the bottom of the viewport instead of sitting in normal flow —
