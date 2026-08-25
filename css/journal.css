@@ -89,45 +89,6 @@
 .addbtn__label .t-en { font-size: 16px; }
 .addbtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
 
-/* Same shell as .addbtn, sitting directly to its left (no room to its
-   right in this 390px header) — toggles the whole list in and out of
-   manage mode. */
-.editbtn {
-  position: absolute;
-  left: 118px;
-  top: 157px;
-  width: 119px;
-  height: 56px;
-  border-radius: 30px;
-  background: var(--c-teal);
-  border: 0;
-  cursor: pointer;
-  transition: transform .12s ease, background .12s ease;
-  font: inherit;
-}
-.editbtn:active { transform: scale(.96); }
-.editbtn.is-active { background: var(--c-accent, #37848c); }
-.editbtn__icon {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  width: 28px;
-  height: 28px;
-}
-.editbtn__label {
-  position: absolute;
-  left: 52px;
-  top: 10px;
-  width: 60px;
-  font-size: 0;
-  line-height: normal;
-  color: #000;
-}
-.editbtn.is-active .editbtn__label { color: #fff; }
-.editbtn__label > span { display: block; font-weight: 700; }
-.editbtn__label .t-en { font-size: 16px; }
-.editbtn__label .t-cn { font-size: 14px; letter-spacing: .7px; }
-
 /* -------------------------------------------------------------------- list */
 .journallist {
   position: relative;
@@ -174,42 +135,6 @@
 .entry__body .t-en { font-size: 18px; }
 .entry__body .t-cn { font-size: 16px; }
 
-/* Only ever rendered for a saved (id-bearing) entry, never one of the
-   three hardcoded seed samples, and only ever shown once the header's
-   own "Edit" toggle has switched the whole list into is-managing. */
-.entry__manage {
-  display: none;
-  position: absolute;
-  z-index: 2;
-  top: 16px;
-  right: 16px;
-  gap: 6px;
-}
-.journallist.is-managing .entry__manage { display: flex; }
-
-.entry__managebtn {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-}
-.entry__managebtn--edit img { width: 15px; height: 15px; }
-.entry__managebtn--delete {
-  background: #b3261e;
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-  font-weight: 700;
-}
-.entry__managebtn:focus-visible { outline: 2px solid #154c52; outline-offset: 2px; }
-
 /* -------------------------------------------------------------- back bar
    Same asset/geometry as contacts.html's own .backbar. */
 .journalbar {
@@ -237,6 +162,5 @@
 .journalbar__text .t-cn { font-family: var(--font-cn); font-size: 22px; font-weight: 700; letter-spacing: 1.1px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .addbtn,
-  .editbtn { transition: none; }
+  .addbtn { transition: none; }
 }

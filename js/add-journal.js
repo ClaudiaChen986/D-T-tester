@@ -26,21 +26,6 @@
   var bodyInput  = document.getElementById('bodyInput');
   var status     = document.getElementById('formStatus');
 
-  /* Editing an existing entry reuses this same form rather than a
-     separate screen — journal.js's own "Edit" toggle links here with
-     ?edit=<id>, so Save below needs to update that record in place
-     instead of unshifting a new one. Only ever a saved (id-bearing)
-     entry, never one of the three hardcoded seed samples. loadEntries
-     is declared further down but hoisted, so it's already callable. */
-  var editId = new URLSearchParams(window.location.search).get('edit');
-  var editingEntry = editId
-    ? loadEntries().filter(function (en) { return en.id === editId; })[0] || null
-    : null;
-  if (editingEntry) {
-    titleInput.value = editingEntry.title || '';
-    bodyInput.value = editingEntry.body || '';
-  }
-
   /* ---------------------------------------------------------------- scaling
      Same fit-to-viewport approach as the other fixed-size screens. */
   function fit() {
@@ -78,7 +63,7 @@
     status.classList.remove('is-error');
 
     var entry = {
-      id: editingEntry ? editingEntry.id : Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
       title: titleInput.value.trim(),
       body: body,
     };
@@ -86,8 +71,7 @@
     var storedOk = false;
     try {
       var entries = loadEntries();
-      var existingIndex = entries.findIndex(function (en) { return en.id === entry.id; });
-      if (existingIndex === -1) entries.unshift(entry); else entries[existingIndex] = entry;
+      entries.unshift(entry);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
       storedOk = true;
     } catch (err) {

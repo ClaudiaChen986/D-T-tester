@@ -53,28 +53,8 @@
     return dateLine + '<br>' + timeLine;
   }
 
-  /* ------------------------------------------------------------------ save */
-  function loadEvents() {
-    try {
-      var raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return Array.isArray(raw) ? raw : [];
-    } catch (e) { return []; }
-  }
-
-  /* Editing an existing event carries its id as draft.editId (set by
-     add-event.js) rather than any of its other fields — those already
-     live in localStorage under that same id, so this page just looks
-     the original record back up to prefill Repeat/sub-task the same
-     way step 1 prefills icon/title/date/time/duration. */
-  var editingEvent = draft.editId
-    ? loadEvents().filter(function (ev) { return ev.id === draft.editId; })[0] || null
-    : null;
-
   /* --------------------------------------------------------------- repeat */
-  var selectedRepeat = editingEvent ? (editingEvent.repeat || 'none') : 'none';
-  repeatGrid.querySelectorAll('.repeatchip').forEach(function (c) {
-    c.classList.toggle('is-selected', c.dataset.repeat === selectedRepeat);
-  });
+  var selectedRepeat = 'none';
   repeatGrid.addEventListener('click', function (e) {
     var chip = e.target.closest('.repeatchip');
     if (!chip) return;
@@ -96,9 +76,12 @@
   subtaskToggle.addEventListener('click', toggleSubtask);
   subtaskLabel.addEventListener('click', toggleSubtask);
 
-  if (editingEvent && editingEvent.subtask) {
-    subtaskInput.value = editingEvent.subtask;
-    toggleSubtask();
+  /* ------------------------------------------------------------------ save */
+  function loadEvents() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return Array.isArray(raw) ? raw : [];
+    } catch (e) { return []; }
   }
 
   form.addEventListener('submit', function (e) {
@@ -106,21 +89,19 @@
 
     var events = loadEvents();
     var event = {
-      id: editingEvent ? editingEvent.id : 'ev-' + Date.now(),
+      id: 'ev-' + Date.now(),
       title: draft.title,
       icon: draft.icon || 'event',
       day: draft.day,
       start: draft.start,
       duration: draft.duration,
-      done: editingEvent ? editingEvent.done : false,
+      done: false,
       repeat: selectedRepeat,
     };
     if (subtaskToggle.getAttribute('aria-checked') === 'true' && subtaskInput.value.trim()) {
       event.subtask = subtaskInput.value.trim();
     }
-
-    var existingIndex = events.findIndex(function (ev) { return ev.id === event.id; });
-    if (existingIndex === -1) events.push(event); else events[existingIndex] = event;
+    events.push(event);
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(events));

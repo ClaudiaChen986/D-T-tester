@@ -89,47 +89,6 @@
 .addpill__label .t-en { font-family: var(--font-en); font-size: 16px; }
 .addpill__label .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
 
-/* Same shell as .addpill, sitting directly to its left (there's no room
-   to its right in this 390px header) — toggles today's list in and out
-   of manage mode, so it visibly reads as this header's other action
-   rather than a one-off control. */
-.editpill {
-  position: absolute;
-  left: 118px;
-  top: 157px;
-  width: 119px;
-  height: 56px;
-  border-radius: 30px;
-  background: var(--c-teal);
-  border: 0;
-  cursor: pointer;
-  transition: transform .12s ease, background .12s ease;
-  font: inherit;
-}
-.editpill:active { transform: scale(.96); }
-.editpill.is-active { background: var(--c-accent); }
-.editpill__icon {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  width: 28px;
-  height: 28px;
-}
-.editpill__label {
-  position: absolute;
-  left: 52px;
-  top: 9px;
-  width: 60px;
-  font-size: 0;
-  line-height: normal;
-  color: #000;
-  text-align: left;
-}
-.editpill.is-active .editpill__label { color: #fff; }
-.editpill__label > span { display: block; font-weight: 700; }
-.editpill__label .t-en { font-family: var(--font-en); font-size: 16px; }
-.editpill__label .t-cn { font-family: var(--font-cn); font-size: 14px; letter-spacing: .7px; }
-
 /* ---------------------------------------------------------- 3-day overview
    Its own bounded, independently-scrollable region behind the card — the
    "other bottom display node" that stays scrollable regardless of the
@@ -457,17 +416,14 @@
   color: rgba(255, 255, 255, .85);
 }
 
-/* mini-timeline (mtl): axis(55px) | rail(50px pill) | text(1fr) | tick(34px)
-   | manage(30px, only while the "Edit" pill above has switched today's
-   list into manage mode — see .mtl__managecol below) */
+/* mini-timeline (mtl): axis(55px) | rail(50px pill) | text(1fr) | tick(30px) */
 .mtl {
   position: relative;
   display: grid;
-  grid-template-columns: 55px 50px 1fr 34px 30px;
+  grid-template-columns: 55px 50px 1fr 34px;
   column-gap: 12px;
   margin-bottom: 16px;
 }
-.mtl:not(.is-managing) { grid-template-columns: 55px 50px 1fr 34px 0; }
 
 .mtl__axis { position: relative; grid-column: 1; }
 .mtl__hour {
@@ -552,31 +508,8 @@
 }
 .mtl__tick[aria-checked="true"] .material-symbols-outlined { visibility: visible; }
 
-/* Only rendered/shown once the "Edit" pill in the header has switched
-   today's list into manage mode (see .mtl.is-managing above) — one
-   small edit + delete button stacked per event, at the same vertical
-   position as that event's own tick box. */
-.mtl__managecol { position: relative; grid-column: 5; }
-.mtl__managebtn {
-  position: absolute;
-  left: 0;
-  width: 26px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  background: #fff;
-}
-.mtl__managebtn img { width: 13px; height: 13px; }
-.mtl__managebtn--delete { background: #b3261e; color: #fff; font-size: 14px; font-weight: 700; }
-.mtl__managebtn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-
 @media (prefers-reduced-motion: reduce) {
   .addpill,
-  .editpill,
   .navpill,
   .planbtn,
   .calsheet,

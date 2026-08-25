@@ -78,87 +78,28 @@
     }).join('');
   }
 
-  /* Only a saved entry (one with an `id`) can be edited or deleted —
-     the three seed samples above are hardcoded, not localStorage
-     records, so there's nothing to update or remove them from. */
-  function manageControlsHtml(entry) {
-    if (!entry.id) return '';
-    return (
-      '<div class="entry__manage">' +
-        '<button type="button" class="entry__managebtn entry__managebtn--edit" data-edit-id="' + entry.id + '" ' +
-           'aria-label="Edit this entry">' +
-          '<img src="../assets/icon-edit.svg" alt="">' +
-        '</button>' +
-        '<button type="button" class="entry__managebtn entry__managebtn--delete" data-delete-id="' + entry.id + '" ' +
-           'aria-label="Delete this entry">' +
-          '<span aria-hidden="true">&times;</span>' +
-        '</button>' +
-      '</div>'
-    );
-  }
-
   function entryHtml(entry) {
     var titleHtml = entry.title ? '<p class="entry__title">' + richTextHtml(entry.title) + '</p>' : '';
     return (
       '<article class="entry">' +
         '<img class="entry__bg" src="../assets/journal-card-bg.svg" alt="">' +
-        manageControlsHtml(entry) +
         titleHtml +
         '<p class="entry__body">' + richTextHtml(entry.body) + '</p>' +
       '</article>'
     );
   }
 
-  var journalList = document.getElementById('journalList');
-  var managing = false;
+  var saved = loadSaved();
 
-  function renderAll() {
-    var saved = loadSaved();
-    var entries = saved.concat(SEED);
-    journalList.classList.toggle('is-managing', managing);
-    journalList.innerHTML = entries.map(entryHtml).join('');
-  }
-
-  (function foldInPending() {
-    var saved = loadSaved();
-    var pending = takePendingFromUrl();
-    if (!pending) return;
-    var existingIndex = saved.findIndex(function (e) { return e.id === pending.id; });
-    if (existingIndex === -1) saved.unshift(pending); else saved[existingIndex] = pending;
+  var pending = takePendingFromUrl();
+  if (pending && !saved.some(function (e) { return e.id === pending.id; })) {
+    saved.unshift(pending);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); } catch (e) { /* still render it below either way */ }
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', window.location.pathname);
     }
-  }());
+  }
 
-  renderAll();
-
-  var editToggle = document.getElementById('editJournalToggle');
-  var editToggleLabel = document.getElementById('editJournalToggleLabel');
-  editToggle.addEventListener('click', function () {
-    managing = !managing;
-    editToggle.classList.toggle('is-active', managing);
-    editToggle.setAttribute('aria-pressed', String(managing));
-    editToggleLabel.innerHTML = managing
-      ? '<span class="t-en">Done</span><span class="t-cn">完成</span>'
-      : '<span class="t-en">Edit</span><span class="t-cn">编辑</span>';
-    renderAll();
-  });
-
-  journalList.addEventListener('click', function (e) {
-    var editBtn = e.target.closest('button[data-edit-id]');
-    if (editBtn) {
-      window.location.href = 'add-journal.html?edit=' + encodeURIComponent(editBtn.dataset.editId);
-      return;
-    }
-
-    var deleteBtn = e.target.closest('button[data-delete-id]');
-    if (deleteBtn) {
-      if (!window.confirm('Delete this journal entry? 删除这篇日志？')) return;
-      var id = deleteBtn.dataset.deleteId;
-      var remaining = loadSaved().filter(function (e) { return e.id !== id; });
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining)); } catch (err) { /* best effort only */ }
-      renderAll();
-    }
-  });
+  var entries = saved.concat(SEED);
+  document.getElementById('journalList').innerHTML = entries.map(entryHtml).join('');
 }());

@@ -57,24 +57,6 @@
 
   var selectedIcon = null;
 
-  /* Editing an existing event reuses this same two-step flow rather than
-     a separate screen — calendar.js's own "Edit" toggle links here with
-     ?edit=<id>. Everything below prefills from that stored event; the
-     draft handed to add-event-continue.html then carries editId along
-     so its own Save updates the same record instead of creating a
-     second one. */
-  var EVENTS_KEY = 'guitu.calendarEvents';
-  function loadStoredEvents() {
-    try {
-      var raw = JSON.parse(localStorage.getItem(EVENTS_KEY));
-      return Array.isArray(raw) ? raw : [];
-    } catch (e) { return []; }
-  }
-  var editId = new URLSearchParams(window.location.search).get('edit');
-  var editingEvent = editId
-    ? loadStoredEvents().filter(function (ev) { return ev.id === editId; })[0] || null
-    : null;
-
   /* ------------------------------------------------------------- icon bar */
   ICONS.forEach(function (name) {
     var btn = document.createElement('button');
@@ -109,18 +91,6 @@
     titlePlaceholder.hidden = titleInput.value.length > 0;
   });
 
-  if (editingEvent) {
-    selectedIcon = editingEvent.icon;
-    iconDisplay.innerHTML = '<span class="material-symbols-outlined">' + editingEvent.icon + '</span>';
-    var matchingIconBtn = iconBar.querySelector('[data-icon="' + editingEvent.icon + '"]');
-    if (matchingIconBtn) {
-      matchingIconBtn.classList.add('is-selected');
-      matchingIconBtn.setAttribute('aria-selected', 'true');
-    }
-    titleInput.value = editingEvent.title;
-    titlePlaceholder.hidden = true;
-  }
-
   /* ------------------------------------------------------------------ date
      Plain query param, no persistence involved — "plan tomorrow" on
      calendar.html links here with ?day=1 to default the date picker to
@@ -133,7 +103,7 @@
   }
 
   var params = new URLSearchParams(window.location.search);
-  var dayParam = editingEvent ? editingEvent.day : parseInt(params.get('day'), 10);
+  var dayParam = parseInt(params.get('day'), 10);
   var defaultDate = new Date();
   if (dayParam === 1 || dayParam === 2) defaultDate.setDate(defaultDate.getDate() + dayParam);
   dateInput.value = toDateInputValue(defaultDate);
@@ -267,19 +237,10 @@
   var minuteWheel = buildWheel(document.getElementById('minuteWheel'), MINUTES);
   var ampmWheel = buildWheel(document.getElementById('ampmWheel'), AMPM);
 
-  if (editingEvent) {
-    var hour24 = Math.floor(editingEvent.start / 60);
-    var minute = editingEvent.start % 60;
-    var hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
-    hourWheel.init(hour12 - 1);
-    minuteWheel.init(minute);
-    ampmWheel.init(hour24 >= 12 ? 1 : 0);
-  } else {
-    // Default to 8:00 pm — the value Figma's own mock shows selected.
-    hourWheel.init(7);   // index 7 -> HOURS[7].value === 8
-    minuteWheel.init(0);
-    ampmWheel.init(1);   // index 1 -> AMPM[1].value === 'PM'
-  }
+  // Default to 8:00 pm — the value Figma's own mock shows selected.
+  hourWheel.init(7);   // index 7 -> HOURS[7].value === 8
+  minuteWheel.init(0);
+  ampmWheel.init(1);   // index 1 -> AMPM[1].value === 'PM'
 
   function wheelStartMinutes() {
     var hour12 = hourWheel.getValue();
@@ -315,10 +276,6 @@
     var thumbRight = frac * (trackW - THUMB_W) + THUMB_W;
     durationHighlight.style.width = Math.max(THUMB_W - HIGHLIGHT_LEFT, thumbRight - HIGHLIGHT_LEFT) + 'px';
   }
-  if (editingEvent) {
-    var durationIndex = DURATIONS.indexOf(editingEvent.duration);
-    durationInput.value = durationIndex === -1 ? 4 : durationIndex;
-  }
   paintDuration();
   durationInput.addEventListener('input', paintDuration);
   window.addEventListener('resize', paintDuration);
@@ -352,7 +309,6 @@
       time: startMinutes,
       duration: selectedDuration(),
     };
-    if (editingEvent) draft.editId = editingEvent.id;
 
     try {
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
