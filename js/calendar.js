@@ -255,17 +255,32 @@
      3-day overview above, just scaled taller with event text and a tick
      box beside each pill. Range shown is whatever covers today's events
      (rounded out to 3-hour boundaries), so an empty today renders nothing
-     here beyond the empty-state message. */
-  var todays = events.filter(function (ev) { return ev.day === 0; })
-    .sort(function (a, b) { return a.start - b.start; });
-  var todaysPlaced = assignColumns(todays);
+     here beyond the empty-state message.
 
-  if (!todays.length) {
-    var empty = document.createElement('p');
-    empty.className = 'today-panel__empty';
-    empty.innerHTML = 'Nothing planned yet — tap Add to plan today.<br>还没有日程，点击“添加”来安排今天吧。';
-    todayList.appendChild(empty);
-  } else {
+     Edit/delete only ever applies here, not the 3-day overview — this is
+     the one place an event actually has a readable title/time to attach
+     a control to. The header's own "Edit" pill (#editTodayToggle) flips
+     managingToday and calls this again; deleting an event reloads the
+     page outright afterwards instead of trying to patch both timelines
+     in place, since the 3-day overview's own lane pill for that event
+     needs to disappear too. */
+  var managingToday = false;
+
+  function renderTodayPanel() {
+    todayList.innerHTML = '';
+
+    var todays = events.filter(function (ev) { return ev.day === 0; })
+      .sort(function (a, b) { return a.start - b.start; });
+    var todaysPlaced = assignColumns(todays);
+
+    if (!todays.length) {
+      var empty = document.createElement('p');
+      empty.className = 'today-panel__empty';
+      empty.innerHTML = 'Nothing planned yet — tap Add to plan today.<br>还没有日程，点击“添加”来安排今天吧。';
+      todayList.appendChild(empty);
+      return;
+    }
+
     var minStart = todays.reduce(function (m, ev) { return Math.min(m, ev.start); }, todays[0].start);
     var maxEnd = todays.reduce(function (m, ev) { return Math.max(m, ev.start + ev.duration); }, 0);
     var rangeStart = Math.max(0, Math.floor(minStart / 60 / 3) * 3);
@@ -274,7 +289,7 @@
     var mtlHeight = (rangeEnd - rangeStart) * HOUR_PX;
 
     var mtl = document.createElement('div');
-    mtl.className = 'mtl';
+    mtl.className = 'mtl' + (managingToday ? ' is-managing' : '');
     mtl.style.height = mtlHeight + 'px';
 
     var mtlAxis = document.createElement('div');
@@ -300,6 +315,10 @@
     var mtlTickCol = document.createElement('div');
     mtlTickCol.className = 'mtl__tickcol';
     mtlTickCol.style.height = mtlHeight + 'px';
+
+    var mtlManageCol = document.createElement('div');
+    mtlManageCol.className = 'mtl__managecol';
+    mtlManageCol.style.height = mtlHeight + 'px';
 
     var prevEndPx = 0;
     todaysPlaced.forEach(function (placed) {
@@ -356,14 +375,56 @@
         tick.setAttribute('aria-checked', String(ev.done));
       });
       mtlTickCol.appendChild(tick);
+
+      if (managingToday) {
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'mtl__managebtn mtl__managebtn--edit';
+        editBtn.style.top = (topPx + heightPx / 2 - 25 + col * 6) + 'px';
+        editBtn.setAttribute('aria-label', 'Edit ' + ev.title);
+        editBtn.innerHTML = '<img src="../assets/icon-edit.svg" alt="">';
+        editBtn.addEventListener('click', function () {
+          window.location.href = 'add-event.html?edit=' + encodeURIComponent(ev.id);
+        });
+        mtlManageCol.appendChild(editBtn);
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'mtl__managebtn mtl__managebtn--delete';
+        deleteBtn.style.top = (topPx + heightPx / 2 + 1 + col * 6) + 'px';
+        deleteBtn.setAttribute('aria-label', 'Delete ' + ev.title);
+        deleteBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
+        deleteBtn.addEventListener('click', function () {
+          if (!window.confirm('Delete this event? 删除这个日程？')) return;
+          var remaining = events.filter(function (e) { return e.id !== ev.id; });
+          saveEvents(remaining);
+          window.location.reload();
+        });
+        mtlManageCol.appendChild(deleteBtn);
+      }
     });
 
     mtl.appendChild(mtlAxis);
     mtl.appendChild(mtlRail);
     mtl.appendChild(mtlBody);
     mtl.appendChild(mtlTickCol);
+    mtl.appendChild(mtlManageCol);
     todayList.appendChild(mtl);
   }
+
+  renderTodayPanel();
+
+  var editTodayToggle = document.getElementById('editTodayToggle');
+  var editTodayToggleLabel = document.getElementById('editTodayToggleLabel');
+  editTodayToggle.addEventListener('click', function () {
+    managingToday = !managingToday;
+    editTodayToggle.classList.toggle('is-active', managingToday);
+    editTodayToggle.setAttribute('aria-pressed', String(managingToday));
+    editTodayToggleLabel.innerHTML = managingToday
+      ? '<span class="t-en">Done</span><span class="t-cn">完成</span>'
+      : '<span class="t-en">Edit</span><span class="t-cn">编辑</span>';
+    renderTodayPanel();
+  });
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (c) {
