@@ -8,8 +8,17 @@
    Save → validates the name, writes a contact object to localStorage
    ("guitu.contacts", the same key contacts.js reads) and navigates to
    contacts.html, where the new contact appears ahead of the "+ Add" card —
-   in Family or Friends depending on which group's Add card was clicked
-   (contacts.js links here with ?group=family or ?group=friends).
+   in Family or Friends depending on which group's Add card was clicked.
+   That handoff used to ride a ?group=family/friends URL query param, but
+   a static host/dev-server that redirects away a page's .html extension
+   (e.g. `serve`'s default "clean URLs", including on Vercel's own
+   production hosting) can drop the query string entirely when it
+   rewrites the URL — silently losing which group was picked and always
+   falling back to Friends. contacts.js now hands the group off via
+   sessionStorage instead (guitu.addContactGroup), the same pattern
+   guitu.callTarget/guitu.addEventDraft already use elsewhere in this
+   app, which survives that redirect untouched; the URL param is kept
+   only as a fallback for a directly-typed/bookmarked link.
 
    Some browsers (Firefox, notably) disable localStorage entirely for
    file:// pages and throw on the first write — with no build step this
@@ -35,7 +44,10 @@
   var IS_CN = document.body.dataset.variant === 'cn';
 
   function targetGroup() {
-    var g = new URLSearchParams(window.location.search).get('group');
+    var fromSession = null;
+    try { fromSession = sessionStorage.getItem('guitu.addContactGroup'); } catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem('guitu.addContactGroup'); } catch (e) { /* ignore */ }
+    var g = fromSession || new URLSearchParams(window.location.search).get('group');
     return g === 'family' ? 'family' : 'friends';
   }
 

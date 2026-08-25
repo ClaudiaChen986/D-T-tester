@@ -130,11 +130,21 @@
            'style="--iw:408.19px;--ih:283.65px;--ix:-163.27px;--iy:-29.92px">' +
     '</span>';
 
+  /* Which group's own Add card was tapped rides sessionStorage
+     (guitu.addContactGroup), the same handoff pattern guitu.callTarget
+     already uses below — not a ?group= URL query param. A static
+     host/dev-server that redirects away this page's .html extension
+     (e.g. `serve`'s default "clean URLs", including on Vercel's own
+     production hosting) can drop query strings on that redirect,
+     silently losing which group was picked and always landing the new
+     contact in Friends; sessionStorage survives that untouched. The
+     link still carries ?group= too, purely as a fallback for a
+     directly-typed/bookmarked add-contact.html link. */
   function addCardHtml(group) {
     var addLabel = LANG === 'en' ? 'Add contact' : LANG === 'cn' ? '添加联系人' : 'Add contact 添加联系人';
     return (
       '<a class="card card--add" href="' + langPath('add-contact.html') + '?group=' + group + '" ' +
-         'aria-label="' + addLabel + '">' +
+         'data-add-group="' + group + '" aria-label="' + addLabel + '">' +
         ADD_ICON_CROP +
         '<p class="card__name"><span class="t-en">Add</span><span class="t-cn">添加</span></p>' +
       '</a>'
@@ -163,6 +173,12 @@
   renderGrid(document.getElementById('friendsGrid'), SEED_FRIENDS, 'friends', saved);
 
   document.addEventListener('click', function (e) {
+    var addLink = e.target.closest('a[data-add-group]');
+    if (addLink) {
+      try { sessionStorage.setItem('guitu.addContactGroup', addLink.dataset.addGroup); } catch (err) { /* best effort only — the ?group= URL fallback still applies */ }
+      return;
+    }
+
     var link = e.target.closest('a[data-call-index]');
     if (!link) return;
     var contact = CALL_TARGETS[Number(link.dataset.callIndex)];
